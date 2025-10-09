@@ -32,7 +32,9 @@ The development server runs at http://localhost:3000.
 ### Framework & Routing
 - **Next.js 15** with App Router (`app/` directory)
 - Server Components by default (RSC enabled)
-- Pages are defined in `app/page.tsx`, layout in `app/layout.tsx`
+- Pages: `app/page.tsx` (home), `app/goals/page.tsx` (goals list), `app/goals/[id]/page.tsx` (goal detail)
+- Layout in `app/layout.tsx`
+- Loading states: `loading.tsx` files for Suspense boundaries
 
 ### Styling
 - **Tailwind CSS v4** with PostCSS
@@ -46,11 +48,16 @@ The development server runs at http://localhost:3000.
 - Configuration in `components.json`
 - Uses Lucide icons (`lucide-react`)
 - Utility function `cn()` in `lib/utils.ts` combines `clsx` and `tailwind-merge`
+- Custom components: `components/goal-card.tsx`, `components/app-sidebar.tsx`
 
 ### Path Aliases
 Configured in `tsconfig.json`:
 - `@/*` - Root directory (e.g., `@/components`, `@/lib`)
 - Shadcn aliases: `@/components/ui`, `@/lib/utils`, `@/hooks`
+
+### Hooks
+Custom React hooks in `hooks/`:
+- `use-mobile.ts` - Responsive design hook for mobile detection
 
 ### Fonts
 Uses Next.js font optimization with Geist and Geist Mono fonts from Google Fonts.
@@ -85,15 +92,17 @@ In-memory mock data stored in `lib/mock-data.ts` for development. This will be r
 ## Component Patterns
 
 ### Server vs Client Components
-- **Server Components** (default): Used for data fetching and static UI (e.g., `app/page.tsx`)
-- **Client Components** (`"use client"`): Required for interactivity, dialogs, event handlers (e.g., `components/goal-card.tsx`)
+- **Server Components** (default): Used for data fetching and static UI (e.g., `app/page.tsx`, `app/goals/page.tsx`, `app/goals/[id]/page.tsx`, `components/goal-card.tsx`)
+- **Client Components** (`"use client"`): Required for interactivity, state, event handlers (e.g., `components/app-sidebar.tsx`)
 - Server Components fetch from API routes using native `fetch()` with `cache: "no-store"`
+- Use `loading.tsx` files for Suspense boundaries and loading states
 
 ### Interactive Cards
-Pattern for clickable cards with dialogs:
-- Wrap shadcn/ui `Card` in `Dialog` + `DialogTrigger`
+Pattern for clickable cards with navigation:
+- Wrap shadcn/ui `Card` in Next.js `Link` component
 - Add visual indicators (hover effects, chevron icon) to show interactivity
 - Use `cursor-pointer` and `hover:shadow-lg` for affordance
+- Chevron animates on hover with `group-hover:translate-x-1`
 
 ## Code Style
 

@@ -7,14 +7,14 @@ export const mockGoals: Goal[] = [
     description: "Master Next.js 15 with App Router and Server Components",
   },
   {
-    id: "2",
-    title: "Build Goal Tracker",
-    description: "Create a full-featured goal tracking application",
-  },
-  {
     id: "3",
     title: "Improve TypeScript Skills",
     description: "Become proficient in advanced TypeScript patterns",
+  },
+  {
+    id: "2",
+    title: "Build Goal Tracker",
+    description: "Create a full-featured goal tracking application",
   },
 ];
 
