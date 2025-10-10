@@ -32,7 +32,7 @@ The development server runs at http://localhost:3000.
 ### Framework & Routing
 - **Next.js 15** with App Router (`app/` directory)
 - Server Components by default (RSC enabled)
-- Pages: `app/page.tsx` (home), `app/goals/page.tsx` (goals list), `app/goals/[id]/page.tsx` (goal detail), `app/goals/[id]/[subgoalId]/page.tsx` (subgoal detail)
+- Pages: `app/page.tsx` (home), `app/progress/page.tsx` (progress tracking), `app/goals/page.tsx` (goals list), `app/goals/[id]/page.tsx` (goal detail), `app/goals/[id]/[subgoalId]/page.tsx` (subgoal detail)
 - Layout in `app/layout.tsx`
 - Loading states: `loading.tsx` files for Suspense boundaries
 
@@ -92,7 +92,7 @@ In-memory mock data stored in `lib/mock-data.ts` for development. This will be r
 ## Component Patterns
 
 ### Server vs Client Components
-- **Server Components** (default): Used for data fetching and static UI (e.g., `app/page.tsx`, `app/goals/page.tsx`, `app/goals/[id]/page.tsx`, `app/goals/[id]/[subgoalId]/page.tsx`, `components/goal-card.tsx`)
+- **Server Components** (default): Used for data fetching and static UI (e.g., `app/page.tsx`, `app/progress/page.tsx`, `app/goals/page.tsx`, `app/goals/[id]/page.tsx`, `app/goals/[id]/[subgoalId]/page.tsx`, `components/goal-card.tsx`)
 - **Client Components** (`"use client"`): Required for interactivity, state, event handlers (e.g., `components/app-sidebar.tsx`)
 - Server Components fetch from API routes using native `fetch()` with `cache: "no-store"`
 - Use `loading.tsx` files for Suspense boundaries and loading states

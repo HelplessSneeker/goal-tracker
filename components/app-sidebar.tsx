@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Goal, Subgoal } from "@/lib/types";
-import { ChevronRight, Target, ChevronsDownUp } from "lucide-react";
+import { ChevronRight, Target, ChevronsDownUp, TrendingUp } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -131,6 +131,18 @@ export function AppSidebar() {
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === "/progress"}
+                  tooltip="Progress"
+                >
+                  <Link href="/progress">
+                    <TrendingUp />
+                    <span>Progress</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               <Collapsible
                 open={isGoalsOpen}
                 className="group/collapsible"
