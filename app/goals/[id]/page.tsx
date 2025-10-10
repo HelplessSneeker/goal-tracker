@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { notFound } from "next/navigation";
 
 async function getGoal(id: string): Promise<Goal | null> {
@@ -58,9 +58,9 @@ export default async function GoalDetailPage({
   const subgoals = await getSubgoals(id);
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
+    <div className="container mx-auto p-6 max-w-4xl animate-fade-in">
       <Link
-        href="/"
+        href="/goals"
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
       >
         <ChevronLeft className="h-4 w-4 mr-1" />
@@ -77,12 +77,25 @@ export default async function GoalDetailPage({
         {subgoals.length > 0 ? (
           <div className="grid gap-4">
             {subgoals.map((subgoal) => (
-              <Card key={subgoal.id}>
-                <CardHeader>
-                  <CardTitle className="text-lg">{subgoal.title}</CardTitle>
-                  <CardDescription>{subgoal.description}</CardDescription>
-                </CardHeader>
-              </Card>
+              <Link
+                key={subgoal.id}
+                href={`/goals/${id}/${subgoal.id}`}
+                className="group block transition-all hover:scale-[1.02]"
+              >
+                <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-lg">
+                          {subgoal.title}
+                        </CardTitle>
+                        <CardDescription>{subgoal.description}</CardDescription>
+                      </div>
+                      <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                    </div>
+                  </CardHeader>
+                </Card>
+              </Link>
             ))}
           </div>
         ) : (
