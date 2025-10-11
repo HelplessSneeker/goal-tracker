@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Goal Tracker",
-  description: "Track your goals and subgoals",
+  description: "Track your goals and regions",
 };
 
 export default function RootLayout({

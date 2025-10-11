@@ -4,7 +4,7 @@ export interface Goal {
   description: string;
 }
 
-export interface Subgoal {
+export interface Region {
   id: string;
   goalId: string;
   title: string;

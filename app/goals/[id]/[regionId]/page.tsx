@@ -1,4 +1,4 @@
-import { Subgoal } from "@/lib/types";
+import { Region } from "@/lib/types";
 import {
   Card,
   CardDescription,
@@ -9,10 +9,10 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 
-async function getSubgoal(subgoalId: string): Promise<Subgoal | null> {
+async function getRegion(regionId: string): Promise<Region | null> {
   try {
     const res = await fetch(
-      `http://localhost:3000/api/subgoals/${subgoalId}`,
+      `http://localhost:3000/api/regions/${regionId}`,
       {
         cache: "no-store",
       }
@@ -22,20 +22,20 @@ async function getSubgoal(subgoalId: string): Promise<Subgoal | null> {
     }
     return res.json();
   } catch (error) {
-    console.error("Failed to fetch subgoal:", error);
+    console.error("Failed to fetch region:", error);
     return null;
   }
 }
 
-export default async function SubgoalDetailPage({
+export default async function RegionDetailPage({
   params,
 }: {
-  params: Promise<{ id: string; subgoalId: string }>;
+  params: Promise<{ id: string; regionId: string }>;
 }) {
-  const { id, subgoalId } = await params;
-  const subgoal = await getSubgoal(subgoalId);
+  const { id, regionId } = await params;
+  const region = await getRegion(regionId);
 
-  if (!subgoal) {
+  if (!region) {
     notFound();
   }
 
@@ -51,9 +51,9 @@ export default async function SubgoalDetailPage({
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-3xl">{subgoal.title}</CardTitle>
+          <CardTitle className="text-3xl">{region.title}</CardTitle>
           <CardDescription className="text-base">
-            {subgoal.description}
+            {region.description}
           </CardDescription>
         </CardHeader>
       </Card>

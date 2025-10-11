@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { Goal, Subgoal } from "@/lib/types";
+import { usePathname } from "next/navigation";
+import { Goal, Region } from "@/lib/types";
 import { ChevronRight, Target, ChevronsDownUp, TrendingUp } from "lucide-react";
 import {
   Sidebar,
@@ -18,21 +18,17 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
   SidebarTrigger,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { useEffect, useState } from "react";
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { state } = useSidebar();
   const [goals, setGoals] = useState<Goal[]>([]);
-  const [subgoals, setSubgoals] = useState<Subgoal[]>([]);
+  const [regions, setRegions] = useState<Region[]>([]);
   const [openGoals, setOpenGoals] = useState<Set<string>>(new Set());
 
   const [isGoalsOpen, setIsGoalsOpen] = useState(false);
@@ -40,9 +36,9 @@ export function AppSidebar() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [goalsRes, subgoalsRes] = await Promise.all([
+        const [goalsRes, regionsRes] = await Promise.all([
           fetch("/api/goals", { cache: "no-store" }),
-          fetch("/api/subgoals", { cache: "no-store" }),
+          fetch("/api/regions", { cache: "no-store" }),
         ]);
 
         if (goalsRes.ok) {
@@ -50,9 +46,9 @@ export function AppSidebar() {
           setGoals(goalsData);
         }
 
-        if (subgoalsRes.ok) {
-          const subgoalsData = await subgoalsRes.json();
-          setSubgoals(subgoalsData);
+        if (regionsRes.ok) {
+          const regionsData = await regionsRes.json();
+          setRegions(regionsData);
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -66,7 +62,7 @@ export function AppSidebar() {
     if (pathname.startsWith("/goals")) {
       setIsGoalsOpen(true);
 
-      // If on a subgoal page, open that goal
+      // If on a region page, open that goal
       const pathParts = pathname.split("/");
       if (pathParts.length >= 4 && pathParts[1] === "goals") {
         const goalId = pathParts[2];
@@ -101,8 +97,8 @@ export function AppSidebar() {
     });
   };
 
-  const getSubgoalsForGoal = (goalId: string) => {
-    return subgoals.filter((subgoal) => subgoal.goalId === goalId);
+  const getRegionsForGoal = (goalId: string) => {
+    return regions.filter((region) => region.goalId === goalId);
   };
 
   const collapseAll = () => {
@@ -171,9 +167,9 @@ export function AppSidebar() {
                     <SidebarMenuSub>
                       {goals.length > 0 &&
                         goals.map((goal) => {
-                          const goalSubgoals = getSubgoalsForGoal(goal.id);
+                          const goalRegions = getRegionsForGoal(goal.id);
                           const isGoalOpen = openGoals.has(goal.id);
-                          const hasSubgoals = goalSubgoals.length > 0;
+                          const hasRegions = goalRegions.length > 0;
 
                           return (
                             <Collapsible
@@ -192,7 +188,7 @@ export function AppSidebar() {
                                       <span>{goal.title}</span>
                                     </Link>
                                   </SidebarMenuSubButton>
-                                  {hasSubgoals && (
+                                  {hasRegions && (
                                     <button
                                       onClick={(e) => toggleGoal(goal.id, e)}
                                       className="absolute right-2 p-1 hover:bg-sidebar-accent rounded-sm cursor-pointer"
@@ -201,22 +197,22 @@ export function AppSidebar() {
                                     </button>
                                   )}
                                 </div>
-                                {hasSubgoals && (
+                                {hasRegions && (
                                   <CollapsibleContent>
                                     <SidebarMenuSub>
-                                      {goalSubgoals.map((subgoal) => (
-                                        <SidebarMenuSubItem key={subgoal.id}>
+                                      {goalRegions.map((region) => (
+                                        <SidebarMenuSubItem key={region.id}>
                                           <SidebarMenuSubButton
                                             asChild
                                             isActive={
                                               pathname ===
-                                              `/goals/${goal.id}/${subgoal.id}`
+                                              `/goals/${goal.id}/${region.id}`
                                             }
                                           >
                                             <Link
-                                              href={`/goals/${goal.id}/${subgoal.id}`}
+                                              href={`/goals/${goal.id}/${region.id}`}
                                             >
-                                              <span>{subgoal.title}</span>
+                                              <span>{region.title}</span>
                                             </Link>
                                           </SidebarMenuSubButton>
                                         </SidebarMenuSubItem>

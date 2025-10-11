@@ -1,4 +1,4 @@
-import { Goal, Subgoal } from "./types";
+import { Goal, Region } from "./types";
 
 export const mockGoals: Goal[] = [
   {
@@ -18,7 +18,7 @@ export const mockGoals: Goal[] = [
   },
 ];
 
-export const mockSubgoals: Subgoal[] = [
+export const mockRegions: Region[] = [
   {
     id: "1",
     goalId: "1",

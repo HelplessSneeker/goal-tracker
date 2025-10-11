@@ -1,4 +1,4 @@
-import { Goal, Subgoal } from "@/lib/types";
+import { Goal, Region } from "@/lib/types";
 import {
   Card,
   CardContent,
@@ -25,10 +25,10 @@ async function getGoal(id: string): Promise<Goal | null> {
   }
 }
 
-async function getSubgoals(goalId: string): Promise<Subgoal[]> {
+async function getRegions(goalId: string): Promise<Region[]> {
   try {
     const res = await fetch(
-      `http://localhost:3000/api/subgoals?goalId=${goalId}`,
+      `http://localhost:3000/api/regions?goalId=${goalId}`,
       {
         cache: "no-store",
       }
@@ -38,7 +38,7 @@ async function getSubgoals(goalId: string): Promise<Subgoal[]> {
     }
     return res.json();
   } catch (error) {
-    console.error("Failed to fetch subgoals:", error);
+    console.error("Failed to fetch regions:", error);
     return [];
   }
 }
@@ -55,7 +55,7 @@ export default async function GoalDetailPage({
     notFound();
   }
 
-  const subgoals = await getSubgoals(id);
+  const regions = await getRegions(id);
 
   return (
     <div className="container mx-auto p-6 max-w-4xl animate-fade-in">
@@ -73,13 +73,13 @@ export default async function GoalDetailPage({
       </div>
 
       <div>
-        <h2 className="text-2xl font-semibold mb-4">Subgoals</h2>
-        {subgoals.length > 0 ? (
+        <h2 className="text-2xl font-semibold mb-4">Regions</h2>
+        {regions.length > 0 ? (
           <div className="grid gap-4">
-            {subgoals.map((subgoal) => (
+            {regions.map((region) => (
               <Link
-                key={subgoal.id}
-                href={`/goals/${id}/${subgoal.id}`}
+                key={region.id}
+                href={`/goals/${id}/${region.id}`}
                 className="group block transition-all hover:scale-[1.02]"
               >
                 <Card className="cursor-pointer hover:shadow-lg transition-shadow">
@@ -87,9 +87,9 @@ export default async function GoalDetailPage({
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <CardTitle className="text-lg">
-                          {subgoal.title}
+                          {region.title}
                         </CardTitle>
-                        <CardDescription>{subgoal.description}</CardDescription>
+                        <CardDescription>{region.description}</CardDescription>
                       </div>
                       <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
                     </div>
@@ -102,7 +102,7 @@ export default async function GoalDetailPage({
           <Card>
             <CardContent className="pt-6">
               <p className="text-muted-foreground text-center">
-                No subgoals for this goal yet.
+                No regions for this goal yet.
               </p>
             </CardContent>
           </Card>
