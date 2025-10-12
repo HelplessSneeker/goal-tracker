@@ -1,5 +1,8 @@
 import { Goal, Region } from "@/lib/types";
-import { GoalCard } from "@/components/goal-card";
+import { GoalCard } from "@/components/goals/goal-card";
+import Link from "next/link";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 async function getGoals(): Promise<Goal[]> {
   const res = await fetch("http://localhost:3000/api/goals", {
@@ -27,13 +30,19 @@ export default async function GoalsPage() {
 
   return (
     <div className="container mx-auto p-6 animate-fade-in">
-      <h1 className="text-3xl font-bold mb-6">My Goals</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold">My Goals</h1>
+        <Link href="/goals/create">
+          <Button size="sm" className="gap-2">
+            <Plus className="h-4 w-4" />
+            New Goal
+          </Button>
+        </Link>
+      </div>
       <div className="grid gap-4 md:grid-cols-2">
         {goals.map((goal) => {
           const goalRegions = regions.filter((r) => r.goalId === goal.id);
-          return (
-            <GoalCard key={goal.id} goal={goal} regions={goalRegions} />
-          );
+          return <GoalCard key={goal.id} goal={goal} regions={goalRegions} />;
         })}
       </div>
     </div>

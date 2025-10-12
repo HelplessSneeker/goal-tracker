@@ -9,6 +9,7 @@ import {
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { notFound } from "next/navigation";
+import { GoalDetailHeader } from "@/components/goals/goal-detail-header";
 
 async function getGoal(id: string): Promise<Goal | null> {
   try {
@@ -31,7 +32,7 @@ async function getRegions(goalId: string): Promise<Region[]> {
       `http://localhost:3000/api/regions?goalId=${goalId}`,
       {
         cache: "no-store",
-      }
+      },
     );
     if (!res.ok) {
       return [];
@@ -67,10 +68,7 @@ export default async function GoalDetailPage({
         Back to Goals
       </Link>
 
-      <div className="mb-6">
-        <h1 className="text-4xl font-bold mb-2">{goal.title}</h1>
-        <p className="text-lg text-muted-foreground">{goal.description}</p>
-      </div>
+      <GoalDetailHeader goal={goal} />
 
       <div>
         <h2 className="text-2xl font-semibold mb-4">Regions</h2>
