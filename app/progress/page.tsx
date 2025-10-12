@@ -1,4 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default async function ProgressPage() {
   return (
@@ -12,7 +18,7 @@ export default async function ProgressPage() {
         <Card>
           <CardHeader>
             <CardTitle>Total Goals</CardTitle>
-            <CardDescription>All goals you've created</CardDescription>
+            <CardDescription>All goals you&apos;ve created</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">0</div>
@@ -22,7 +28,7 @@ export default async function ProgressPage() {
         <Card>
           <CardHeader>
             <CardTitle>Completed Goals</CardTitle>
-            <CardDescription>Goals you've finished</CardDescription>
+            <CardDescription>Goals you&apos;ve finished</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">0</div>
@@ -32,7 +38,7 @@ export default async function ProgressPage() {
         <Card>
           <CardHeader>
             <CardTitle>In Progress</CardTitle>
-            <CardDescription>Goals you're working on</CardDescription>
+            <CardDescription>Goals you&apos;re working on</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">0</div>

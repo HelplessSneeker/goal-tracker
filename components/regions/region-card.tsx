@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -42,7 +41,11 @@ export function RegionCard({ region, goalId }: RegionCardProps) {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Link href={`/goals/${goalId}/${region.id}`}>
-                      <Button size="sm" variant="outline" className="h-9 w-9 p-0">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-9 w-9 p-0"
+                      >
                         <Eye className="h-4 w-4" />
                       </Button>
                     </Link>
@@ -57,7 +60,11 @@ export function RegionCard({ region, goalId }: RegionCardProps) {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Link href={`/goals/${goalId}/${region.id}/edit`}>
-                      <Button size="sm" variant="outline" className="h-9 w-9 p-0">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-9 w-9 p-0"
+                      >
                         <Pencil className="h-4 w-4" />
                       </Button>
                     </Link>
