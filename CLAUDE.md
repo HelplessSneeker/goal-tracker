@@ -28,8 +28,8 @@ This application implements a hierarchical goal management system designed to he
 
 **Implementation Status:**
 - ✅ Goals (CRUD complete - filtering/search pending)
-- ⏳ Regions (in progress - missing: edit, delete, filtering)
-- ⏳ Tasks (TODO)
+- ✅ Regions (CRUD complete - filtering/search pending)
+- ⏳ Tasks (TODO - next priority)
 - ⏳ Weekly Tasks (TODO)
 - ⏳ Progress Entries (TODO)
 - ⏳ Weekly review workflow (TODO)
@@ -70,7 +70,9 @@ The development server runs at http://localhost:3000.
   - `app/goals/create/page.tsx` - Create goal (Client Component)
   - `app/goals/[id]/page.tsx` - Goal detail (Server Component)
   - `app/goals/[id]/edit/page.tsx` - Edit goal (Client Component)
-  - `app/goals/[id]/[regionId]/page.tsx` - Region detail
+  - `app/goals/[id]/addRegion/page.tsx` - Create region (Client Component)
+  - `app/goals/[id]/[regionId]/page.tsx` - Region detail (Server Component)
+  - `app/goals/[id]/[regionId]/edit/page.tsx` - Edit region (Client Component)
 - Layout in `app/layout.tsx`
 - Loading states: `loading.tsx` files for Suspense boundaries
 
@@ -93,6 +95,10 @@ The development server runs at http://localhost:3000.
     - `goal-detail-header.tsx` - Goal detail page header with edit/delete actions
     - `goal-form.tsx` - Reusable form for create/edit (handles both modes)
     - `delete-goal-dialog.tsx` - Confirmation dialog for goal deletion
+  - `components/regions/` - Region-related components
+    - `region-card.tsx` - Region card with Eye, Edit, Delete action buttons (uses tooltips)
+    - `region-form.tsx` - Reusable form for create/edit (handles both modes)
+    - `delete-region-dialog.tsx` - Confirmation dialog requiring region name to be typed
 
 ### Path Aliases
 Configured in `tsconfig.json`:
@@ -128,12 +134,12 @@ Goal (1) ──> Region (n) ──> Task (n) ──> Weekly Task (n, 3 per week)
 - `PUT /api/goals/[id]` - Update goal ✅
 - `DELETE /api/goals/[id]` - Delete goal ✅
 
-**Regions:** ⏳ In Progress
+**Regions:** ✅ Complete
 - `GET /api/regions?goalId={id}` - List regions (optional filter by goalId) ✅
 - `POST /api/regions` - Create a region ✅
 - `GET /api/regions/[id]` - Get specific region ✅
-- `PUT /api/regions/[id]` - Update region ⏳ (endpoint exists, UI missing)
-- `DELETE /api/regions/[id]` - Delete region ⏳ (endpoint exists, UI missing)
+- `PUT /api/regions/[id]` - Update region ✅
+- `DELETE /api/regions/[id]` - Delete region ✅
 
 **Tasks:** ⏳ TODO
 - `GET /api/tasks?regionId={id}` - List tasks for a region
@@ -182,12 +188,21 @@ In-memory mock data stored in `lib/mock-data.ts` for development. This will be r
 - Use `loading.tsx` files for Suspense boundaries and loading states
 - Nested dynamic routes follow the pattern: `/goals/[id]/[regionId]` for hierarchical navigation
 
-### Interactive Cards
-Pattern for clickable cards with navigation:
-- Wrap shadcn/ui `Card` in Next.js `Link` component
-- Add visual indicators (hover effects, chevron icon) to show interactivity
-- Use `cursor-pointer` and `hover:shadow-lg` for affordance
-- Chevron animates on hover with `group-hover:translate-x-1`
+### Interactive Cards & Action Buttons
+Two patterns for cards:
+
+1. **Clickable Navigation Cards** (Goals):
+   - Wrap shadcn/ui `Card` in Next.js `Link` component
+   - Add visual indicators (hover effects, chevron icon) to show interactivity
+   - Use `cursor-pointer` and `hover:shadow-lg` for affordance
+   - Chevron animates on hover with `group-hover:translate-x-1`
+
+2. **Cards with Action Buttons** (Regions):
+   - Card contains multiple action buttons (View, Edit, Delete)
+   - Use icon-only buttons with tooltips for compact layout
+   - Eye icon (view), Pencil icon (edit), Trash icon (delete)
+   - Delete button uses `hover:bg-destructive` for visual warning
+   - Each button links to appropriate route or triggers dialog
 
 ## Code Style
 

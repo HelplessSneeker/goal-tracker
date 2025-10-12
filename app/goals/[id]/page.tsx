@@ -7,9 +7,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, Plus } from "lucide-react";
 import { notFound } from "next/navigation";
 import { GoalDetailHeader } from "@/components/goals/goal-detail-header";
+import { Button } from "@/components/ui/button";
+import { RegionCard } from "@/components/regions/region-card";
 
 async function getGoal(id: string): Promise<Goal | null> {
   try {
@@ -71,29 +73,19 @@ export default async function GoalDetailPage({
       <GoalDetailHeader goal={goal} />
 
       <div>
-        <h2 className="text-2xl font-semibold mb-4">Regions</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-semibold">Regions</h2>
+          <Link href={`/goals/${id}/addRegion`}>
+            <Button size="sm" className="gap-2">
+              <Plus className="h-4 w-4" />
+              New Region
+            </Button>
+          </Link>
+        </div>
         {regions.length > 0 ? (
           <div className="grid gap-4">
             {regions.map((region) => (
-              <Link
-                key={region.id}
-                href={`/goals/${id}/${region.id}`}
-                className="group block transition-all hover:scale-[1.02]"
-              >
-                <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <CardTitle className="text-lg">
-                          {region.title}
-                        </CardTitle>
-                        <CardDescription>{region.description}</CardDescription>
-                      </div>
-                      <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
-                    </div>
-                  </CardHeader>
-                </Card>
-              </Link>
+              <RegionCard key={region.id} region={region} goalId={id} />
             ))}
           </div>
         ) : (

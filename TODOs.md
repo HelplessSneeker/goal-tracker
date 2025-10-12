@@ -29,23 +29,31 @@ The system follows a 4-level hierarchy:
   - [x] Redirects to `/goals` after deletion
   - Note: Currently deletes goal only, cascade behavior to be implemented with Tasks phase
 
-### Regions - CRUD Operations
+### Regions - CRUD Operations ✅
 - [x] Create region (API + UI)
+  - [x] API: `POST /api/regions`
+  - [x] UI: `/goals/[id]/addRegion` page with RegionForm component
 - [x] Read/List regions (API + UI)
+  - [x] API: `GET /api/regions?goalId={id}`
+  - [x] UI: Goal detail page with RegionCard components
 - [x] Get single region (API + UI)
-- [ ] Update region (API exists, UI missing)
-  - [ ] Add edit button on region detail page
-  - [ ] Create edit region form/modal
-  - [ ] Wire up PUT endpoint
-- [ ] Delete region (API exists, UI missing)
-  - [ ] Add delete button with confirmation dialog
-  - [ ] Wire up DELETE endpoint
-  - [ ] Handle cascade delete (what happens to tasks?)
+  - [x] API: `GET /api/regions/[id]`
+  - [x] UI: `/goals/[id]/[regionId]` page
+- [x] Update region (API + UI)
+  - [x] API: `PUT /api/regions/[id]`
+  - [x] UI: `/goals/[id]/[regionId]/edit` page with RegionForm component
+  - [x] Edit button (pencil icon) on region cards
+- [x] Delete region (API + UI)
+  - [x] API: `DELETE /api/regions/[id]`
+  - [x] UI: Delete button (trash icon) with DeleteRegionDialog confirmation
+  - [x] Requires typing region name for confirmation
+  - [x] Warns about cascade deletion of tasks, weekly tasks, and progress entries
+  - [x] Redirects to goal detail page after deletion
 
 ### Additional Features for Goals/Regions
 - [x] Add "Create" buttons/forms on relevant pages
   - [x] "Add Goal" button on `/goals` page → links to `/goals/create`
-  - [ ] "Add Region" button on `/goals/[id]` page
+  - [x] "Add Region" button on `/goals/[id]` page → links to `/goals/[id]/addRegion`
 - [ ] Add filtering/search functionality
 - [ ] Add sorting options
 - [ ] Improve empty states with clear CTAs
@@ -56,6 +64,10 @@ The system follows a 4-level hierarchy:
   - [x] `goal-detail-header.tsx` - Header with edit/delete actions
   - [x] `goal-form.tsx` - Reusable form for create/edit operations
   - [x] `delete-goal-dialog.tsx` - Confirmation dialog for deletion
+- [x] Region components organized in `components/regions/` directory
+  - [x] `region-card.tsx` - Displays region with Eye, Edit, Delete action buttons
+  - [x] `region-form.tsx` - Reusable form for create/edit operations
+  - [x] `delete-region-dialog.tsx` - Confirmation dialog with name verification
 
 ---
 
@@ -363,12 +375,12 @@ Currently using in-memory mock data. Need real persistence.
 
 ## Immediate Next Steps (Recommended Priority)
 
-1. **Complete Goals & Regions CRUD** (Phase 1)
-   - Add edit/delete UI for goals
-   - Add edit/delete UI for regions
-   - Add create buttons/forms
+1. ~~**Complete Goals & Regions CRUD** (Phase 1)~~ ✅ **COMPLETE**
+   - ~~Add edit/delete UI for goals~~ ✅
+   - ~~Add edit/delete UI for regions~~ ✅
+   - ~~Add create buttons/forms~~ ✅
 
-2. **Implement Tasks** (Phase 2)
+2. **Implement Tasks** (Phase 2) 🎯 **NEXT**
    - Build out the Task data model and API
    - Create task pages and UI
    - Add deadline functionality
