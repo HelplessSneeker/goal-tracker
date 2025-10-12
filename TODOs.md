@@ -9,18 +9,25 @@ The system follows a 4-level hierarchy:
 
 ## Phase 1: Complete Goals & Regions (Foundation) ⏳
 
-### Goals - CRUD Operations
+### Goals - CRUD Operations ✅
 - [x] Create goal (API + UI)
+  - [x] API: `POST /api/goals`
+  - [x] UI: `/goals/create` page with GoalForm component
 - [x] Read/List goals (API + UI)
+  - [x] API: `GET /api/goals`
+  - [x] UI: `/goals` page with GoalCard components
 - [x] Get single goal (API + UI)
-- [ ] Update goal (API exists, UI missing)
-  - [ ] Add edit button on goal detail page
-  - [ ] Create edit goal form/modal
-  - [ ] Wire up PUT endpoint
-- [ ] Delete goal (API exists, UI missing)
-  - [ ] Add delete button with confirmation dialog
-  - [ ] Wire up DELETE endpoint
-  - [ ] Handle cascade delete (should we delete regions/tasks too, or prevent deletion?)
+  - [x] API: `GET /api/goals/[id]`
+  - [x] UI: `/goals/[id]` page with GoalDetailHeader
+- [x] Update goal (API + UI)
+  - [x] API: `PUT /api/goals/[id]`
+  - [x] UI: `/goals/[id]/edit` page with GoalForm component
+  - [x] Edit button on goal detail page
+- [x] Delete goal (API + UI)
+  - [x] API: `DELETE /api/goals/[id]`
+  - [x] UI: Delete button with DeleteGoalDialog confirmation
+  - [x] Redirects to `/goals` after deletion
+  - Note: Currently deletes goal only, cascade behavior to be implemented with Tasks phase
 
 ### Regions - CRUD Operations
 - [x] Create region (API + UI)
@@ -36,12 +43,19 @@ The system follows a 4-level hierarchy:
   - [ ] Handle cascade delete (what happens to tasks?)
 
 ### Additional Features for Goals/Regions
-- [ ] Add "Create" buttons/forms on relevant pages
-  - [ ] "Add Goal" button on /goals page
-  - [ ] "Add Region" button on /goals/[id] page
+- [x] Add "Create" buttons/forms on relevant pages
+  - [x] "Add Goal" button on `/goals` page → links to `/goals/create`
+  - [ ] "Add Region" button on `/goals/[id]` page
 - [ ] Add filtering/search functionality
 - [ ] Add sorting options
 - [ ] Improve empty states with clear CTAs
+
+### Component Organization
+- [x] Goal components organized in `components/goals/` directory
+  - [x] `goal-card.tsx` - Displays goal summary on list page
+  - [x] `goal-detail-header.tsx` - Header with edit/delete actions
+  - [x] `goal-form.tsx` - Reusable form for create/edit operations
+  - [x] `delete-goal-dialog.tsx` - Confirmation dialog for deletion
 
 ---
 
@@ -378,4 +392,4 @@ Currently using in-memory mock data. Need real persistence.
 
 ---
 
-**Last Updated:** 2025-10-11
+**Last Updated:** 2025-10-12

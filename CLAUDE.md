@@ -27,7 +27,7 @@ This application implements a hierarchical goal management system designed to he
 - The Progress page focuses on the current week's tasks
 
 **Implementation Status:**
-- ⏳ Goals (in progress - missing: edit, delete, filtering)
+- ✅ Goals (CRUD complete - filtering/search pending)
 - ⏳ Regions (in progress - missing: edit, delete, filtering)
 - ⏳ Tasks (TODO)
 - ⏳ Weekly Tasks (TODO)
@@ -63,7 +63,14 @@ The development server runs at http://localhost:3000.
 ### Framework & Routing
 - **Next.js 15** with App Router (`app/` directory)
 - Server Components by default (RSC enabled)
-- Pages: `app/page.tsx` (home), `app/progress/page.tsx` (progress tracking), `app/goals/page.tsx` (goals list), `app/goals/[id]/page.tsx` (goal detail), `app/goals/[id]/[regionId]/page.tsx` (region detail)
+- Pages:
+  - `app/page.tsx` - Home
+  - `app/progress/page.tsx` - Progress tracking
+  - `app/goals/page.tsx` - Goals list (Server Component)
+  - `app/goals/create/page.tsx` - Create goal (Client Component)
+  - `app/goals/[id]/page.tsx` - Goal detail (Server Component)
+  - `app/goals/[id]/edit/page.tsx` - Edit goal (Client Component)
+  - `app/goals/[id]/[regionId]/page.tsx` - Region detail
 - Layout in `app/layout.tsx`
 - Loading states: `loading.tsx` files for Suspense boundaries
 
@@ -79,7 +86,13 @@ The development server runs at http://localhost:3000.
 - Configuration in `components.json`
 - Uses Lucide icons (`lucide-react`)
 - Utility function `cn()` in `lib/utils.ts` combines `clsx` and `tailwind-merge`
-- Custom components: `components/goal-card.tsx`, `components/app-sidebar.tsx`
+- Custom components organized by feature:
+  - `components/app-sidebar.tsx` - Main navigation sidebar
+  - `components/goals/` - Goal-related components
+    - `goal-card.tsx` - Goal list item display
+    - `goal-detail-header.tsx` - Goal detail page header with edit/delete actions
+    - `goal-form.tsx` - Reusable form for create/edit (handles both modes)
+    - `delete-goal-dialog.tsx` - Confirmation dialog for goal deletion
 
 ### Path Aliases
 Configured in `tsconfig.json`:
@@ -98,24 +111,22 @@ Uses Next.js font optimization with Geist and Geist Mono fonts from Google Fonts
 ### Entity Relationships
 
 ```
-Goal (1) ──┬──> Region (n)
-           │
-           └──> Task (n) ──> Weekly Task (n, 3 per week) ──> Progress Entry (n, daily)
+Goal (1) ──> Region (n) ──> Task (n) ──> Weekly Task (n, 3 per week) ──> Progress Entry (n, daily)
 ```
 
 - A **Goal** can have many **Regions**
-- A **Goal** can have many **Tasks** (Tasks can optionally be associated with a specific Region)
+- A **Region** can have many **Tasks** (Tasks belong to Regions)
 - A **Task** can have many **Weekly Tasks** (3 per week, with priority 1-3)
 - A **Weekly Task** can have many **Progress Entries** (daily journal entries)
 
 ### API Routes
 
-**Goals:** ⏳ In Progress
+**Goals:** ✅ Complete
 - `GET /api/goals` - List all goals ✅
 - `POST /api/goals` - Create a goal ✅
 - `GET /api/goals/[id]` - Get specific goal ✅
-- `PUT /api/goals/[id]` - Update goal ⏳ (endpoint exists, UI missing)
-- `DELETE /api/goals/[id]` - Delete goal ⏳ (endpoint exists, UI missing)
+- `PUT /api/goals/[id]` - Update goal ✅
+- `DELETE /api/goals/[id]` - Delete goal ✅
 
 **Regions:** ⏳ In Progress
 - `GET /api/regions?goalId={id}` - List regions (optional filter by goalId) ✅
@@ -125,7 +136,7 @@ Goal (1) ──┬──> Region (n)
 - `DELETE /api/regions/[id]` - Delete region ⏳ (endpoint exists, UI missing)
 
 **Tasks:** ⏳ TODO
-- `GET /api/tasks?goalId={id}&regionId={id}` - List tasks with optional filters
+- `GET /api/tasks?regionId={id}` - List tasks for a region
 - `POST /api/tasks` - Create a task
 - `GET /api/tasks/[id]` - Get specific task
 - `PUT /api/tasks/[id]` - Update task
@@ -155,7 +166,7 @@ TypeScript interfaces in `lib/types.ts`:
 - `Region`: id, goalId (reference), title, description
 
 **TODO:**
-- `Task`: id, goalId, regionId (optional), title, description, deadline (Date, required)
+- `Task`: id, regionId (required), title, description, deadline (Date, required)
 - `WeeklyTask`: id, taskId, title, description, priority (1-3), weekStartDate (Date), status (pending/completed)
 - `ProgressEntry`: id, weeklyTaskId, date (Date), notes (string), completionPercentage (0-100), createdAt (timestamp)
 
