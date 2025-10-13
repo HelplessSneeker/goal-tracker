@@ -2,7 +2,8 @@
 
 ## About This Project
 
-After watching [VIDEO_URL], I was inspired to take a more structured approach to tracking my goals. As both an exercise in building with modern web technologies and a way to document my journey, I decided to create this goal-tracking tool.
+After watching [[This Viedeo]](https://www.youtube.com/watch?v=QGB_jCIk8IA) from [SpoonFedStudy](https://www.youtube.com/@spoonfedstudy), I was inspired to take a more structured approach to tracking my goals. 
+As both an exercise in building with modern web technologies and a way to document my journey, I decided to create this goal-tracking tool.
 
 This project serves a dual purpose: it's a practical application to help me stay accountable to my goals, and it's also a learning experience where I'm documenting my development process and progress.
 
