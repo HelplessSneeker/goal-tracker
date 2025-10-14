@@ -17,7 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Region } from "@/lib/types";
-import { DeleteRegionDialog } from "./delete-region-dialog";
+import { DeleteRegionDialog } from "@/components/regions/delete-region-dialog/delete-region-dialog";
 
 interface RegionCardProps {
   region: Region;

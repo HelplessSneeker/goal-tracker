@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Region } from "@/lib/types";
-import { RegionForm } from "@/components/regions/region-form";
+import { RegionForm } from "@/components/regions/region-form/region-form";
 
 export default function EditRegionPage({
   params,

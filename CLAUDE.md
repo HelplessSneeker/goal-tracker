@@ -27,15 +27,19 @@ This application implements a hierarchical goal management system designed to he
 - The Progress page focuses on the current week's tasks
 
 **Implementation Status:**
-- ✅ Goals (CRUD complete - filtering/search pending)
-- ✅ Regions (CRUD complete - filtering/search pending)
-- ⏳ Tasks (TODO - next priority)
-- ⏳ Weekly Tasks (TODO)
-- ⏳ Progress Entries (TODO)
+- ✅ Goals (CRUD complete with full test coverage - filtering/search pending)
+- ✅ Regions (CRUD complete with full test coverage - filtering/search pending)
+- ✅ Testing infrastructure (Jest + React Testing Library - 94 tests passing in ~3.5s)
+  - ✅ 100% API coverage for Goals and Regions
+  - ✅ 93-100% component coverage for Goals and Regions
+  - ✅ Comprehensive TESTING.md documentation
+- ⏳ Tasks (TODO - next priority, **use TDD approach**)
+- ⏳ Weekly Tasks (TODO - use TDD approach)
+- ⏳ Progress Entries (TODO - use TDD approach)
 - ⏳ Weekly review workflow (TODO)
 - ⏳ Archive system (TODO)
 
-See [TODOs.md](./TODOs.md) for detailed implementation roadmap.
+See [TODOs.md](./TODOs.md) for detailed implementation roadmap and [TESTING.md](./TESTING.md) for comprehensive testing guide.
 
 ## Development Commands
 
@@ -54,9 +58,89 @@ pnpm start
 
 # Run ESLint
 pnpm lint
+
+# Run tests
+pnpm test
+
+# Run tests in watch mode
+pnpm test:watch
+
+# Run tests with coverage
+pnpm test:coverage
 ```
 
 The development server runs at http://localhost:3000.
+
+## Testing Strategy
+
+**⚠️ IMPORTANT: We follow Test-Driven Development (TDD) for all new features.**
+
+### Current Test Coverage (2025-10-13)
+- ✅ **94 tests passing** (37 API + 51 component + 6 utility)
+- ✅ **100% API coverage** for Goals and Regions CRUD
+- ✅ **High component coverage** (93-100%) for all implemented features
+
+### Testing Stack
+- **Jest** with Next.js 15 built-in support (`next/jest`)
+- **React Testing Library** for component testing
+- **Coverage provider**: v8 (faster than babel)
+- **Test environment**: jsdom for components, node for API routes
+- **Configuration**: `jest.config.ts` and `jest.setup.ts`
+
+### Current Test Results (2025-10-14)
+```
+Test Suites: 12 passed, 12 total
+Tests:       94 passed, 94 total
+Time:        ~3.5 seconds
+```
+
+**Breakdown:**
+- API tests: 37 tests (100% coverage)
+- Component tests: 51 tests (93-100% coverage)
+- Utility tests: 6 tests (100% coverage)
+
+### TDD Workflow (Red-Green-Refactor)
+For all new features, follow this cycle:
+1. **🔴 RED**: Write a failing test first
+2. **🟢 GREEN**: Write minimal code to make it pass
+3. **♻️ REFACTOR**: Improve code while keeping tests green
+
+### Test File Locations & Organization
+- API tests: `app/api/**/*.test.ts` (co-located with routes)
+- Component tests: `components/**/[component-name]/[component-name].test.tsx` (co-located with component)
+- Utility tests: `lib/**/*.test.ts` (co-located with utilities)
+
+**Component Structure:** Each component lives in its own folder with its test:
+```
+components/
+├── goals/
+│   ├── goal-form/
+│   │   ├── goal-form.tsx
+│   │   └── goal-form.test.tsx
+│   ├── goal-card/
+│   │   ├── goal-card.tsx
+│   │   └── goal-card.test.tsx
+│   └── ...
+└── regions/
+    ├── region-form/
+    │   ├── region-form.tsx
+    │   └── region-form.test.tsx
+    └── ...
+```
+
+### Key Testing Patterns
+- API tests use `/** @jest-environment node */` docblock
+- Component tests import global mocks from `jest.setup.ts`
+- All tests use Arrange-Act-Assert pattern
+- Mock `fetch` for API calls, mock router for navigation
+- Each component test file uses relative imports: `import { Component } from "./component"`
+
+### Test Coverage Goals
+- **API routes**: 100% coverage (required) ✅ Goals & Regions complete
+- **Components**: 80%+ coverage ✅ Goals & Regions complete
+- **Utilities**: 90%+ coverage ✅ Complete
+
+See [TESTING.md](./TESTING.md) for comprehensive testing guide, examples, and best practices.
 
 ## Architecture
 
@@ -88,17 +172,17 @@ The development server runs at http://localhost:3000.
 - Configuration in `components.json`
 - Uses Lucide icons (`lucide-react`)
 - Utility function `cn()` in `lib/utils.ts` combines `clsx` and `tailwind-merge`
-- Custom components organized by feature:
+- Custom components organized by feature (each in its own folder with test):
   - `components/app-sidebar.tsx` - Main navigation sidebar
   - `components/goals/` - Goal-related components
-    - `goal-card.tsx` - Goal list item display
-    - `goal-detail-header.tsx` - Goal detail page header with edit/delete actions
-    - `goal-form.tsx` - Reusable form for create/edit (handles both modes)
-    - `delete-goal-dialog.tsx` - Confirmation dialog for goal deletion
+    - `goal-card/` - Goal list item display
+    - `goal-detail-header/` - Goal detail page header with edit/delete actions
+    - `goal-form/` - Reusable form for create/edit (handles both modes)
+    - `delete-goal-dialog/` - Confirmation dialog for goal deletion
   - `components/regions/` - Region-related components
-    - `region-card.tsx` - Region card with Eye, Edit, Delete action buttons (uses tooltips)
-    - `region-form.tsx` - Reusable form for create/edit (handles both modes)
-    - `delete-region-dialog.tsx` - Confirmation dialog requiring region name to be typed
+    - `region-card/` - Region card with Eye, Edit, Delete action buttons (uses tooltips)
+    - `region-form/` - Reusable form for create/edit (handles both modes)
+    - `delete-region-dialog/` - Confirmation dialog requiring region name to be typed
 
 ### Path Aliases
 Configured in `tsconfig.json`:
@@ -127,28 +211,28 @@ Goal (1) ──> Region (n) ──> Task (n) ──> Weekly Task (n, 3 per week)
 
 ### API Routes
 
-**Goals:** ✅ Complete
+**Goals:** ✅ Complete (100% test coverage)
 - `GET /api/goals` - List all goals ✅
 - `POST /api/goals` - Create a goal ✅
 - `GET /api/goals/[id]` - Get specific goal ✅
 - `PUT /api/goals/[id]` - Update goal ✅
 - `DELETE /api/goals/[id]` - Delete goal ✅
 
-**Regions:** ✅ Complete
+**Regions:** ✅ Complete (100% test coverage)
 - `GET /api/regions?goalId={id}` - List regions (optional filter by goalId) ✅
 - `POST /api/regions` - Create a region ✅
 - `GET /api/regions/[id]` - Get specific region ✅
 - `PUT /api/regions/[id]` - Update region ✅
 - `DELETE /api/regions/[id]` - Delete region ✅
 
-**Tasks:** ⏳ TODO
+**Tasks:** ⏳ TODO (implement with TDD)
 - `GET /api/tasks?regionId={id}` - List tasks for a region
 - `POST /api/tasks` - Create a task
 - `GET /api/tasks/[id]` - Get specific task
 - `PUT /api/tasks/[id]` - Update task
 - `DELETE /api/tasks/[id]` - Delete task
 
-**Weekly Tasks:** ⏳ TODO
+**Weekly Tasks:** ⏳ TODO (implement with TDD)
 - `GET /api/weekly-tasks?taskId={id}&weekStartDate={date}` - List weekly tasks with filters
 - `GET /api/weekly-tasks/current-week` - Get all weekly tasks for the current week
 - `POST /api/weekly-tasks` - Create a weekly task
@@ -156,7 +240,7 @@ Goal (1) ──> Region (n) ──> Task (n) ──> Weekly Task (n, 3 per week)
 - `PUT /api/weekly-tasks/[id]` - Update weekly task
 - `DELETE /api/weekly-tasks/[id]` - Delete weekly task
 
-**Progress Entries:** ⏳ TODO
+**Progress Entries:** ⏳ TODO (implement with TDD)
 - `GET /api/progress-entries?weeklyTaskId={id}` - List progress entries for a weekly task
 - `POST /api/progress-entries` - Create a progress entry
 - `GET /api/progress-entries/[id]` - Get specific progress entry
@@ -210,3 +294,32 @@ Two patterns for cards:
 - TypeScript strict mode enabled
 - Component props use `React.ComponentProps<>` type helper
 - UI components use data slots pattern (e.g., `data-slot="card"`)
+
+## Development Workflow
+
+### When Implementing New Features (TDD Approach)
+1. **🔴 Write tests first** - Create failing tests that define the expected behavior
+2. **🟢 Implement minimal code** - Write just enough code to pass the tests
+3. **♻️ Refactor** - Improve code quality while keeping tests green
+4. **Run full test suite** - Ensure no regressions: `pnpm test`
+5. **Check coverage** - Verify coverage targets met: `pnpm test:coverage`
+6. **Lint before commit** - Ensure code style: `pnpm lint`
+
+### Example TDD Cycle for New API Route
+```bash
+# 1. Create test file first
+# app/api/tasks/route.test.ts
+
+# 2. Write failing test
+pnpm test  # Should fail
+
+# 3. Implement route
+# app/api/tasks/route.ts
+
+# 4. Run tests
+pnpm test  # Should pass
+
+# 5. Refactor if needed, tests still passing
+```
+
+See [TESTING.md](./TESTING.md) for detailed TDD examples and patterns.

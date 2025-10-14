@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Goal } from "@/lib/types";
-import { GoalForm } from "@/components/goals/goal-form";
+import { GoalForm } from "@/components/goals/goal-form/goal-form";
 
 export default function EditGoalPage({
   params,
