@@ -10,7 +10,7 @@ import Link from "next/link";
 import { ChevronLeft, Plus } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { TaskCard } from "@/components/tasks/task-card/task-card";
+import { TaskCard } from "@/components/tasks";
 
 async function getRegion(regionId: string): Promise<Region | null> {
   try {

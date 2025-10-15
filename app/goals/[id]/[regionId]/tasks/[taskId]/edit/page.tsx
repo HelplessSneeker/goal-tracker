@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Task } from "@/lib/types";
-import { TaskForm } from "@/components/tasks/task-form/task-form";
+import { TaskForm } from "@/components/tasks";
 
 export default function EditTaskPage({
   params,

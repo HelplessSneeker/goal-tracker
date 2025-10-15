@@ -12,7 +12,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Task } from "@/lib/types";
-import { DeleteTaskDialog } from "@/components/tasks/delete-task-dialog/delete-task-dialog";
+import { DeleteTaskDialog } from "@/components/tasks";
 
 interface TaskCardProps {
   task: Task;

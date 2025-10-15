@@ -110,10 +110,11 @@ For all new features, follow this cycle:
 - Component tests: `components/**/[component-name]/[component-name].test.tsx` (co-located with component)
 - Utility tests: `lib/**/*.test.ts` (co-located with utilities)
 
-**Component Structure:** Each component lives in its own folder with its test:
+**Component Structure:** Each component lives in its own folder with its test, and each feature folder has an `index.ts` for centralized exports:
 ```
 components/
 ├── goals/
+│   ├── index.ts                  # Exports all goal components
 │   ├── goal-form/
 │   │   ├── goal-form.tsx
 │   │   └── goal-form.test.tsx
@@ -122,11 +123,13 @@ components/
 │   │   └── goal-card.test.tsx
 │   └── ...
 ├── regions/
+│   ├── index.ts                  # Exports all region components
 │   ├── region-form/
 │   │   ├── region-form.tsx
 │   │   └── region-form.test.tsx
 │   └── ...
 └── tasks/
+    ├── index.ts                  # Exports all task components
     ├── task-form/
     │   ├── task-form.tsx
     │   └── task-form.test.tsx
@@ -135,6 +138,22 @@ components/
     │   └── task-card.test.tsx
     └── ...
 ```
+
+**Import Pattern:** Always import components from the feature folder's index, not directly from component folders:
+```typescript
+// ✅ Good - import from index
+import { TaskForm, TaskCard, DeleteTaskDialog } from "@/components/tasks";
+import { RegionForm, RegionCard } from "@/components/regions";
+
+// ❌ Bad - direct import from component folder
+import { TaskForm } from "@/components/tasks/task-form/task-form";
+```
+
+**Adding New Components:** When creating a new component in a feature folder:
+1. Create the component in its own folder (e.g., `components/tasks/new-component/`)
+2. Add the component and its test file
+3. Export it in the feature's `index.ts` file
+4. Always import from the feature folder index in other files
 
 ### Key Testing Patterns
 - API tests use `/** @jest-environment node */` docblock
