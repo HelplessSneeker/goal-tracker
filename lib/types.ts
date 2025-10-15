@@ -10,3 +10,13 @@ export interface Region {
   title: string;
   description: string;
 }
+
+export interface Task {
+  id: string;
+  regionId: string;
+  title: string;
+  description: string;
+  deadline: string; // ISO date string
+  status: 'active' | 'completed';
+  createdAt: string; // ISO date string
+}

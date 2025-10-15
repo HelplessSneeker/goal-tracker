@@ -29,12 +29,12 @@ This application implements a hierarchical goal management system designed to he
 **Implementation Status:**
 - ✅ Goals (CRUD complete with full test coverage - filtering/search pending)
 - ✅ Regions (CRUD complete with full test coverage - filtering/search pending)
-- ✅ Testing infrastructure (Jest + React Testing Library - 94 tests passing in ~3.5s)
-  - ✅ 100% API coverage for Goals and Regions
-  - ✅ 93-100% component coverage for Goals and Regions
+- ✅ Tasks (CRUD complete with full test coverage, deadline tracking, status badges)
+- ✅ Testing infrastructure (Jest + React Testing Library - 147 tests passing in ~3.8s)
+  - ✅ 100% API coverage for Goals, Regions, and Tasks
+  - ✅ 93-100% component coverage for Goals, Regions, and Tasks
   - ✅ Comprehensive TESTING.md documentation
-- ⏳ Tasks (TODO - next priority, **use TDD approach**)
-- ⏳ Weekly Tasks (TODO - use TDD approach)
+- ⏳ Weekly Tasks (TODO - next priority, **use TDD approach**)
 - ⏳ Progress Entries (TODO - use TDD approach)
 - ⏳ Weekly review workflow (TODO)
 - ⏳ Archive system (TODO)
@@ -75,9 +75,9 @@ The development server runs at http://localhost:3000.
 
 **⚠️ IMPORTANT: We follow Test-Driven Development (TDD) for all new features.**
 
-### Current Test Coverage (2025-10-13)
-- ✅ **94 tests passing** (37 API + 51 component + 6 utility)
-- ✅ **100% API coverage** for Goals and Regions CRUD
+### Current Test Coverage (2025-10-15)
+- ✅ **147 tests passing** (58 API + 83 component + 6 utility)
+- ✅ **100% API coverage** for Goals, Regions, and Tasks CRUD
 - ✅ **High component coverage** (93-100%) for all implemented features
 
 ### Testing Stack
@@ -87,16 +87,16 @@ The development server runs at http://localhost:3000.
 - **Test environment**: jsdom for components, node for API routes
 - **Configuration**: `jest.config.ts` and `jest.setup.ts`
 
-### Current Test Results (2025-10-14)
+### Current Test Results (2025-10-15)
 ```
-Test Suites: 12 passed, 12 total
-Tests:       94 passed, 94 total
-Time:        ~3.5 seconds
+Test Suites: 17 passed, 17 total
+Tests:       147 passed, 147 total
+Time:        ~3.8 seconds
 ```
 
 **Breakdown:**
-- API tests: 37 tests (100% coverage)
-- Component tests: 51 tests (93-100% coverage)
+- API tests: 58 tests (100% coverage for Goals, Regions, Tasks)
+- Component tests: 83 tests (93-100% coverage)
 - Utility tests: 6 tests (100% coverage)
 
 ### TDD Workflow (Red-Green-Refactor)
@@ -121,10 +121,18 @@ components/
 │   │   ├── goal-card.tsx
 │   │   └── goal-card.test.tsx
 │   └── ...
-└── regions/
-    ├── region-form/
-    │   ├── region-form.tsx
-    │   └── region-form.test.tsx
+├── regions/
+│   ├── region-form/
+│   │   ├── region-form.tsx
+│   │   └── region-form.test.tsx
+│   └── ...
+└── tasks/
+    ├── task-form/
+    │   ├── task-form.tsx
+    │   └── task-form.test.tsx
+    ├── task-card/
+    │   ├── task-card.tsx
+    │   └── task-card.test.tsx
     └── ...
 ```
 
@@ -136,8 +144,8 @@ components/
 - Each component test file uses relative imports: `import { Component } from "./component"`
 
 ### Test Coverage Goals
-- **API routes**: 100% coverage (required) ✅ Goals & Regions complete
-- **Components**: 80%+ coverage ✅ Goals & Regions complete
+- **API routes**: 100% coverage (required) ✅ Goals, Regions & Tasks complete
+- **Components**: 80%+ coverage ✅ Goals, Regions & Tasks complete
 - **Utilities**: 90%+ coverage ✅ Complete
 
 See [TESTING.md](./TESTING.md) for comprehensive testing guide, examples, and best practices.
@@ -157,6 +165,9 @@ See [TESTING.md](./TESTING.md) for comprehensive testing guide, examples, and be
   - `app/goals/[id]/addRegion/page.tsx` - Create region (Client Component)
   - `app/goals/[id]/[regionId]/page.tsx` - Region detail (Server Component)
   - `app/goals/[id]/[regionId]/edit/page.tsx` - Edit region (Client Component)
+  - `app/goals/[id]/[regionId]/addTask/page.tsx` - Create task (Client Component)
+  - `app/goals/[id]/[regionId]/tasks/[taskId]/page.tsx` - Task detail (Server Component)
+  - `app/goals/[id]/[regionId]/tasks/[taskId]/edit/page.tsx` - Edit task (Client Component)
 - Layout in `app/layout.tsx`
 - Loading states: `loading.tsx` files for Suspense boundaries
 
@@ -183,6 +194,10 @@ See [TESTING.md](./TESTING.md) for comprehensive testing guide, examples, and be
     - `region-card/` - Region card with Eye, Edit, Delete action buttons (uses tooltips)
     - `region-form/` - Reusable form for create/edit (handles both modes)
     - `delete-region-dialog/` - Confirmation dialog requiring region name to be typed
+  - `components/tasks/` - Task-related components
+    - `task-card/` - Task card with deadline, status badge, action buttons
+    - `task-form/` - Reusable form for create/edit with date picker (handles both modes)
+    - `delete-task-dialog/` - Confirmation dialog with cascade warning
 
 ### Path Aliases
 Configured in `tsconfig.json`:
@@ -225,12 +240,12 @@ Goal (1) ──> Region (n) ──> Task (n) ──> Weekly Task (n, 3 per week)
 - `PUT /api/regions/[id]` - Update region ✅
 - `DELETE /api/regions/[id]` - Delete region ✅
 
-**Tasks:** ⏳ TODO (implement with TDD)
-- `GET /api/tasks?regionId={id}` - List tasks for a region
-- `POST /api/tasks` - Create a task
-- `GET /api/tasks/[id]` - Get specific task
-- `PUT /api/tasks/[id]` - Update task
-- `DELETE /api/tasks/[id]` - Delete task
+**Tasks:** ✅ Complete (100% test coverage)
+- `GET /api/tasks?regionId={id}` - List tasks (optional filter by regionId) ✅
+- `POST /api/tasks` - Create a task ✅
+- `GET /api/tasks/[id]` - Get specific task ✅
+- `PUT /api/tasks/[id]` - Update task ✅
+- `DELETE /api/tasks/[id]` - Delete task ✅
 
 **Weekly Tasks:** ⏳ TODO (implement with TDD)
 - `GET /api/weekly-tasks?taskId={id}&weekStartDate={date}` - List weekly tasks with filters
@@ -254,9 +269,9 @@ TypeScript interfaces in `lib/types.ts`:
 **Implemented:**
 - `Goal`: id, title, description
 - `Region`: id, goalId (reference), title, description
+- `Task`: id, regionId (required), title, description, deadline (ISO date string, required), status (active/completed), createdAt (ISO date string)
 
 **TODO:**
-- `Task`: id, regionId (required), title, description, deadline (Date, required)
 - `WeeklyTask`: id, taskId, title, description, priority (1-3), weekStartDate (Date), status (pending/completed)
 - `ProgressEntry`: id, weeklyTaskId, date (Date), notes (string), completionPercentage (0-100), createdAt (timestamp)
 
@@ -266,14 +281,14 @@ In-memory mock data stored in `lib/mock-data.ts` for development. This will be r
 ## Component Patterns
 
 ### Server vs Client Components
-- **Server Components** (default): Used for data fetching and static UI (e.g., `app/page.tsx`, `app/progress/page.tsx`, `app/goals/page.tsx`, `app/goals/[id]/page.tsx`, `app/goals/[id]/[regionId]/page.tsx`, `components/goal-card.tsx`)
-- **Client Components** (`"use client"`): Required for interactivity, state, event handlers (e.g., `components/app-sidebar.tsx`)
+- **Server Components** (default): Used for data fetching and static UI (e.g., `app/page.tsx`, `app/progress/page.tsx`, `app/goals/page.tsx`, `app/goals/[id]/page.tsx`, `app/goals/[id]/[regionId]/page.tsx`, `app/goals/[id]/[regionId]/tasks/[taskId]/page.tsx`, `components/goal-card.tsx`)
+- **Client Components** (`"use client"`): Required for interactivity, state, event handlers (e.g., `components/app-sidebar.tsx`, form components)
 - Server Components fetch from API routes using native `fetch()` with `cache: "no-store"`
 - Use `loading.tsx` files for Suspense boundaries and loading states
-- Nested dynamic routes follow the pattern: `/goals/[id]/[regionId]` for hierarchical navigation
+- Nested dynamic routes follow the pattern: `/goals/[id]/[regionId]/tasks/[taskId]` for hierarchical navigation
 
 ### Interactive Cards & Action Buttons
-Two patterns for cards:
+Three patterns for cards:
 
 1. **Clickable Navigation Cards** (Goals):
    - Wrap shadcn/ui `Card` in Next.js `Link` component
@@ -287,6 +302,13 @@ Two patterns for cards:
    - Eye icon (view), Pencil icon (edit), Trash icon (delete)
    - Delete button uses `hover:bg-destructive` for visual warning
    - Each button links to appropriate route or triggers dialog
+
+3. **Cards with Status & Metadata** (Tasks):
+   - Card displays title, description, and action buttons
+   - Status badges show task state (active/completed) with color coding
+   - Deadline displayed with countdown (days remaining/overdue)
+   - Visual indicators for approaching/overdue deadlines
+   - Action buttons: View, Edit, Delete with tooltips
 
 ## Code Style
 

@@ -30,13 +30,22 @@ jest.mock("next/link", () => {
   return function Link({
     children,
     href,
+    ...props
   }: {
     children: React.ReactNode;
     href: string;
+    [key: string]: any;
   }) {
-    return React.createElement("a", { href }, children);
+    return React.createElement("a", { href, ...props }, children);
   };
 });
+
+// Mock ResizeObserver (used by tooltips and other UI components)
+global.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
 
 // Setup global mocks
 beforeEach(() => {
