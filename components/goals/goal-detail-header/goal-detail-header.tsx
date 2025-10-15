@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DeleteGoalDialog } from "@/components/goals/delete-goal-dialog/delete-goal-dialog";
+import { DeleteGoalDialog } from "@/components/goals";
 import { Goal } from "@/lib/types";
 
 interface GoalDetailHeaderProps {

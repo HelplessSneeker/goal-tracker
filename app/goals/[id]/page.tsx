@@ -3,9 +3,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { ChevronLeft, Plus } from "lucide-react";
 import { notFound } from "next/navigation";
-import { GoalDetailHeader } from "@/components/goals/goal-detail-header/goal-detail-header";
+import { GoalDetailHeader } from "@/components/goals";
 import { Button } from "@/components/ui/button";
-import { RegionCard } from "@/components/regions/region-card/region-card";
+import { RegionCard } from "@/components/regions";
 
 async function getGoal(id: string): Promise<Goal | null> {
   try {

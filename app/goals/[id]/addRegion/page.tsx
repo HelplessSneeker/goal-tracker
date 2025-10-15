@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
-import { RegionForm } from "@/components/regions/region-form/region-form";
+import { RegionForm } from "@/components/regions";
 
 export default function AddRegionPage({
   params,

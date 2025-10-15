@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
-import { GoalForm } from "@/components/goals/goal-form/goal-form";
+import { GoalForm } from "@/components/goals";
 
 export default function CreateGoalPage() {
   return (

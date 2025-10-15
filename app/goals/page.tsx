@@ -1,5 +1,5 @@
 import { Goal, Region } from "@/lib/types";
-import { GoalCard } from "@/components/goals/goal-card/goal-card";
+import { GoalCard } from "@/components/goals";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
