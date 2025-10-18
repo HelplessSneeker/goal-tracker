@@ -2,6 +2,14 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TaskCard } from "./task-card";
 
+// Mock useRouter
+const mockPush = jest.fn();
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+}));
+
 describe("TaskCard", () => {
   const mockTask = {
     id: "123",
@@ -12,6 +20,10 @@ describe("TaskCard", () => {
     status: "active" as const,
     createdAt: "2025-10-01T10:00:00.000Z",
   };
+
+  beforeEach(() => {
+    mockPush.mockClear();
+  });
 
   it("should render task title and description", () => {
     render(<TaskCard task={mockTask} goalId="goal-1" />);
@@ -26,43 +38,14 @@ describe("TaskCard", () => {
     expect(screen.getByText(/Dec 1, 2025/i)).toBeInTheDocument();
   });
 
-  it("should show view button with correct link", () => {
-    render(<TaskCard task={mockTask} goalId="goal-1" />);
-
-    const viewButton = screen.getByRole("link", { name: /view task/i });
-    expect(viewButton).toHaveAttribute(
-      "href",
-      "/goals/goal-1/region-1/tasks/123",
-    );
-  });
-
-  it("should show edit button with correct link", () => {
-    render(<TaskCard task={mockTask} goalId="goal-1" />);
-
-    const editButton = screen.getByRole("link", { name: /edit task/i });
-    expect(editButton).toHaveAttribute(
-      "href",
-      "/goals/goal-1/region-1/tasks/123/edit",
-    );
-  });
-
-  it("should show delete button", () => {
-    render(<TaskCard task={mockTask} goalId="goal-1" />);
-
-    expect(
-      screen.getByRole("button", { name: /delete task/i }),
-    ).toBeInTheDocument();
-  });
-
-  it("should open delete dialog when delete button clicked", async () => {
+  it("should navigate to task detail when card is clicked", async () => {
     const user = userEvent.setup();
     render(<TaskCard task={mockTask} goalId="goal-1" />);
 
-    await user.click(screen.getByRole("button", { name: /delete task/i }));
+    const cardTitle = screen.getByText("Test Task");
+    await user.click(cardTitle);
 
-    expect(
-      screen.getByRole("heading", { name: /delete task/i }),
-    ).toBeInTheDocument();
+    expect(mockPush).toHaveBeenCalledWith("/goals/goal-1/region-1/tasks/123");
   });
 
   it("should display task status badge", () => {
@@ -76,5 +59,14 @@ describe("TaskCard", () => {
     render(<TaskCard task={completedTask} goalId="goal-1" />);
 
     expect(screen.getByText(/completed/i)).toBeInTheDocument();
+  });
+
+  it("has hover styles for better UX", () => {
+    const { container } = render(<TaskCard task={mockTask} goalId="goal-1" />);
+
+    const card = container.querySelector('[class*="cursor-pointer"]');
+    expect(card).toBeInTheDocument();
+    expect(card).toHaveClass("cursor-pointer");
+    expect(card).toHaveClass("hover:shadow-lg");
   });
 });

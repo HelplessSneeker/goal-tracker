@@ -3,6 +3,14 @@ import userEvent from "@testing-library/user-event";
 import { RegionCard } from "./region-card";
 import { Region } from "@/lib/types";
 
+// Mock useRouter
+const mockPush = jest.fn();
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+}));
+
 describe("RegionCard", () => {
   const mockRegion: Region = {
     id: "region-1",
@@ -13,6 +21,10 @@ describe("RegionCard", () => {
 
   const goalId = "goal-1";
 
+  beforeEach(() => {
+    mockPush.mockClear();
+  });
+
   it("renders region title and description", () => {
     render(<RegionCard region={mockRegion} goalId={goalId} />);
 
@@ -22,53 +34,22 @@ describe("RegionCard", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders all three action buttons", () => {
-    render(<RegionCard region={mockRegion} goalId={goalId} />);
-
-    const buttons = screen.getAllByRole("button");
-    expect(buttons).toHaveLength(3); // View, Edit, Delete
-  });
-
-  it("renders view button with correct link", () => {
-    render(<RegionCard region={mockRegion} goalId={goalId} />);
-
-    const viewLinks = screen.getAllByRole("link");
-    const viewLink = viewLinks.find((link) =>
-      link.getAttribute("href")?.includes("/region-1"),
-    );
-
-    expect(viewLink).toHaveAttribute("href", "/goals/goal-1/region-1");
-  });
-
-  it("renders edit button with correct link", () => {
-    render(<RegionCard region={mockRegion} goalId={goalId} />);
-
-    const editLinks = screen.getAllByRole("link");
-    const editLink = editLinks.find((link) =>
-      link.getAttribute("href")?.includes("/edit"),
-    );
-
-    expect(editLink).toHaveAttribute("href", "/goals/goal-1/region-1/edit");
-  });
-
-  it("opens delete dialog when delete button is clicked", async () => {
+  it("navigates to region detail when card is clicked", async () => {
     const user = userEvent.setup();
-
     render(<RegionCard region={mockRegion} goalId={goalId} />);
 
-    // Find the delete button (the one with trash icon that's not in a link)
-    const buttons = screen.getAllByRole("button");
-    const deleteButton = buttons.find(
-      (btn) => btn.querySelector("svg") && !btn.closest("a"),
-    );
+    const cardTitle = screen.getByText("Server Components");
+    await user.click(cardTitle);
 
-    if (deleteButton) {
-      await user.click(deleteButton);
+    expect(mockPush).toHaveBeenCalledWith("/goals/goal-1/region-1");
+  });
 
-      // Dialog should appear - use heading to avoid multiple matches
-      expect(
-        screen.getByRole("heading", { name: /delete region/i }),
-      ).toBeInTheDocument();
-    }
+  it("has hover styles for better UX", () => {
+    const { container } = render(<RegionCard region={mockRegion} goalId={goalId} />);
+
+    const card = container.querySelector('[class*="cursor-pointer"]');
+    expect(card).toBeInTheDocument();
+    expect(card).toHaveClass("cursor-pointer");
+    expect(card).toHaveClass("hover:shadow-lg");
   });
 });

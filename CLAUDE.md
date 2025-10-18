@@ -205,16 +205,18 @@ See [TESTING.md](./TESTING.md) for comprehensive testing guide, examples, and be
 - Custom components organized by feature (each in its own folder with test):
   - `components/app-sidebar.tsx` - Main navigation sidebar
   - `components/goals/` - Goal-related components
-    - `goal-card/` - Goal list item display
+    - `goal-card/` - Clickable card for navigation to goal detail
     - `goal-detail-header/` - Goal detail page header with edit/delete actions
     - `goal-form/` - Reusable form for create/edit (handles both modes)
     - `delete-goal-dialog/` - Confirmation dialog for goal deletion
   - `components/regions/` - Region-related components
-    - `region-card/` - Region card with Eye, Edit, Delete action buttons (uses tooltips)
+    - `region-card/` - Clickable card for navigation to region detail
+    - `region-detail-header/` - Region detail page header with edit/delete actions
     - `region-form/` - Reusable form for create/edit (handles both modes)
     - `delete-region-dialog/` - Confirmation dialog requiring region name to be typed
   - `components/tasks/` - Task-related components
-    - `task-card/` - Task card with deadline, status badge, action buttons
+    - `task-card/` - Clickable card for navigation to task detail (shows deadline, status badge)
+    - `task-detail-header/` - Task detail page header with edit/delete actions
     - `task-form/` - Reusable form for create/edit with date picker (handles both modes)
     - `delete-task-dialog/` - Confirmation dialog with cascade warning
 
@@ -306,28 +308,21 @@ In-memory mock data stored in `lib/mock-data.ts` for development. This will be r
 - Use `loading.tsx` files for Suspense boundaries and loading states
 - Nested dynamic routes follow the pattern: `/goals/[id]/[regionId]/tasks/[taskId]` for hierarchical navigation
 
-### Interactive Cards & Action Buttons
-Three patterns for cards:
+### Interactive Cards & Detail Headers
+All cards follow a consistent clickable navigation pattern:
 
-1. **Clickable Navigation Cards** (Goals):
-   - Wrap shadcn/ui `Card` in Next.js `Link` component
-   - Add visual indicators (hover effects, chevron icon) to show interactivity
-   - Use `cursor-pointer` and `hover:shadow-lg` for affordance
-   - Chevron animates on hover with `group-hover:translate-x-1`
+**Card Pattern** (Goals, Regions, Tasks):
+- Entire card is clickable for navigation using `onClick` with `useRouter`
+- Use `cursor-pointer` and `hover:shadow-lg` for visual affordance
+- Display relevant metadata (title, description, deadline, status) without action buttons
+- Clean, uncluttered design focused on content
 
-2. **Cards with Action Buttons** (Regions):
-   - Card contains multiple action buttons (View, Edit, Delete)
-   - Use icon-only buttons with tooltips for compact layout
-   - Eye icon (view), Pencil icon (edit), Trash icon (delete)
-   - Delete button uses `hover:bg-destructive` for visual warning
-   - Each button links to appropriate route or triggers dialog
-
-3. **Cards with Status & Metadata** (Tasks):
-   - Card displays title, description, and action buttons
-   - Status badges show task state (active/completed) with color coding
-   - Deadline displayed with countdown (days remaining/overdue)
-   - Visual indicators for approaching/overdue deadlines
-   - Action buttons: View, Edit, Delete with tooltips
+**Detail Header Pattern** (GoalDetailHeader, RegionDetailHeader, TaskDetailHeader):
+- Displays entity title, description, and metadata (deadline/status for tasks)
+- Contains Edit and Delete action buttons
+- Edit button links to edit page
+- Delete button opens confirmation dialog
+- Consistent placement across all detail pages
 
 ## Code Style
 

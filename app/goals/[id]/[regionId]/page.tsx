@@ -1,16 +1,11 @@
 import { Region, Task } from "@/lib/types";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { ChevronLeft, Plus } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { TaskCard } from "@/components/tasks";
+import { RegionDetailHeader } from "@/components/regions";
 
 async function getRegion(regionId: string): Promise<Region | null> {
   try {
@@ -72,14 +67,7 @@ export default async function RegionDetailPage({
         Back to Goal
       </Link>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-3xl">{region.title}</CardTitle>
-          <CardDescription className="text-base">
-            {region.description}
-          </CardDescription>
-        </CardHeader>
-      </Card>
+      <RegionDetailHeader region={region} goalId={id} />
 
       <div>
         <div className="flex items-center justify-between mb-4">
