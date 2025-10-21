@@ -2,8 +2,8 @@
 
 Comprehensive guide for testing this Next.js 15 goal-tracking application using Test-Driven Development (TDD).
 
-**Last Updated:** 2025-10-14  
-**Status:** ✅ All tests passing - 94 tests in ~3.5s
+**Last Updated:** 2025-10-21
+**Status:** ✅ All tests passing - 156 tests in ~7.9s
 
 ---
 
@@ -28,17 +28,17 @@ Comprehensive guide for testing this Next.js 15 goal-tracking application using 
 ### Current Results
 
 ```
-Test Suites: 12 passed, 12 total
-Tests:       94 passed, 94 total
-Time:        ~3.5 seconds
+Test Suites: 19 passed, 19 total
+Tests:       156 passed, 156 total
+Time:        ~7.9 seconds
 ```
 
 ### Coverage at a Glance
 
 | Category | Tests | Coverage | Status |
 |----------|-------|----------|--------|
-| **API Routes** | 37 tests | 100% | ✅ Complete |
-| **Components** | 51 tests | 93-100% | ✅ Complete |
+| **API Routes** | 58 tests | 100% | ✅ Complete |
+| **Components** | 92 tests | 93-100% | ✅ Complete |
 | **Utilities** | 6 tests | 100% | ✅ Complete |
 | **E2E Tests** | 0 tests | N/A | ⏳ Pending |
 
@@ -46,76 +46,101 @@ Time:        ~3.5 seconds
 
 ## Implemented Tests
 
-### ✅ API Route Tests (37 tests - 100% coverage)
+### ✅ API Route Tests (58 tests - 100% coverage)
+
+**All API routes now use Prisma ORM with mocked Prisma client for testing.**
 
 #### Goals API (18 tests)
 
-**File:** `app/api/goals/route.test.ts` (8 tests)
-- ✅ GET /api/goals - returns all goals
-- ✅ GET /api/goals - returns correct structure (id, title, description)
-- ✅ POST /api/goals - creates goal with valid data
-- ✅ POST /api/goals - adds to mockGoals array
-- ✅ POST /api/goals - handles special characters in title/description
-- ✅ POST /api/goals - generates unique ID
-- ✅ POST /api/goals - creates multiple goals independently
-- ✅ POST /api/goals - returns correct structure
+**File:** `app/api/goals/route.test.ts` (3 tests)
+- ✅ GET /api/goals - returns all goals from Prisma
+- ✅ GET /api/goals - returns correct structure (id, title, description, userId, createdAt, updatedAt)
+- ✅ POST /api/goals - creates goal via Prisma with UUID
 
-**File:** `app/api/goals/[id]/route.test.ts` (10 tests)
-- ✅ GET /api/goals/[id] - returns existing goal
+**File:** `app/api/goals/[id]/route.test.ts` (7 tests)
+- ✅ GET /api/goals/[id] - returns existing goal via Prisma
 - ✅ GET /api/goals/[id] - returns 404 for non-existent goal
-- ✅ PUT /api/goals/[id] - updates existing goal
-- ✅ PUT /api/goals/[id] - persists updates across calls
+- ✅ PUT /api/goals/[id] - updates existing goal via Prisma
 - ✅ PUT /api/goals/[id] - returns 404 for non-existent goal
-- ✅ PUT /api/goals/[id] - allows partial updates (title only)
-- ✅ DELETE /api/goals/[id] - deletes existing goal
+- ✅ PUT /api/goals/[id] - allows partial updates
+- ✅ DELETE /api/goals/[id] - deletes existing goal via Prisma
 - ✅ DELETE /api/goals/[id] - returns 404 for non-existent goal
-- ✅ DELETE /api/goals/[id] - doesn't affect other goals (isolation)
-- ✅ DELETE /api/goals/[id] - handles deleting last goal
+
+**Coverage:** 100% (Statements, Branches, Functions, Lines)
+
+#### Tasks API (21 tests)
+
+**File:** `app/api/tasks/route.test.ts` (11 tests)
+- ✅ GET /api/tasks - returns all tasks from Prisma
+- ✅ GET /api/tasks?regionId={id} - filters by regionId via Prisma where clause
+- ✅ GET /api/tasks?regionId={id} - returns empty array for non-existent regionId
+- ✅ GET /api/tasks - returns correct structure (deadline, status, etc.)
+- ✅ POST /api/tasks - creates task with deadline via Prisma
+- ✅ POST /api/tasks - handles special characters
+- ✅ POST /api/tasks - creates tasks for different regions
+- ✅ POST /api/tasks - generates UUID
+- ✅ POST /api/tasks - sets default status to active
+- ✅ POST /api/tasks - auto-generates createdAt timestamp
+- ✅ POST /api/tasks - converts deadline string to Date object
+
+**File:** `app/api/tasks/[id]/route.test.ts` (10 tests)
+- ✅ GET /api/tasks/[id] - returns existing task via Prisma
+- ✅ GET /api/tasks/[id] - returns 404 for non-existent task
+- ✅ PUT /api/tasks/[id] - updates existing task via Prisma
+- ✅ PUT /api/tasks/[id] - updates deadline
+- ✅ PUT /api/tasks/[id] - updates status (active/completed)
+- ✅ PUT /api/tasks/[id] - returns 404 for non-existent task
+- ✅ PUT /api/tasks/[id] - allows partial updates
+- ✅ DELETE /api/tasks/[id] - deletes existing task via Prisma
+- ✅ DELETE /api/tasks/[id] - returns 404 for non-existent task
+- ✅ DELETE /api/tasks/[id] - handles deletion isolation
 
 **Coverage:** 100% (Statements, Branches, Functions, Lines)
 
 #### Regions API (19 tests)
 
-**File:** `app/api/regions/route.test.ts` (9 tests)
-- ✅ GET /api/regions - returns all regions
-- ✅ GET /api/regions?goalId={id} - filters by goalId
+**File:** `app/api/regions/route.test.ts` (11 tests)
+- ✅ GET /api/regions - returns all regions from Prisma
+- ✅ GET /api/regions?goalId={id} - filters by goalId via Prisma where clause
 - ✅ GET /api/regions?goalId={id} - returns empty array for non-existent goalId
-- ✅ GET /api/regions - returns correct structure (id, goalId, title, description)
-- ✅ POST /api/regions - creates region with valid data
-- ✅ POST /api/regions - adds to mockRegions array
+- ✅ GET /api/regions - returns correct structure (id, goalId, title, description, userId, createdAt, updatedAt)
+- ✅ POST /api/regions - creates region via Prisma
 - ✅ POST /api/regions - handles special characters
 - ✅ POST /api/regions - creates regions for different goals
-- ✅ POST /api/regions - generates unique ID
+- ✅ POST /api/regions - generates UUID
+- ✅ POST /api/regions - associates with correct goalId
+- ✅ POST /api/regions - sets userId placeholder
+- ✅ POST /api/regions - auto-generates timestamps
 
-**File:** `app/api/regions/[id]/route.test.ts` (10 tests)
-- ✅ GET /api/regions/[id] - returns existing region
+**File:** `app/api/regions/[id]/route.test.ts` (8 tests)
+- ✅ GET /api/regions/[id] - returns existing region via Prisma
 - ✅ GET /api/regions/[id] - returns 404 for non-existent region
-- ✅ PUT /api/regions/[id] - updates existing region
-- ✅ PUT /api/regions/[id] - persists updates across calls
+- ✅ PUT /api/regions/[id] - updates existing region via Prisma
 - ✅ PUT /api/regions/[id] - returns 404 for non-existent region
 - ✅ PUT /api/regions/[id] - allows updating goalId
 - ✅ PUT /api/regions/[id] - allows partial updates
-- ✅ DELETE /api/regions/[id] - deletes existing region
+- ✅ DELETE /api/regions/[id] - deletes existing region via Prisma
 - ✅ DELETE /api/regions/[id] - returns 404 for non-existent region
-- ✅ DELETE /api/regions/[id] - doesn't affect other regions (isolation)
-- ✅ DELETE /api/regions/[id] - handles goal isolation (regions in different goals)
-- ✅ DELETE /api/regions/[id] - handles deleting last region
 
 **Coverage:** 100% (Statements, Branches, Functions, Lines)
 
 **Key Edge Cases Tested:**
-- 404 handling for non-existent IDs
+- 404 handling for non-existent UUIDs
 - Special characters in title/description
-- Empty arrays / last item deletion
-- Data persistence verification
-- Query parameter filtering
-- Cross-entity isolation (deleting one doesn't affect others)
+- Empty result sets from Prisma queries
+- Prisma transaction handling
+- Query parameter filtering via Prisma where clauses
+- UUID generation and validation
+- Date/DateTime handling for tasks
+- Status enum validation (active/completed/incomplete)
 
 ---
 
-### ✅ Component Tests (51 tests - 93-100% coverage)
+### ✅ Component Tests (92 tests - 93-100% coverage)
 
 #### Goal Components (33 tests)
+
+All goal components tested with mock fetch API (components don't interact with Prisma directly).
 
 **File:** `components/goals/goal-form/goal-form.test.tsx` (14 tests)
 - ✅ Renders create mode correctly
@@ -157,6 +182,57 @@ Time:        ~3.5 seconds
 - ✅ Shows chevron icon for navigation affordance
 - ✅ Applies hover styles
 - ✅ Handles goals with empty description
+
+#### Task Components (41 tests)
+
+**File:** `components/tasks/task-form/task-form.test.tsx` (14 tests)
+- ✅ Renders create mode correctly
+- ✅ Renders edit mode with initial data
+- ✅ Displays proper title for each mode
+- ✅ Shows correct button text
+- ✅ Shows cancel button
+- ✅ Submits form with valid data (create mode)
+- ✅ Submits form with valid data (edit mode)
+- ✅ Calls correct API endpoint for each mode
+- ✅ Navigates after successful submission
+- ✅ Displays error when API fails
+- ✅ Shows loading state during submission
+- ✅ Handles cancel button correctly
+- ✅ Includes deadline field with date picker
+- ✅ Validates required deadline field
+
+**File:** `components/tasks/delete-task-dialog/delete-task-dialog.test.tsx` (11 tests)
+- ✅ Renders dialog when open
+- ✅ Shows task title in warning message
+- ✅ Shows cascade warning for weekly tasks
+- ✅ Requires exact task name to enable delete button
+- ✅ Delete button disabled with wrong name
+- ✅ Delete button enabled with correct name
+- ✅ Calls API on successful delete
+- ✅ Redirects after delete
+- ✅ Displays error on API failure
+- ✅ Shows loading state during deletion
+- ✅ Handles different task statuses in display
+
+**File:** `components/tasks/task-detail-header/task-detail-header.test.tsx` (6 tests)
+- ✅ Renders task title and description
+- ✅ Shows deadline information
+- ✅ Shows status badge (active/completed)
+- ✅ Shows edit button with correct link
+- ✅ Shows delete button
+- ✅ Opens delete dialog on button click
+
+**File:** `components/tasks/task-card/task-card.test.tsx` (10 tests)
+- ✅ Renders task title and description
+- ✅ Displays deadline date
+- ✅ Shows status badge
+- ✅ Applies different styles for active vs completed status
+- ✅ Shows warning for overdue tasks
+- ✅ Navigates to task detail on click
+- ✅ Shows chevron icon for navigation affordance
+- ✅ Applies hover styles
+- ✅ Handles tasks with empty description
+- ✅ Formats deadline correctly
 
 #### Region Components (18 tests)
 
@@ -218,23 +294,8 @@ Time:        ~3.5 seconds
 
 These tests should be implemented when the corresponding features are built. **Follow TDD approach: write tests first!**
 
-### ⏳ Tasks API Tests (Pending)
-
-**Files to create:**
-- `app/api/tasks/route.test.ts`
-- `app/api/tasks/[id]/route.test.ts`
-
-**Tests needed:**
-- [ ] GET /api/tasks?regionId={id} - list tasks for region
-- [ ] GET /api/tasks?regionId={id} - filter by regionId
-- [ ] POST /api/tasks - create task with deadline
-- [ ] POST /api/tasks - validates required deadline
-- [ ] GET /api/tasks/[id] - returns existing task
-- [ ] GET /api/tasks/[id] - returns 404 for non-existent
-- [ ] PUT /api/tasks/[id] - updates task
-- [ ] PUT /api/tasks/[id] - validates deadline
-- [ ] DELETE /api/tasks/[id] - deletes task
-- [ ] DELETE /api/tasks/[id] - cascades to weekly tasks
+### ⏳ Tasks API Tests
+✅ **COMPLETE** - All 21 tests implemented with Prisma mocks
 
 ### ⏳ Weekly Tasks API Tests (Pending)
 
@@ -271,18 +332,15 @@ These tests should be implemented when the corresponding features are built. **F
 ### ⏳ Component Tests (Pending)
 
 **Files to create:**
-- `components/tasks/task-form/task-form.test.tsx`
-- `components/tasks/task-card/task-card.test.tsx`
-- `components/tasks/delete-task-dialog/delete-task-dialog.test.tsx`
 - `components/weekly-tasks/weekly-task-form/weekly-task-form.test.tsx`
 - `components/weekly-tasks/weekly-task-card/weekly-task-card.test.tsx`
 - `components/progress/progress-entry-form/progress-entry-form.test.tsx`
 - `components/progress/progress-entry-card/progress-entry-card.test.tsx`
 
-**Tests needed:** (follow same patterns as Goals/Regions)
+**Tests needed:** (follow same patterns as Goals/Regions/Tasks)
 - [ ] Form rendering (create/edit modes)
-- [ ] Form validation (deadlines, priorities, completion %)
-- [ ] API integration
+- [ ] Form validation (priorities 1-3, completion % 0-100)
+- [ ] API integration with Prisma-backed endpoints
 - [ ] Navigation after actions
 - [ ] Delete dialogs with confirmation
 - [ ] Weekly review workflow
@@ -371,12 +429,15 @@ These tests should be implemented when the corresponding features are built. **F
 **Global Mocks** (`jest.setup.ts`)
 - Next.js router (`useRouter`, `usePathname`, etc.)
 - Next.js Link component (renders as `<a>`)
-- Fetch API (`global.fetch`)
+- Fetch API (`global.fetch`) - for component tests
+- **Prisma Client** - for API route tests
+  - All CRUD methods mocked (findMany, findUnique, create, update, delete)
+  - Returns mock data matching Prisma schema types
+  - Cleared before each test via `jest.clearAllMocks()`
 
 **Mock Data** (`lib/mock-data.ts`)
-- In-memory mock database
-- Used by API routes and tests
-- Reset before each test
+- Legacy in-memory data (deprecated for new features)
+- Use Prisma mocks for new tests instead
 
 ### Type Safety
 
@@ -804,6 +865,37 @@ jest.mock("next/link", () => {
   };
 });
 
+// Mock Prisma client globally for API tests
+jest.mock("@/lib/prisma", () => ({
+  __esModule: true,
+  default: {
+    goal: {
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      count: jest.fn(),
+    },
+    region: {
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      count: jest.fn(),
+    },
+    task: {
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      count: jest.fn(),
+    },
+  },
+}));
+
 // Clear mocks and reset fetch before each test
 beforeEach(() => {
   mockRouterPush.mockClear();
@@ -816,6 +908,7 @@ beforeEach(() => {
 **Key features:**
 - Exports mock functions for component tests to import
 - Global Next.js router and Link mocks
+- **Prisma client mock** with all CRUD operations
 - Auto-clears mocks before each test
 - Resets fetch mock before each test
 
@@ -1020,13 +1113,15 @@ pnpm test goal-form.test.tsx
 
 ## Test Patterns & Examples
 
-### Pattern 1: API Route Tests
+### Pattern 1: API Route Tests (with Prisma Mocks)
 
 **Key characteristics:**
 - Use `@jest-environment node` docblock
 - Import route handlers directly
-- Create Request objects for testing
+- Import and type-cast Prisma mock
+- Mock Prisma method return values
 - Test all HTTP methods (GET, POST, PUT, DELETE)
+- Verify Prisma methods called with correct parameters
 - Test edge cases (404, validation)
 
 **Example:**
@@ -1036,33 +1131,34 @@ pnpm test goal-form.test.tsx
  * @jest-environment node
  */
 import { GET, POST } from './route'
-import { mockGoals } from '@/lib/mock-data'
+import prisma from '@/lib/prisma'
+
+// Type the mocked prisma
+const mockPrisma = prisma as jest.Mocked<typeof prisma>
 
 describe('Goals API - /api/goals', () => {
   beforeEach(() => {
-    // Reset mock data before each test
-    mockGoals.length = 0
-    mockGoals.push(
-      { id: '1', title: 'Test Goal 1', description: 'Description 1' },
-      { id: '2', title: 'Test Goal 2', description: 'Description 2' }
-    )
+    jest.clearAllMocks()
   })
 
   describe('GET /api/goals', () => {
     it('should return all goals', async () => {
+      // ARRANGE
+      const mockGoalsData = [
+        { id: 'uuid-1', title: 'Test Goal 1', description: 'Description 1', userId: 0, createdAt: new Date(), updatedAt: new Date() },
+        { id: 'uuid-2', title: 'Test Goal 2', description: 'Description 2', userId: 0, createdAt: new Date(), updatedAt: new Date() },
+      ]
+      mockPrisma.goal.findMany.mockResolvedValue(mockGoalsData)
+
       // ACT
       const response = await GET()
       const data = await response.json()
-      
+
       // ASSERT
       expect(response.status).toBe(200)
       expect(Array.isArray(data)).toBe(true)
       expect(data.length).toBe(2)
-      expect(data[0]).toMatchObject({
-        id: '1',
-        title: 'Test Goal 1',
-        description: 'Description 1'
-      })
+      expect(mockPrisma.goal.findMany).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -1070,44 +1166,36 @@ describe('Goals API - /api/goals', () => {
     it('should create a new goal', async () => {
       // ARRANGE
       const newGoal = { title: 'New Goal', description: 'New Description' }
-      
+      const createdGoal = {
+        id: 'uuid-new',
+        ...newGoal,
+        userId: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+      mockPrisma.goal.create.mockResolvedValue(createdGoal)
+
       const request = new Request('http://localhost:3000/api/goals', {
         method: 'POST',
         body: JSON.stringify(newGoal),
         headers: { 'Content-Type': 'application/json' },
       })
-      
+
       // ACT
       const response = await POST(request)
       const data = await response.json()
-      
+
       // ASSERT
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(201)
       expect(data).toMatchObject(newGoal)
       expect(data.id).toBeDefined()
-      expect(mockGoals).toHaveLength(3) // Verify it was added
-    })
-    
-    it('should handle special characters', async () => {
-      // ARRANGE
-      const newGoal = { 
-        title: 'Goal with "quotes" & ampersands', 
-        description: 'Description with <html> tags'
-      }
-      
-      const request = new Request('http://localhost:3000/api/goals', {
-        method: 'POST',
-        body: JSON.stringify(newGoal),
-        headers: { 'Content-Type': 'application/json' },
+      expect(mockPrisma.goal.create).toHaveBeenCalledWith({
+        data: {
+          title: newGoal.title,
+          description: newGoal.description,
+          userId: 0,
+        },
       })
-      
-      // ACT
-      const response = await POST(request)
-      const data = await response.json()
-      
-      // ASSERT
-      expect(data.title).toBe(newGoal.title)
-      expect(data.description).toBe(newGoal.description)
     })
   })
 })

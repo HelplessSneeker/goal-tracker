@@ -2,21 +2,26 @@
  * @jest-environment node
  */
 import { GET, POST } from "./route";
-import { mockRegions } from "@/lib/mock-data";
+import prisma from "@/lib/prisma";
+
+// Type the mocked prisma
+const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 
 describe("Regions API - /api/regions", () => {
   beforeEach(() => {
-    // Reset mock data before each test
-    mockRegions.length = 0;
-    mockRegions.push(
-      { id: "1", goalId: "goal-1", title: "Region 1", description: "Desc 1" },
-      { id: "2", goalId: "goal-1", title: "Region 2", description: "Desc 2" },
-      { id: "3", goalId: "goal-2", title: "Region 3", description: "Desc 3" },
-    );
+    jest.clearAllMocks();
   });
 
   describe("GET /api/regions", () => {
     it("should return all regions when no goalId filter is provided", async () => {
+      const mockRegionsData = [
+        { id: "uuid-1", goalId: "goal-1", title: "Region 1", description: "Desc 1", userId: 0, createdAt: new Date(), updatedAt: new Date() },
+        { id: "uuid-2", goalId: "goal-1", title: "Region 2", description: "Desc 2", userId: 0, createdAt: new Date(), updatedAt: new Date() },
+        { id: "uuid-3", goalId: "goal-2", title: "Region 3", description: "Desc 3", userId: 0, createdAt: new Date(), updatedAt: new Date() },
+      ];
+
+      mockPrisma.region.findMany.mockResolvedValue(mockRegionsData);
+
       const request = new Request("http://localhost:3000/api/regions");
       const response = await GET(request);
       const data = await response.json();
@@ -24,9 +29,17 @@ describe("Regions API - /api/regions", () => {
       expect(response.status).toBe(200);
       expect(Array.isArray(data)).toBe(true);
       expect(data.length).toBe(3);
+      expect(mockPrisma.region.findMany).toHaveBeenCalledWith({});
     });
 
     it("should filter regions by goalId when provided", async () => {
+      const mockRegionsData = [
+        { id: "uuid-1", goalId: "goal-1", title: "Region 1", description: "Desc 1", userId: 0, createdAt: new Date(), updatedAt: new Date() },
+        { id: "uuid-2", goalId: "goal-1", title: "Region 2", description: "Desc 2", userId: 0, createdAt: new Date(), updatedAt: new Date() },
+      ];
+
+      mockPrisma.region.findMany.mockResolvedValue(mockRegionsData);
+
       const request = new Request(
         "http://localhost:3000/api/regions?goalId=goal-1",
       );
@@ -37,9 +50,14 @@ describe("Regions API - /api/regions", () => {
       expect(Array.isArray(data)).toBe(true);
       expect(data.length).toBe(2);
       expect(data.every((r: any) => r.goalId === "goal-1")).toBe(true);
+      expect(mockPrisma.region.findMany).toHaveBeenCalledWith({
+        where: { goalId: "goal-1" },
+      });
     });
 
     it("should return empty array when goalId has no regions", async () => {
+      mockPrisma.region.findMany.mockResolvedValue([]);
+
       const request = new Request(
         "http://localhost:3000/api/regions?goalId=nonexistent",
       );
@@ -49,9 +67,18 @@ describe("Regions API - /api/regions", () => {
       expect(response.status).toBe(200);
       expect(Array.isArray(data)).toBe(true);
       expect(data.length).toBe(0);
+      expect(mockPrisma.region.findMany).toHaveBeenCalledWith({
+        where: { goalId: "nonexistent" },
+      });
     });
 
     it("should return regions with correct structure", async () => {
+      const mockRegionsData = [
+        { id: "uuid-1", goalId: "goal-1", title: "Region 1", description: "Desc 1", userId: 0, createdAt: new Date(), updatedAt: new Date() },
+      ];
+
+      mockPrisma.region.findMany.mockResolvedValue(mockRegionsData);
+
       const request = new Request("http://localhost:3000/api/regions");
       const response = await GET(request);
       const data = await response.json();
@@ -76,6 +103,18 @@ describe("Regions API - /api/regions", () => {
         description: "New region description",
       };
 
+      const createdRegion = {
+        id: "uuid-new",
+        goalId: newRegion.goalId,
+        title: newRegion.title,
+        description: newRegion.description,
+        userId: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockPrisma.region.create.mockResolvedValue(createdRegion);
+
       const request = new Request("http://localhost:3000/api/regions", {
         method: "POST",
         headers: {
@@ -88,19 +127,39 @@ describe("Regions API - /api/regions", () => {
       const data = await response.json();
 
       expect(response.status).toBe(201);
-      expect(data).toMatchObject(newRegion);
+      expect(data.goalId).toBe(newRegion.goalId);
+      expect(data.title).toBe(newRegion.title);
+      expect(data.description).toBe(newRegion.description);
       expect(data.id).toBeDefined();
       expect(typeof data.id).toBe("string");
+      expect(mockPrisma.region.create).toHaveBeenCalledWith({
+        data: {
+          goalId: newRegion.goalId,
+          title: newRegion.title,
+          description: newRegion.description,
+          userId: 0,
+        },
+      });
     });
 
-    it("should add the region to mockRegions array", async () => {
-      const initialLength = mockRegions.length;
-
+    it("should add the region to database via Prisma", async () => {
       const newRegion = {
         goalId: "goal-2",
         title: "Another Region",
         description: "Description here",
       };
+
+      const createdRegion = {
+        id: "uuid-new-2",
+        goalId: newRegion.goalId,
+        title: newRegion.title,
+        description: newRegion.description,
+        userId: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockPrisma.region.create.mockResolvedValue(createdRegion);
 
       const request = new Request("http://localhost:3000/api/regions", {
         method: "POST",
@@ -112,9 +171,14 @@ describe("Regions API - /api/regions", () => {
 
       await POST(request);
 
-      expect(mockRegions.length).toBe(initialLength + 1);
-      expect(mockRegions[mockRegions.length - 1].title).toBe("Another Region");
-      expect(mockRegions[mockRegions.length - 1].goalId).toBe("goal-2");
+      expect(mockPrisma.region.create).toHaveBeenCalledTimes(1);
+      expect(mockPrisma.region.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          goalId: "goal-2",
+          title: "Another Region",
+          description: "Description here",
+        }),
+      });
     });
 
     it("should handle special characters in title and description", async () => {
@@ -123,6 +187,18 @@ describe("Regions API - /api/regions", () => {
         title: 'Region with "quotes" & special chars',
         description: "Description with <tags> and @symbols",
       };
+
+      const createdRegion = {
+        id: "uuid-special",
+        goalId: newRegion.goalId,
+        title: newRegion.title,
+        description: newRegion.description,
+        userId: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockPrisma.region.create.mockResolvedValue(createdRegion);
 
       const request = new Request("http://localhost:3000/api/regions", {
         method: "POST",
@@ -152,6 +228,30 @@ describe("Regions API - /api/regions", () => {
         title: "Region for Goal 3",
         description: "Description",
       };
+
+      const createdRegion1 = {
+        id: "uuid-region-1",
+        goalId: region1.goalId,
+        title: region1.title,
+        description: region1.description,
+        userId: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const createdRegion2 = {
+        id: "uuid-region-2",
+        goalId: region2.goalId,
+        title: region2.title,
+        description: region2.description,
+        userId: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockPrisma.region.create
+        .mockResolvedValueOnce(createdRegion1)
+        .mockResolvedValueOnce(createdRegion2);
 
       const request1 = new Request("http://localhost:3000/api/regions", {
         method: "POST",

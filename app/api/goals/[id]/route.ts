@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
-import { mockGoals } from "@/lib/mock-data";
+import prisma from "@/lib/prisma";
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const goal = mockGoals.find((g) => g.id === id);
+  const goal = await prisma.goal.findUnique({
+    where: { id },
+  });
 
   if (!goal) {
     return NextResponse.json({ error: "Goal not found" }, { status: 404 });
@@ -21,14 +23,19 @@ export async function PUT(
 ) {
   const { id } = await params;
   const body = await request.json();
-  const index = mockGoals.findIndex((g) => g.id === id);
 
-  if (index === -1) {
+  try {
+    const updatedGoal = await prisma.goal.update({
+      where: { id },
+      data: {
+        title: body.title,
+        description: body.description,
+      },
+    });
+    return NextResponse.json(updatedGoal);
+  } catch (error) {
     return NextResponse.json({ error: "Goal not found" }, { status: 404 });
   }
-
-  mockGoals[index] = { ...mockGoals[index], ...body };
-  return NextResponse.json(mockGoals[index]);
 }
 
 export async function DELETE(
@@ -36,12 +43,13 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const index = mockGoals.findIndex((g) => g.id === id);
 
-  if (index === -1) {
+  try {
+    await prisma.goal.delete({
+      where: { id },
+    });
+    return NextResponse.json({ success: true });
+  } catch (error) {
     return NextResponse.json({ error: "Goal not found" }, { status: 404 });
   }
-
-  mockGoals.splice(index, 1);
-  return NextResponse.json({ success: true });
 }

@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
-import { mockRegions } from "@/lib/mock-data";
+import prisma from "@/lib/prisma";
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const region = mockRegions.find((r) => r.id === id);
+  const region = await prisma.region.findUnique({
+    where: { id },
+  });
 
   if (!region) {
     return NextResponse.json({ error: "Region not found" }, { status: 404 });
@@ -21,14 +23,20 @@ export async function PUT(
 ) {
   const { id } = await params;
   const body = await request.json();
-  const index = mockRegions.findIndex((r) => r.id === id);
 
-  if (index === -1) {
+  try {
+    const updatedRegion = await prisma.region.update({
+      where: { id },
+      data: {
+        title: body.title,
+        description: body.description,
+        goalId: body.goalId,
+      },
+    });
+    return NextResponse.json(updatedRegion);
+  } catch (error) {
     return NextResponse.json({ error: "Region not found" }, { status: 404 });
   }
-
-  mockRegions[index] = { ...mockRegions[index], ...body };
-  return NextResponse.json(mockRegions[index]);
 }
 
 export async function DELETE(
@@ -36,12 +44,13 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const index = mockRegions.findIndex((r) => r.id === id);
 
-  if (index === -1) {
+  try {
+    await prisma.region.delete({
+      where: { id },
+    });
+    return NextResponse.json({ success: true });
+  } catch (error) {
     return NextResponse.json({ error: "Region not found" }, { status: 404 });
   }
-
-  mockRegions.splice(index, 1);
-  return NextResponse.json({ success: true });
 }

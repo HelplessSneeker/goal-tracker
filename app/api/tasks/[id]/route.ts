@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
-import { mockTasks } from "@/lib/mock-data";
+import prisma from "@/lib/prisma";
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const task = mockTasks.find((t) => t.id === id);
+  const task = await prisma.task.findUnique({
+    where: { id },
+  });
 
   if (!task) {
     return NextResponse.json({ error: "Task not found" }, { status: 404 });
@@ -21,14 +23,22 @@ export async function PUT(
 ) {
   const { id } = await params;
   const body = await request.json();
-  const index = mockTasks.findIndex((t) => t.id === id);
 
-  if (index === -1) {
+  try {
+    const updatedTask = await prisma.task.update({
+      where: { id },
+      data: {
+        title: body.title,
+        description: body.description,
+        deadline: body.deadline ? new Date(body.deadline) : undefined,
+        status: body.status,
+        regionId: body.regionId,
+      },
+    });
+    return NextResponse.json(updatedTask);
+  } catch (error) {
     return NextResponse.json({ error: "Task not found" }, { status: 404 });
   }
-
-  mockTasks[index] = { ...mockTasks[index], ...body };
-  return NextResponse.json(mockTasks[index]);
 }
 
 export async function DELETE(
@@ -36,12 +46,13 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const index = mockTasks.findIndex((t) => t.id === id);
 
-  if (index === -1) {
+  try {
+    await prisma.task.delete({
+      where: { id },
+    });
+    return NextResponse.json({ success: true });
+  } catch (error) {
     return NextResponse.json({ error: "Task not found" }, { status: 404 });
   }
-
-  mockTasks.splice(index, 1);
-  return NextResponse.json({ success: true });
 }

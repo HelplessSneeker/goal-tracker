@@ -15,7 +15,7 @@ datasource db {
 }
 
 model Goal {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -28,15 +28,15 @@ model Goal {
 }
 
 model Region {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   title       String  @db.VarChar(255)
   description String?
 
-  goal   Goal @relation(fields: [goalId], references: [id])
-  goalId Int
+  goal   Goal   @relation(fields: [goalId], references: [id])
+  goalId String
 
   tasks Task[]
 
@@ -46,12 +46,13 @@ model Region {
 enum TaskStatus {
   active
   incomplete
+  completed
 }
 
 model Task {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String     @id @default(uuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
   title       String     @db.VarChar(255)
   description String?
@@ -59,7 +60,7 @@ model Task {
   status      TaskStatus
 
   region   Region @relation(fields: [regionId], references: [id])
-  regionId Int
+  regionId String
 
   userId Int // User To Be Implemented
 }

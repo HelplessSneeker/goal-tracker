@@ -1,29 +1,28 @@
 import { NextResponse } from "next/server";
-import { mockTasks } from "@/lib/mock-data";
+import prisma from "@/lib/prisma";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const regionId = searchParams.get("regionId");
 
-  if (regionId) {
-    const filteredTasks = mockTasks.filter((t) => t.regionId === regionId);
-    return NextResponse.json(filteredTasks);
-  }
+  const tasks = await prisma.task.findMany({
+    where: regionId ? { regionId } : undefined,
+  });
 
-  return NextResponse.json(mockTasks);
+  return NextResponse.json(tasks);
 }
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const newTask = {
-    id: String(mockTasks.length + 1),
-    regionId: body.regionId,
-    title: body.title,
-    description: body.description,
-    deadline: body.deadline,
-    status: "active" as const,
-    createdAt: new Date().toISOString(),
-  };
-  mockTasks.push(newTask);
+  const newTask = await prisma.task.create({
+    data: {
+      regionId: body.regionId,
+      title: body.title,
+      description: body.description,
+      deadline: new Date(body.deadline),
+      status: "active",
+      userId: 0, // todo implement userID
+    },
+  });
   return NextResponse.json(newTask, { status: 201 });
 }

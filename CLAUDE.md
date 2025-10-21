@@ -30,7 +30,8 @@ This application implements a hierarchical goal management system designed to he
 - ✅ Goals (CRUD complete with full test coverage - filtering/search pending)
 - ✅ Regions (CRUD complete with full test coverage - filtering/search pending)
 - ✅ Tasks (CRUD complete with full test coverage, deadline tracking, status badges)
-- ✅ Testing infrastructure (Jest + React Testing Library - 147 tests passing in ~3.8s)
+- ✅ Database (Prisma + PostgreSQL with UUID primary keys)
+- ✅ Testing infrastructure (Jest + React Testing Library - 156 tests passing in ~7.9s)
   - ✅ 100% API coverage for Goals, Regions, and Tasks
   - ✅ 93-100% component coverage for Goals, Regions, and Tasks
   - ✅ Comprehensive TESTING.md documentation
@@ -67,6 +68,12 @@ pnpm test:watch
 
 # Run tests with coverage
 pnpm test:coverage
+
+# Database commands (Prisma)
+pnpm prisma generate         # Generate Prisma client
+pnpm prisma db push          # Push schema changes to database
+pnpm prisma db seed          # Seed database with initial data
+pnpm prisma studio           # Open Prisma Studio (database GUI)
 ```
 
 The development server runs at http://localhost:3000.
@@ -75,29 +82,24 @@ The development server runs at http://localhost:3000.
 
 **⚠️ IMPORTANT: We follow Test-Driven Development (TDD) for all new features.**
 
-### Current Test Coverage (2025-10-15)
-- ✅ **147 tests passing** (58 API + 83 component + 6 utility)
+### Current Test Coverage
+- ✅ **156 tests passing** (58 API + 92 component + 6 utility)
 - ✅ **100% API coverage** for Goals, Regions, and Tasks CRUD
 - ✅ **High component coverage** (93-100%) for all implemented features
 
 ### Testing Stack
 - **Jest** with Next.js 15 built-in support (`next/jest`)
 - **React Testing Library** for component testing
+- **Prisma mocks** configured in `jest.setup.ts` for API tests
 - **Coverage provider**: v8 (faster than babel)
 - **Test environment**: jsdom for components, node for API routes
-- **Configuration**: `jest.config.ts` and `jest.setup.ts`
 
-### Current Test Results (2025-10-15)
+### Current Test Results
 ```
-Test Suites: 17 passed, 17 total
-Tests:       147 passed, 147 total
-Time:        ~3.8 seconds
+Test Suites: 19 passed, 19 total
+Tests:       156 passed, 156 total
+Time:        ~7.9 seconds
 ```
-
-**Breakdown:**
-- API tests: 58 tests (100% coverage for Goals, Regions, Tasks)
-- Component tests: 83 tests (93-100% coverage)
-- Utility tests: 6 tests (100% coverage)
 
 ### TDD Workflow (Red-Green-Refactor)
 For all new features, follow this cycle:
@@ -156,16 +158,17 @@ import { TaskForm } from "@/components/tasks/task-form/task-form";
 4. Always import from the feature folder index in other files
 
 ### Key Testing Patterns
-- API tests use `/** @jest-environment node */` docblock
+- API tests use `/** @jest-environment node */` docblock and mocked Prisma client
+- Prisma mock configured globally in `jest.setup.ts` with all CRUD methods
 - Component tests import global mocks from `jest.setup.ts`
 - All tests use Arrange-Act-Assert pattern
 - Mock `fetch` for API calls, mock router for navigation
-- Each component test file uses relative imports: `import { Component } from "./component"`
+- API tests verify Prisma method calls with correct parameters
 
 ### Test Coverage Goals
-- **API routes**: 100% coverage (required) ✅ Goals, Regions & Tasks complete
-- **Components**: 80%+ coverage ✅ Goals, Regions & Tasks complete
-- **Utilities**: 90%+ coverage ✅ Complete
+- **API routes**: 100% coverage (required) ✅
+- **Components**: 80%+ coverage ✅
+- **Utilities**: 90%+ coverage ✅
 
 See [TESTING.md](./TESTING.md) for comprehensive testing guide, examples, and best practices.
 
@@ -234,6 +237,13 @@ Uses Next.js font optimization with Geist and Geist Mono fonts from Google Fonts
 
 ## Data Architecture
 
+### Database
+- **Prisma ORM** with PostgreSQL
+- **Schema**: `prisma/schema.prisma`
+- **Client**: Generated to `generated/prisma/`
+- **UUID primary keys** for all entities (Goals, Regions, Tasks)
+- **Seed file**: `prisma/seed.ts` for development data
+
 ### Entity Relationships
 
 ```
@@ -246,6 +256,8 @@ Goal (1) ──> Region (n) ──> Task (n) ──> Weekly Task (n, 3 per week)
 - A **Weekly Task** can have many **Progress Entries** (daily journal entries)
 
 ### API Routes
+
+All API routes use Prisma client imported from `@/lib/prisma` for database operations.
 
 **Goals:** ✅ Complete (100% test coverage)
 - `GET /api/goals` - List all goals ✅
@@ -268,7 +280,8 @@ Goal (1) ──> Region (n) ──> Task (n) ──> Weekly Task (n, 3 per week)
 - `PUT /api/tasks/[id]` - Update task ✅
 - `DELETE /api/tasks/[id]` - Delete task ✅
 
-**Weekly Tasks:** ⏳ TODO (implement with TDD)
+**Weekly Tasks:** ⏳ TODO (implement with TDD using Prisma)
+- First add `WeeklyTask` model to `prisma/schema.prisma` and run migration
 - `GET /api/weekly-tasks?taskId={id}&weekStartDate={date}` - List weekly tasks with filters
 - `GET /api/weekly-tasks/current-week` - Get all weekly tasks for the current week
 - `POST /api/weekly-tasks` - Create a weekly task
@@ -276,7 +289,8 @@ Goal (1) ──> Region (n) ──> Task (n) ──> Weekly Task (n, 3 per week)
 - `PUT /api/weekly-tasks/[id]` - Update weekly task
 - `DELETE /api/weekly-tasks/[id]` - Delete weekly task
 
-**Progress Entries:** ⏳ TODO (implement with TDD)
+**Progress Entries:** ⏳ TODO (implement with TDD using Prisma)
+- First add `ProgressEntry` model to `prisma/schema.prisma` and run migration
 - `GET /api/progress-entries?weeklyTaskId={id}` - List progress entries for a weekly task
 - `POST /api/progress-entries` - Create a progress entry
 - `GET /api/progress-entries/[id]` - Get specific progress entry
@@ -285,28 +299,28 @@ Goal (1) ──> Region (n) ──> Task (n) ──> Weekly Task (n, 3 per week)
 
 ### Data Types
 
-TypeScript interfaces in `lib/types.ts`:
+**Prisma Models** (`prisma/schema.prisma`):
+- `Goal`: id (UUID), title, description, userId, createdAt, updatedAt, regions[]
+- `Region`: id (UUID), goalId, title, description, userId, createdAt, updatedAt, goal, tasks[]
+- `Task`: id (UUID), regionId, title, description, deadline (DateTime), status (active/completed/incomplete), userId, createdAt, updatedAt, region
 
-**Implemented:**
-- `Goal`: id, title, description
-- `Region`: id, goalId (reference), title, description
-- `Task`: id, regionId (required), title, description, deadline (ISO date string, required), status (active/completed), createdAt (ISO date string)
+**TypeScript Interfaces** (`lib/types.ts` - for frontend use):
+- Simplified versions of Prisma models (id, title, description, etc.)
+- Used by components and pages for type checking
 
-**TODO:**
-- `WeeklyTask`: id, taskId, title, description, priority (1-3), weekStartDate (Date), status (pending/completed)
-- `ProgressEntry`: id, weeklyTaskId, date (Date), notes (string), completionPercentage (0-100), createdAt (timestamp)
-
-### Mock Data
-In-memory mock data stored in `lib/mock-data.ts` for development. This will be replaced with a real backend later.
+**TODO - Prisma Models:**
+- `WeeklyTask`: id, taskId, title, description, priority (1-3), weekStartDate, status
+- `ProgressEntry`: id, weeklyTaskId, date, notes, completionPercentage (0-100), createdAt
 
 ## Component Patterns
 
 ### Server vs Client Components
-- **Server Components** (default): Used for data fetching and static UI (e.g., `app/page.tsx`, `app/progress/page.tsx`, `app/goals/page.tsx`, `app/goals/[id]/page.tsx`, `app/goals/[id]/[regionId]/page.tsx`, `app/goals/[id]/[regionId]/tasks/[taskId]/page.tsx`, `components/goal-card.tsx`)
-- **Client Components** (`"use client"`): Required for interactivity, state, event handlers (e.g., `components/app-sidebar.tsx`, form components)
+- **Server Components** (default): Used for data fetching and static UI (pages, detail views, cards)
+- **Client Components** (`"use client"`): Required for interactivity, state, event handlers (forms, dialogs, sidebar)
 - Server Components fetch from API routes using native `fetch()` with `cache: "no-store"`
+- API routes use Prisma to query PostgreSQL database
 - Use `loading.tsx` files for Suspense boundaries and loading states
-- Nested dynamic routes follow the pattern: `/goals/[id]/[regionId]/tasks/[taskId]` for hierarchical navigation
+- Nested dynamic routes: `/goals/[id]/[regionId]/tasks/[taskId]` for hierarchical navigation
 
 ### Interactive Cards & Detail Headers
 All cards follow a consistent clickable navigation pattern:
@@ -335,27 +349,10 @@ All cards follow a consistent clickable navigation pattern:
 
 ### When Implementing New Features (TDD Approach)
 1. **🔴 Write tests first** - Create failing tests that define the expected behavior
-2. **🟢 Implement minimal code** - Write just enough code to pass the tests
+2. **🟢 Implement minimal code** - Write just enough code to pass the tests (use Prisma for database operations)
 3. **♻️ Refactor** - Improve code quality while keeping tests green
 4. **Run full test suite** - Ensure no regressions: `pnpm test`
 5. **Check coverage** - Verify coverage targets met: `pnpm test:coverage`
 6. **Lint before commit** - Ensure code style: `pnpm lint`
-
-### Example TDD Cycle for New API Route
-```bash
-# 1. Create test file first
-# app/api/tasks/route.test.ts
-
-# 2. Write failing test
-pnpm test  # Should fail
-
-# 3. Implement route
-# app/api/tasks/route.ts
-
-# 4. Run tests
-pnpm test  # Should pass
-
-# 5. Refactor if needed, tests still passing
-```
 
 See [TESTING.md](./TESTING.md) for detailed TDD examples and patterns.

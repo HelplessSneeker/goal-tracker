@@ -1,22 +1,22 @@
-export interface Goal {
-  id: string;
-  title: string;
-  description: string;
-}
+import {
+  Goal as PrismaGoal,
+  Region as PrismaRegion,
+  Task as PrismaTask,
+} from "@/generated/prisma/client";
 
-export interface Region {
-  id: string;
-  goalId: string;
-  title: string;
-  description: string;
-}
+// API response types - Prisma Date objects are serialized to ISO strings in JSON
+export type Goal = Omit<PrismaGoal, "createdAt" | "updatedAt"> & {
+  createdAt?: string;
+  updatedAt?: string;
+};
 
-export interface Task {
-  id: string;
-  regionId: string;
-  title: string;
-  description: string;
+export type Region = Omit<PrismaRegion, "createdAt" | "updatedAt"> & {
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type Task = Omit<PrismaTask, "createdAt" | "updatedAt" | "deadline"> & {
   deadline: string; // ISO date string
-  status: 'active' | 'completed';
   createdAt: string; // ISO date string
-}
+  updatedAt?: string;
+};

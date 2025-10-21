@@ -1,26 +1,26 @@
 import { NextResponse } from "next/server";
-import { mockRegions } from "@/lib/mock-data";
+import prisma from "@/lib/prisma";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const goalId = searchParams.get("goalId");
 
-  if (goalId) {
-    const filteredRegions = mockRegions.filter((r) => r.goalId === goalId);
-    return NextResponse.json(filteredRegions);
-  }
+  const regions = await prisma.region.findMany({
+    where: goalId ? { goalId } : undefined,
+  });
 
-  return NextResponse.json(mockRegions);
+  return NextResponse.json(regions);
 }
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const newRegion = {
-    id: String(mockRegions.length + 1),
-    goalId: body.goalId,
-    title: body.title,
-    description: body.description,
-  };
-  mockRegions.push(newRegion);
+  const newRegion = await prisma.region.create({
+    data: {
+      goalId: body.goalId,
+      title: body.title,
+      description: body.description,
+      userId: 0, // todo implement userID
+    },
+  });
   return NextResponse.json(newRegion, { status: 201 });
 }

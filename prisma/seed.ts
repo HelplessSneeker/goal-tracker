@@ -130,8 +130,7 @@ async function main() {
       title: "Setup shadcn/ui component library",
       description: "Install and configure shadcn/ui in the project",
       deadline: new Date("2025-10-20T00:00:00.000Z"),
-      // Note: Schema uses "incomplete" instead of "completed" - using "active" for now
-      status: "active",
+      status: "completed",
       createdAt: new Date("2025-10-04T10:00:00.000Z"),
       userId: 1,
     },

@@ -47,6 +47,37 @@ global.ResizeObserver = class ResizeObserver {
   disconnect() {}
 };
 
+// Mock Prisma client
+jest.mock("@/lib/prisma", () => ({
+  __esModule: true,
+  default: {
+    goal: {
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      count: jest.fn(),
+    },
+    region: {
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      count: jest.fn(),
+    },
+    task: {
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      count: jest.fn(),
+    },
+  },
+}));
+
 // Setup global mocks
 beforeEach(() => {
   // Clear all mocks before each test

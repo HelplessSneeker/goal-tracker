@@ -2,45 +2,56 @@
  * @jest-environment node
  */
 import { GET, POST } from "./route";
-import { mockTasks } from "@/lib/mock-data";
+import prisma from "@/lib/prisma";
+
+// Type the mocked prisma
+const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 
 describe("Tasks API - /api/tasks", () => {
   beforeEach(() => {
-    // Reset mock data before each test
-    mockTasks.length = 0;
-    mockTasks.push(
-      {
-        id: "1",
-        regionId: "region-1",
-        title: "Task 1",
-        description: "Description 1",
-        deadline: "2025-10-31T00:00:00.000Z",
-        status: "active",
-        createdAt: "2025-10-01T10:00:00.000Z",
-      },
-      {
-        id: "2",
-        regionId: "region-1",
-        title: "Task 2",
-        description: "Description 2",
-        deadline: "2025-11-15T00:00:00.000Z",
-        status: "active",
-        createdAt: "2025-10-02T10:00:00.000Z",
-      },
-      {
-        id: "3",
-        regionId: "region-2",
-        title: "Task 3",
-        description: "Description 3",
-        deadline: "2025-10-25T00:00:00.000Z",
-        status: "completed",
-        createdAt: "2025-10-03T10:00:00.000Z",
-      }
-    );
+    jest.clearAllMocks();
   });
 
   describe("GET /api/tasks", () => {
     it("should return all tasks when no regionId filter is provided", async () => {
+      const mockTasksData = [
+        {
+          id: "1",
+          regionId: "region-1",
+          title: "Task 1",
+          description: "Description 1",
+          deadline: new Date("2025-10-31T00:00:00.000Z"),
+          status: "active" as const,
+          userId: 0,
+          createdAt: new Date("2025-10-01T10:00:00.000Z"),
+          updatedAt: new Date(),
+        },
+        {
+          id: "2",
+          regionId: "region-1",
+          title: "Task 2",
+          description: "Description 2",
+          deadline: new Date("2025-11-15T00:00:00.000Z"),
+          status: "active" as const,
+          userId: 0,
+          createdAt: new Date("2025-10-02T10:00:00.000Z"),
+          updatedAt: new Date(),
+        },
+        {
+          id: "3",
+          regionId: "region-2",
+          title: "Task 3",
+          description: "Description 3",
+          deadline: new Date("2025-10-25T00:00:00.000Z"),
+          status: "completed" as const,
+          userId: 0,
+          createdAt: new Date("2025-10-03T10:00:00.000Z"),
+          updatedAt: new Date(),
+        },
+      ];
+
+      mockPrisma.task.findMany.mockResolvedValue(mockTasksData);
+
       const request = new Request("http://localhost:3000/api/tasks");
       const response = await GET(request);
       const data = await response.json();
@@ -48,9 +59,38 @@ describe("Tasks API - /api/tasks", () => {
       expect(response.status).toBe(200);
       expect(Array.isArray(data)).toBe(true);
       expect(data.length).toBe(3);
+      expect(mockPrisma.task.findMany).toHaveBeenCalledTimes(1);
+      expect(mockPrisma.task.findMany).toHaveBeenCalledWith({});
     });
 
     it("should filter tasks by regionId when provided", async () => {
+      const mockTasksData = [
+        {
+          id: "1",
+          regionId: "region-1",
+          title: "Task 1",
+          description: "Description 1",
+          deadline: new Date("2025-10-31T00:00:00.000Z"),
+          status: "active" as const,
+          userId: 0,
+          createdAt: new Date("2025-10-01T10:00:00.000Z"),
+          updatedAt: new Date(),
+        },
+        {
+          id: "2",
+          regionId: "region-1",
+          title: "Task 2",
+          description: "Description 2",
+          deadline: new Date("2025-11-15T00:00:00.000Z"),
+          status: "active" as const,
+          userId: 0,
+          createdAt: new Date("2025-10-02T10:00:00.000Z"),
+          updatedAt: new Date(),
+        },
+      ];
+
+      mockPrisma.task.findMany.mockResolvedValue(mockTasksData);
+
       const request = new Request(
         "http://localhost:3000/api/tasks?regionId=region-1"
       );
@@ -61,9 +101,14 @@ describe("Tasks API - /api/tasks", () => {
       expect(Array.isArray(data)).toBe(true);
       expect(data.length).toBe(2);
       expect(data.every((t: any) => t.regionId === "region-1")).toBe(true);
+      expect(mockPrisma.task.findMany).toHaveBeenCalledWith({
+        where: { regionId: "region-1" },
+      });
     });
 
     it("should return empty array when regionId has no tasks", async () => {
+      mockPrisma.task.findMany.mockResolvedValue([]);
+
       const request = new Request(
         "http://localhost:3000/api/tasks?regionId=nonexistent"
       );
@@ -73,9 +118,28 @@ describe("Tasks API - /api/tasks", () => {
       expect(response.status).toBe(200);
       expect(Array.isArray(data)).toBe(true);
       expect(data.length).toBe(0);
+      expect(mockPrisma.task.findMany).toHaveBeenCalledWith({
+        where: { regionId: "nonexistent" },
+      });
     });
 
     it("should return tasks with correct structure", async () => {
+      const mockTasksData = [
+        {
+          id: "uuid-1",
+          regionId: "region-1",
+          title: "Task 1",
+          description: "Description 1",
+          deadline: new Date("2025-10-31T00:00:00.000Z"),
+          status: "active" as const,
+          userId: 0,
+          createdAt: new Date("2025-10-01T10:00:00.000Z"),
+          updatedAt: new Date(),
+        },
+      ];
+
+      mockPrisma.task.findMany.mockResolvedValue(mockTasksData);
+
       const request = new Request("http://localhost:3000/api/tasks");
       const response = await GET(request);
       const data = await response.json();
@@ -107,6 +171,20 @@ describe("Tasks API - /api/tasks", () => {
         deadline: "2025-12-01T00:00:00.000Z",
       };
 
+      const createdTask = {
+        id: "uuid-new",
+        regionId: newTask.regionId,
+        title: newTask.title,
+        description: newTask.description,
+        deadline: new Date(newTask.deadline),
+        status: "active" as const,
+        userId: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockPrisma.task.create.mockResolvedValue(createdTask);
+
       const request = new Request("http://localhost:3000/api/tasks", {
         method: "POST",
         headers: {
@@ -130,15 +208,27 @@ describe("Tasks API - /api/tasks", () => {
       expect(typeof data.createdAt).toBe("string");
     });
 
-    it("should add the task to mockTasks array", async () => {
-      const initialLength = mockTasks.length;
-
+    it("should add the task to database via Prisma", async () => {
       const newTask = {
         regionId: "region-2",
         title: "Another Task",
         description: "Description here",
         deadline: "2025-11-30T00:00:00.000Z",
       };
+
+      const createdTask = {
+        id: "uuid-new-2",
+        regionId: newTask.regionId,
+        title: newTask.title,
+        description: newTask.description,
+        deadline: new Date(newTask.deadline),
+        status: "active" as const,
+        userId: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockPrisma.task.create.mockResolvedValue(createdTask);
 
       const request = new Request("http://localhost:3000/api/tasks", {
         method: "POST",
@@ -150,9 +240,16 @@ describe("Tasks API - /api/tasks", () => {
 
       await POST(request);
 
-      expect(mockTasks.length).toBe(initialLength + 1);
-      expect(mockTasks[mockTasks.length - 1].title).toBe("Another Task");
-      expect(mockTasks[mockTasks.length - 1].regionId).toBe("region-2");
+      expect(mockPrisma.task.create).toHaveBeenCalledTimes(1);
+      expect(mockPrisma.task.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          regionId: "region-2",
+          title: "Another Task",
+          description: "Description here",
+          deadline: expect.any(Date),
+          status: "active",
+        }),
+      });
     });
 
     it("should handle special characters in title and description", async () => {
@@ -162,6 +259,20 @@ describe("Tasks API - /api/tasks", () => {
         description: "Description with <tags> and @symbols",
         deadline: "2025-12-15T00:00:00.000Z",
       };
+
+      const createdTask = {
+        id: "uuid-special",
+        regionId: newTask.regionId,
+        title: newTask.title,
+        description: newTask.description,
+        deadline: new Date(newTask.deadline),
+        status: "active" as const,
+        userId: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockPrisma.task.create.mockResolvedValue(createdTask);
 
       const request = new Request("http://localhost:3000/api/tasks", {
         method: "POST",
@@ -193,6 +304,34 @@ describe("Tasks API - /api/tasks", () => {
         description: "Description",
         deadline: "2025-11-05T00:00:00.000Z",
       };
+
+      const createdTask1 = {
+        id: "uuid-1",
+        regionId: task1.regionId,
+        title: task1.title,
+        description: task1.description,
+        deadline: new Date(task1.deadline),
+        status: "active" as const,
+        userId: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const createdTask2 = {
+        id: "uuid-2",
+        regionId: task2.regionId,
+        title: task2.title,
+        description: task2.description,
+        deadline: new Date(task2.deadline),
+        status: "active" as const,
+        userId: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockPrisma.task.create
+        .mockResolvedValueOnce(createdTask1)
+        .mockResolvedValueOnce(createdTask2);
 
       const request1 = new Request("http://localhost:3000/api/tasks", {
         method: "POST",
@@ -230,6 +369,34 @@ describe("Tasks API - /api/tasks", () => {
         description: "Description 2",
         deadline: "2025-11-11T00:00:00.000Z",
       };
+
+      const createdTask1 = {
+        id: "uuid-task-1",
+        regionId: task1.regionId,
+        title: task1.title,
+        description: task1.description,
+        deadline: new Date(task1.deadline),
+        status: "active" as const,
+        userId: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const createdTask2 = {
+        id: "uuid-task-2",
+        regionId: task2.regionId,
+        title: task2.title,
+        description: task2.description,
+        deadline: new Date(task2.deadline),
+        status: "active" as const,
+        userId: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockPrisma.task.create
+        .mockResolvedValueOnce(createdTask1)
+        .mockResolvedValueOnce(createdTask2);
 
       const request1 = new Request("http://localhost:3000/api/tasks", {
         method: "POST",

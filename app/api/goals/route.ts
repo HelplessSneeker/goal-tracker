@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { mockGoals } from "@/lib/mock-data";
 import prisma from "@/lib/prisma";
 
 export async function GET() {
