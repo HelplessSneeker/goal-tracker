@@ -24,7 +24,8 @@ model Goal {
 
   regions Region[]
 
-  userId Int // User To Be Implemented
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
 }
 
 model Region {
@@ -39,8 +40,6 @@ model Region {
   goalId String
 
   tasks Task[]
-
-  userId Int // User To Be Implemented
 }
 
 enum TaskStatus {
@@ -50,9 +49,9 @@ enum TaskStatus {
 }
 
 model Task {
-  id        String     @id @default(uuid())
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   title       String     @db.VarChar(255)
   description String?
@@ -61,6 +60,55 @@ model Task {
 
   region   Region @relation(fields: [regionId], references: [id])
   regionId String
+}
 
-  userId Int // User To Be Implemented
+// Nextauth tables for user management
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+
+  // user management references
+  accounts Account[]
+  sessions Session[]
+
+  // application references
+  goals Goal[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }

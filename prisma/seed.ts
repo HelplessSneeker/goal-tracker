@@ -17,7 +17,7 @@ async function main() {
     data: {
       title: "Learn Next.js",
       description: "Master Next.js 15 with App Router and Server Components",
-      userId: 1, // Placeholder user ID
+      // userId: "1", // Placeholder user ID
     },
   });
 
@@ -25,7 +25,7 @@ async function main() {
     data: {
       title: "Build Goal Tracker",
       description: "Create a full-featured goal tracking application",
-      userId: 1,
+      // userId: "1",
     },
   });
 
@@ -33,7 +33,7 @@ async function main() {
     data: {
       title: "Improve TypeScript Skills",
       description: "Become proficient in advanced TypeScript patterns",
-      userId: 1,
+      // userId: "1",
     },
   });
 
@@ -45,7 +45,6 @@ async function main() {
       title: "Study Server Components",
       description:
         "Understand the difference between Server and Client Components",
-      userId: 1,
     },
   });
 
@@ -54,7 +53,6 @@ async function main() {
       goalId: goal1.id,
       title: "Learn Server Actions",
       description: "Implement form handling with Server Actions",
-      userId: 1,
     },
   });
 
@@ -63,7 +61,6 @@ async function main() {
       goalId: goal2.id,
       title: "Design UI Components",
       description: "Create reusable UI components with shadcn/ui",
-      userId: 1,
     },
   });
 
@@ -73,7 +70,6 @@ async function main() {
       title: "Implement CRUD Operations",
       description:
         "Add create, read, update, and delete functionality for goals",
-      userId: 1,
     },
   });
 
@@ -82,7 +78,6 @@ async function main() {
       goalId: goal3.id,
       title: "Learn Generics",
       description: "Master TypeScript generics and type constraints",
-      userId: 1,
     },
   });
 
@@ -96,7 +91,6 @@ async function main() {
       deadline: new Date("2025-10-31T00:00:00.000Z"),
       status: "active",
       createdAt: new Date("2025-10-01T10:00:00.000Z"),
-      userId: 1,
     },
   });
 
@@ -108,7 +102,6 @@ async function main() {
       deadline: new Date("2025-10-25T00:00:00.000Z"),
       status: "active",
       createdAt: new Date("2025-10-02T10:00:00.000Z"),
-      userId: 1,
     },
   });
 
@@ -120,7 +113,6 @@ async function main() {
       deadline: new Date("2025-11-15T00:00:00.000Z"),
       status: "active",
       createdAt: new Date("2025-10-03T10:00:00.000Z"),
-      userId: 1,
     },
   });
 
@@ -132,7 +124,6 @@ async function main() {
       deadline: new Date("2025-10-20T00:00:00.000Z"),
       status: "completed",
       createdAt: new Date("2025-10-04T10:00:00.000Z"),
-      userId: 1,
     },
   });
 
@@ -144,7 +135,6 @@ async function main() {
       deadline: new Date("2025-10-18T00:00:00.000Z"),
       status: "active",
       createdAt: new Date("2025-10-05T10:00:00.000Z"),
-      userId: 1,
     },
   });
 
@@ -154,11 +144,11 @@ async function main() {
   console.log(`Created ${await prisma.task.count()} tasks`);
 }
 
-main()
-  .catch((e) => {
-    console.error("❌ Error seeding database:", e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+// main()
+//   .catch((e) => {
+//     console.error("❌ Error seeding database:", e);
+//     process.exit(1);
+//   })
+//   .finally(async () => {
+//     await prisma.$disconnect();
+//   });
