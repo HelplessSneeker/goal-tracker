@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Providers } from "./providers";
 import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,8 +31,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession();
-  const isAuthPage = false; // Will be determined by middleware/client-side routing
+  const session = await getServerSession(authOptions);
 
   return (
     <html lang="en">
