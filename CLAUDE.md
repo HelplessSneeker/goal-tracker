@@ -1,358 +1,175 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code when working with this repository.
 
 ## Project Overview
 
-This is a Next.js 15 goal-tracking application using the App Router, React 19, TypeScript, and Tailwind CSS v4. The project uses pnpm as the package manager and Turbopack for faster builds.
+Next.js 15 goal-tracking application using App Router, React 19, TypeScript, Tailwind CSS v4, Prisma, and PostgreSQL.
 
-### Goal Management System
+**Package manager:** pnpm
+**Dev server:** http://localhost:3000
 
-This application implements a hierarchical goal management system designed to help users break down and track progress toward their goals:
+### Goal Management Hierarchy
 
-**Hierarchy:**
-1. **Goal** (no deadline) - High-level objectives (e.g., "Learn Next.js")
-2. **Region** (no deadline) - Specific areas within a goal to work on (e.g., "Master Server Components")
-3. **Task** (has deadline) - Concrete tasks with urgency created by deadlines (e.g., "Build 3 projects using Server Components" - due end of month)
-4. **Weekly Task** (belongs to a Task, 3 per task per week, priority 1-3) - Weekly action items reviewed and recreated each week (e.g., "Read Server Components documentation")
-5. **Progress Entry** (daily journal for Weekly Tasks) - Daily progress notes with completion percentage
-
-**Key Workflows:**
-- Goals and Regions have no deadlines (long-term focus areas)
-- Tasks always have deadlines to create urgency
-- Each Task gets 3 Weekly Tasks per week with priorities 1-3
-- Weekly Tasks are reviewed and recreated each week
-- Progress is tracked daily on Weekly Tasks via journal entries with completion percentages
-- Old weeks are archived but accessible for historical review
-- The Progress page focuses on the current week's tasks
+1. **Goal** (no deadline) → High-level objectives
+2. **Region** (no deadline) → Specific areas within a goal
+3. **Task** (has deadline) → Concrete tasks with urgency
+4. **Weekly Task** (3 per task/week, priority 1-3) → Weekly action items
+5. **Progress Entry** (daily) → Daily progress notes with completion %
 
 **Implementation Status:**
-- ✅ Goals (CRUD complete with full test coverage - filtering/search pending)
-- ✅ Regions (CRUD complete with full test coverage - filtering/search pending)
-- ✅ Tasks (CRUD complete with full test coverage, deadline tracking, status badges)
+- ✅ Goals, Regions, Tasks (CRUD + full test coverage)
 - ✅ Database (Prisma + PostgreSQL with UUID primary keys)
-- ✅ Testing infrastructure (Jest + React Testing Library - 156 tests passing in ~7.9s)
-  - ✅ 100% API coverage for Goals, Regions, and Tasks
-  - ✅ 93-100% component coverage for Goals, Regions, and Tasks
-  - ✅ Comprehensive TESTING.md documentation
-- ⏳ Weekly Tasks (TODO - next priority, **use TDD approach**)
-- ⏳ Progress Entries (TODO - use TDD approach)
-- ⏳ Weekly review workflow (TODO)
-- ⏳ Archive system (TODO)
+- ✅ Authentication (NextAuth.js with email/magic link, JWT sessions)
+- ✅ Testing (Jest + React Testing Library - 183/184 tests passing)
+- ⏳ Weekly Tasks, Progress Entries (TODO - use TDD)
 
-See [TODOs.md](./TODOs.md) for detailed implementation roadmap and [TESTING.md](./TESTING.md) for comprehensive testing guide.
+See [TODOs.md](./TODOs.md) for roadmap and [TESTING.md](./TESTING.md) for testing guide.
 
 ## Development Commands
 
 ```bash
-# Install dependencies
-pnpm install
+pnpm install         # Install dependencies
+pnpm dev             # Development server (Turbopack)
+pnpm build           # Production build
+pnpm test            # Run tests
+pnpm test:watch      # Watch mode
+pnpm test:coverage   # Coverage report
+pnpm lint            # ESLint
 
-# Run development server with Turbopack
-pnpm dev
-
-# Build for production with Turbopack
-pnpm build
-
-# Start production server
-pnpm start
-
-# Run ESLint
-pnpm lint
-
-# Run tests
-pnpm test
-
-# Run tests in watch mode
-pnpm test:watch
-
-# Run tests with coverage
-pnpm test:coverage
-
-# Database commands (Prisma)
-pnpm prisma generate         # Generate Prisma client
-pnpm prisma db push          # Push schema changes to database
-pnpm prisma db seed          # Seed database with initial data
-pnpm prisma studio           # Open Prisma Studio (database GUI)
+# Database (Prisma)
+pnpm prisma generate    # Generate client
+pnpm prisma db push     # Push schema changes
+pnpm prisma db seed     # Seed database
+pnpm prisma studio      # Database GUI
 ```
 
-The development server runs at http://localhost:3000.
+## Testing Strategy (TDD)
 
-## Testing Strategy
+**⚠️ IMPORTANT: Follow Test-Driven Development for all new features.**
 
-**⚠️ IMPORTANT: We follow Test-Driven Development (TDD) for all new features.**
+**Current Status:** 183/184 tests passing (~8s)
+- ✅ 58 API tests (100% coverage)
+- ✅ 92 component tests (93-100% coverage)
+- ✅ 6 utility tests (100% coverage)
+- ✅ 28 authentication tests (100% coverage)
+- ⚠️ 1 failing test (pre-existing, task-form.test.tsx:275)
 
-### Current Test Coverage
-- ✅ **156 tests passing** (58 API + 92 component + 6 utility)
-- ✅ **100% API coverage** for Goals, Regions, and Tasks CRUD
-- ✅ **High component coverage** (93-100%) for all implemented features
+**TDD Workflow:**
+1. 🔴 **RED**: Write failing test first
+2. 🟢 **GREEN**: Write minimal code to pass
+3. ♻️ **REFACTOR**: Improve code while tests stay green
 
-### Testing Stack
-- **Jest** with Next.js 15 built-in support (`next/jest`)
-- **React Testing Library** for component testing
-- **Prisma mocks** configured in `jest.setup.ts` for API tests
-- **Coverage provider**: v8 (faster than babel)
-- **Test environment**: jsdom for components, node for API routes
-
-### Current Test Results
-```
-Test Suites: 19 passed, 19 total
-Tests:       156 passed, 156 total
-Time:        ~7.9 seconds
-```
-
-### TDD Workflow (Red-Green-Refactor)
-For all new features, follow this cycle:
-1. **🔴 RED**: Write a failing test first
-2. **🟢 GREEN**: Write minimal code to make it pass
-3. **♻️ REFACTOR**: Improve code while keeping tests green
-
-### Test File Locations & Organization
+**Test Organization:**
 - API tests: `app/api/**/*.test.ts` (co-located with routes)
-- Component tests: `components/**/[component-name]/[component-name].test.tsx` (co-located with component)
-- Utility tests: `lib/**/*.test.ts` (co-located with utilities)
+- Component tests: `components/**/[component-name]/[component-name].test.tsx`
+- Use Prisma mocks for API tests (configured in `jest.setup.ts`)
+- Components use global Next.js mocks (router, Link)
 
-**Component Structure:** Each component lives in its own folder with its test, and each feature folder has an `index.ts` for centralized exports:
+**Component Structure:**
 ```
 components/
 ├── goals/
-│   ├── index.ts                  # Exports all goal components
+│   ├── index.ts                  # Export all goal components
 │   ├── goal-form/
 │   │   ├── goal-form.tsx
 │   │   └── goal-form.test.tsx
-│   ├── goal-card/
-│   │   ├── goal-card.tsx
-│   │   └── goal-card.test.tsx
 │   └── ...
-├── regions/
-│   ├── index.ts                  # Exports all region components
-│   ├── region-form/
-│   │   ├── region-form.tsx
-│   │   └── region-form.test.tsx
-│   └── ...
-└── tasks/
-    ├── index.ts                  # Exports all task components
-    ├── task-form/
-    │   ├── task-form.tsx
-    │   └── task-form.test.tsx
-    ├── task-card/
-    │   ├── task-card.tsx
-    │   └── task-card.test.tsx
-    └── ...
 ```
 
-**Import Pattern:** Always import components from the feature folder's index, not directly from component folders:
+**Import Pattern:** Always import from feature index
 ```typescript
-// ✅ Good - import from index
-import { TaskForm, TaskCard, DeleteTaskDialog } from "@/components/tasks";
-import { RegionForm, RegionCard } from "@/components/regions";
+// ✅ Good
+import { TaskForm, TaskCard } from "@/components/tasks";
 
-// ❌ Bad - direct import from component folder
+// ❌ Bad
 import { TaskForm } from "@/components/tasks/task-form/task-form";
 ```
 
-**Adding New Components:** When creating a new component in a feature folder:
-1. Create the component in its own folder (e.g., `components/tasks/new-component/`)
-2. Add the component and its test file
-3. Export it in the feature's `index.ts` file
-4. Always import from the feature folder index in other files
-
-### Key Testing Patterns
-- API tests use `/** @jest-environment node */` docblock and mocked Prisma client
-- Prisma mock configured globally in `jest.setup.ts` with all CRUD methods
-- Component tests import global mocks from `jest.setup.ts`
-- All tests use Arrange-Act-Assert pattern
-- Mock `fetch` for API calls, mock router for navigation
-- API tests verify Prisma method calls with correct parameters
-
-### Test Coverage Goals
-- **API routes**: 100% coverage (required) ✅
-- **Components**: 80%+ coverage ✅
-- **Utilities**: 90%+ coverage ✅
-
-See [TESTING.md](./TESTING.md) for comprehensive testing guide, examples, and best practices.
+See [TESTING.md](./TESTING.md) for detailed patterns and examples.
 
 ## Architecture
 
-### Framework & Routing
-- **Next.js 15** with App Router (`app/` directory)
-- Server Components by default (RSC enabled)
-- Pages:
-  - `app/page.tsx` - Home
-  - `app/progress/page.tsx` - Progress tracking
-  - `app/goals/page.tsx` - Goals list (Server Component)
-  - `app/goals/create/page.tsx` - Create goal (Client Component)
-  - `app/goals/[id]/page.tsx` - Goal detail (Server Component)
-  - `app/goals/[id]/edit/page.tsx` - Edit goal (Client Component)
-  - `app/goals/[id]/addRegion/page.tsx` - Create region (Client Component)
-  - `app/goals/[id]/[regionId]/page.tsx` - Region detail (Server Component)
-  - `app/goals/[id]/[regionId]/edit/page.tsx` - Edit region (Client Component)
-  - `app/goals/[id]/[regionId]/addTask/page.tsx` - Create task (Client Component)
-  - `app/goals/[id]/[regionId]/tasks/[taskId]/page.tsx` - Task detail (Server Component)
-  - `app/goals/[id]/[regionId]/tasks/[taskId]/edit/page.tsx` - Edit task (Client Component)
-- Layout in `app/layout.tsx`
-- Loading states: `loading.tsx` files for Suspense boundaries
+### Tech Stack
+- **Framework:** Next.js 15 with App Router
+- **Database:** PostgreSQL + Prisma ORM (UUID primary keys)
+- **Authentication:** NextAuth.js with email provider (JWT sessions)
+- **Styling:** Tailwind CSS v4 + shadcn/ui components
+- **Testing:** Jest + React Testing Library
+- **Icons:** Lucide React
 
-### Styling
-- **Tailwind CSS v4** with PostCSS
-- CSS variables enabled for theming
-- Global styles in `app/globals.css`
-- Uses `tw-animate-css` for animations
+### Key Patterns
+- **Server Components** (default): Data fetching, static UI
+- **Client Components** (`"use client"`): Forms, dialogs, interactivity
+- Server Components fetch from API routes (`fetch` with `cache: "no-store"`)
+- API routes use Prisma for database operations
+- Path alias: `@/*` for root directory
 
-### UI Components
-- **shadcn/ui** components (New York style variant)
-- Components stored in `components/ui/`
-- Configuration in `components.json`
-- Uses Lucide icons (`lucide-react`)
-- Utility function `cn()` in `lib/utils.ts` combines `clsx` and `tailwind-merge`
-- Custom components organized by feature (each in its own folder with test):
-  - `components/app-sidebar.tsx` - Main navigation sidebar
-  - `components/goals/` - Goal-related components
-    - `goal-card/` - Clickable card for navigation to goal detail
-    - `goal-detail-header/` - Goal detail page header with edit/delete actions
-    - `goal-form/` - Reusable form for create/edit (handles both modes)
-    - `delete-goal-dialog/` - Confirmation dialog for goal deletion
-  - `components/regions/` - Region-related components
-    - `region-card/` - Clickable card for navigation to region detail
-    - `region-detail-header/` - Region detail page header with edit/delete actions
-    - `region-form/` - Reusable form for create/edit (handles both modes)
-    - `delete-region-dialog/` - Confirmation dialog requiring region name to be typed
-  - `components/tasks/` - Task-related components
-    - `task-card/` - Clickable card for navigation to task detail (shows deadline, status badge)
-    - `task-detail-header/` - Task detail page header with edit/delete actions
-    - `task-form/` - Reusable form for create/edit with date picker (handles both modes)
-    - `delete-task-dialog/` - Confirmation dialog with cascade warning
+### Authentication
+- **NextAuth.js** with email provider (magic links)
+- **Config:** `lib/auth.ts` (centralized)
+- **Session:** JWT strategy
+- **Middleware:** `middleware.ts` protects routes
+- **Pages:** `/auth/signin`, `/auth/verify-request`
+- **Adapter:** Prisma adapter for NextAuth
 
-### Path Aliases
-Configured in `tsconfig.json`:
-- `@/*` - Root directory (e.g., `@/components`, `@/lib`)
-- Shadcn aliases: `@/components/ui`, `@/lib/utils`, `@/hooks`
+### API Routes (All use Prisma)
 
-### Hooks
-Custom React hooks in `hooks/`:
-- `use-mobile.ts` - Responsive design hook for mobile detection
+**Goals:** ✅ Complete
+- `GET/POST /api/goals`
+- `GET/PUT/DELETE /api/goals/[id]`
 
-### Fonts
-Uses Next.js font optimization with Geist and Geist Mono fonts from Google Fonts.
+**Regions:** ✅ Complete
+- `GET/POST /api/regions` (filter by `?goalId={id}`)
+- `GET/PUT/DELETE /api/regions/[id]`
 
-## Data Architecture
+**Tasks:** ✅ Complete
+- `GET/POST /api/tasks` (filter by `?regionId={id}`)
+- `GET/PUT/DELETE /api/tasks/[id]`
 
-### Database
-- **Prisma ORM** with PostgreSQL
-- **Schema**: `prisma/schema.prisma`
-- **Client**: Generated to `generated/prisma/`
-- **UUID primary keys** for all entities (Goals, Regions, Tasks)
-- **Seed file**: `prisma/seed.ts` for development data
+**Weekly Tasks:** ⏳ TODO
+- Add `WeeklyTask` model to `prisma/schema.prisma` first
+- Implement CRUD API with TDD approach
 
-### Entity Relationships
+**Progress Entries:** ⏳ TODO
+- Add `ProgressEntry` model to `prisma/schema.prisma` first
+- Implement CRUD API with TDD approach
 
-```
-Goal (1) ──> Region (n) ──> Task (n) ──> Weekly Task (n, 3 per week) ──> Progress Entry (n, daily)
-```
+### Database Models (Prisma)
 
-- A **Goal** can have many **Regions**
-- A **Region** can have many **Tasks** (Tasks belong to Regions)
-- A **Task** can have many **Weekly Tasks** (3 per week, with priority 1-3)
-- A **Weekly Task** can have many **Progress Entries** (daily journal entries)
+**Current:**
+- `User`: id, email, name, image (NextAuth adapter models)
+- `Goal`: id, title, description, userId, createdAt, updatedAt
+- `Region`: id, goalId, title, description, userId, createdAt, updatedAt
+- `Task`: id, regionId, title, description, deadline, status, userId, createdAt, updatedAt
 
-### API Routes
-
-All API routes use Prisma client imported from `@/lib/prisma` for database operations.
-
-**Goals:** ✅ Complete (100% test coverage)
-- `GET /api/goals` - List all goals ✅
-- `POST /api/goals` - Create a goal ✅
-- `GET /api/goals/[id]` - Get specific goal ✅
-- `PUT /api/goals/[id]` - Update goal ✅
-- `DELETE /api/goals/[id]` - Delete goal ✅
-
-**Regions:** ✅ Complete (100% test coverage)
-- `GET /api/regions?goalId={id}` - List regions (optional filter by goalId) ✅
-- `POST /api/regions` - Create a region ✅
-- `GET /api/regions/[id]` - Get specific region ✅
-- `PUT /api/regions/[id]` - Update region ✅
-- `DELETE /api/regions/[id]` - Delete region ✅
-
-**Tasks:** ✅ Complete (100% test coverage)
-- `GET /api/tasks?regionId={id}` - List tasks (optional filter by regionId) ✅
-- `POST /api/tasks` - Create a task ✅
-- `GET /api/tasks/[id]` - Get specific task ✅
-- `PUT /api/tasks/[id]` - Update task ✅
-- `DELETE /api/tasks/[id]` - Delete task ✅
-
-**Weekly Tasks:** ⏳ TODO (implement with TDD using Prisma)
-- First add `WeeklyTask` model to `prisma/schema.prisma` and run migration
-- `GET /api/weekly-tasks?taskId={id}&weekStartDate={date}` - List weekly tasks with filters
-- `GET /api/weekly-tasks/current-week` - Get all weekly tasks for the current week
-- `POST /api/weekly-tasks` - Create a weekly task
-- `GET /api/weekly-tasks/[id]` - Get specific weekly task
-- `PUT /api/weekly-tasks/[id]` - Update weekly task
-- `DELETE /api/weekly-tasks/[id]` - Delete weekly task
-
-**Progress Entries:** ⏳ TODO (implement with TDD using Prisma)
-- First add `ProgressEntry` model to `prisma/schema.prisma` and run migration
-- `GET /api/progress-entries?weeklyTaskId={id}` - List progress entries for a weekly task
-- `POST /api/progress-entries` - Create a progress entry
-- `GET /api/progress-entries/[id]` - Get specific progress entry
-- `PUT /api/progress-entries/[id]` - Update progress entry
-- `DELETE /api/progress-entries/[id]` - Delete progress entry
-
-### Data Types
-
-**Prisma Models** (`prisma/schema.prisma`):
-- `Goal`: id (UUID), title, description, userId, createdAt, updatedAt, regions[]
-- `Region`: id (UUID), goalId, title, description, userId, createdAt, updatedAt, goal, tasks[]
-- `Task`: id (UUID), regionId, title, description, deadline (DateTime), status (active/completed/incomplete), userId, createdAt, updatedAt, region
-
-**TypeScript Interfaces** (`lib/types.ts` - for frontend use):
-- Simplified versions of Prisma models (id, title, description, etc.)
-- Used by components and pages for type checking
-
-**TODO - Prisma Models:**
+**TODO:**
 - `WeeklyTask`: id, taskId, title, description, priority (1-3), weekStartDate, status
-- `ProgressEntry`: id, weeklyTaskId, date, notes, completionPercentage (0-100), createdAt
-
-## Component Patterns
-
-### Server vs Client Components
-- **Server Components** (default): Used for data fetching and static UI (pages, detail views, cards)
-- **Client Components** (`"use client"`): Required for interactivity, state, event handlers (forms, dialogs, sidebar)
-- Server Components fetch from API routes using native `fetch()` with `cache: "no-store"`
-- API routes use Prisma to query PostgreSQL database
-- Use `loading.tsx` files for Suspense boundaries and loading states
-- Nested dynamic routes: `/goals/[id]/[regionId]/tasks/[taskId]` for hierarchical navigation
-
-### Interactive Cards & Detail Headers
-All cards follow a consistent clickable navigation pattern:
-
-**Card Pattern** (Goals, Regions, Tasks):
-- Entire card is clickable for navigation using `onClick` with `useRouter`
-- Use `cursor-pointer` and `hover:shadow-lg` for visual affordance
-- Display relevant metadata (title, description, deadline, status) without action buttons
-- Clean, uncluttered design focused on content
-
-**Detail Header Pattern** (GoalDetailHeader, RegionDetailHeader, TaskDetailHeader):
-- Displays entity title, description, and metadata (deadline/status for tasks)
-- Contains Edit and Delete action buttons
-- Edit button links to edit page
-- Delete button opens confirmation dialog
-- Consistent placement across all detail pages
-
-## Code Style
-
-- ESLint configured with Next.js TypeScript presets (`next/core-web-vitals`, `next/typescript`)
-- TypeScript strict mode enabled
-- Component props use `React.ComponentProps<>` type helper
-- UI components use data slots pattern (e.g., `data-slot="card"`)
+- `ProgressEntry`: id, weeklyTaskId, date, notes, completionPercentage (0-100)
 
 ## Development Workflow
 
-### When Implementing New Features (TDD Approach)
-1. **🔴 Write tests first** - Create failing tests that define the expected behavior
-2. **🟢 Implement minimal code** - Write just enough code to pass the tests (use Prisma for database operations)
-3. **♻️ Refactor** - Improve code quality while keeping tests green
-4. **Run full test suite** - Ensure no regressions: `pnpm test`
-5. **Check coverage** - Verify coverage targets met: `pnpm test:coverage`
-6. **Lint before commit** - Ensure code style: `pnpm lint`
+### Implementing New Features
+1. 🔴 **Write tests first** (API + component tests)
+2. 🟢 **Implement feature** using Prisma for data operations
+3. ♻️ **Refactor** while keeping tests green
+4. Run `pnpm test` to verify no regressions
+5. Run `pnpm lint` before committing
 
-See [TESTING.md](./TESTING.md) for detailed TDD examples and patterns.
+### Adding New Components
+1. Create folder: `components/[feature]/[component-name]/`
+2. Add `[component-name].tsx` and `[component-name].test.tsx`
+3. Export from feature's `index.ts`
+4. Import from feature index in other files
+
+## Path Aliases
+
+Configured in `tsconfig.json`:
+- `@/*` - Root directory
+- `@/components`, `@/lib`, `@/app`, `@/hooks`
+
+## Code Style
+
+- ESLint: Next.js TypeScript presets
+- TypeScript strict mode enabled
+- Use `cn()` utility from `@/lib/utils` for className merging

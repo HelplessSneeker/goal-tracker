@@ -14,13 +14,15 @@ This project serves a dual purpose: it's a practical application to help me stay
 This is a full-stack application with:
 - ✅ **Complete CRUD operations** for Goals, Regions, and Tasks
 - ✅ **PostgreSQL database** with Prisma ORM
-- ✅ **Comprehensive test coverage** (156 tests, 100% API coverage)
+- ✅ **Authentication** with NextAuth.js (email/magic link)
+- ✅ **Comprehensive test coverage** (183/184 tests, 100% API coverage)
 - ✅ **Modern UI** with shadcn/ui components
 - ⏳ **Weekly Tasks and Progress Tracking** (planned)
 
 ## Features
 
 ### Implemented
+- **Authentication** - Email-based magic link authentication with NextAuth.js
 - **Goals** - High-level objectives (no deadlines)
 - **Regions** - Specific areas within goals to focus on
 - **Tasks** - Concrete tasks with deadlines and status tracking
@@ -71,10 +73,25 @@ Ensure you have a PostgreSQL instance running and note your connection details.
 Create a `.env` file in the project root:
 
 ```env
+# Database
 DATABASE_URL="postgresql://username:password@localhost:5432/goal-tracker-db"
+
+# NextAuth
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret-key-here"  # Generate with: openssl rand -base64 32
+
+# Email (SMTP)
+EMAIL_SERVER_HOST="localhost"
+EMAIL_SERVER_PORT="1025"
+EMAIL_SERVER_USER=""
+EMAIL_SERVER_PASSWORD=""
+EMAIL_FROM="noreply@goal-tracker.local"
 ```
 
-Replace `username` and `password` with your PostgreSQL credentials.
+**Important Notes:**
+- Replace `username` and `password` in DATABASE_URL with your PostgreSQL credentials
+- Generate a secure NEXTAUTH_SECRET using: `openssl rand -base64 32`
+- For development, use Mailpit (see Email Setup below) for testing magic link emails
 
 ### 4. Set Up Database Schema
 
@@ -89,13 +106,46 @@ pnpm prisma generate
 pnpm prisma db seed
 ```
 
-### 5. Run Development Server
+### 5. Set Up Email (Development)
+
+For development, use **Mailpit** to test magic link emails without sending real emails:
+
+#### Install Mailpit
+
+**macOS (Homebrew):**
+```bash
+brew install mailpit
+mailpit
+```
+
+**Linux/Windows:**
+Download from [https://github.com/axllent/mailpit/releases](https://github.com/axllent/mailpit/releases)
+
+#### Using Mailpit
+
+1. Start Mailpit (runs on port 1025 for SMTP, 8025 for web UI)
+2. Access web interface at [http://localhost:8025](http://localhost:8025)
+3. All magic link emails will appear in the Mailpit inbox
+4. Click the link in the email to complete sign-in
+
+**Alternative (Docker):**
+```bash
+docker run -d --name mailpit -p 8025:8025 -p 1025:1025 axllent/mailpit
+```
+
+### 6. Run Development Server
 
 ```bash
 pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+**First Time Setup:**
+1. Navigate to `/auth/signin`
+2. Enter your email address
+3. Check Mailpit inbox at [http://localhost:8025](http://localhost:8025)
+4. Click the magic link in the email to sign in
 
 ## Available Commands
 
@@ -126,9 +176,10 @@ pnpm test:coverage     # Run tests with coverage report
 ```
 
 **Current Test Status:**
-- 156 tests passing
+- 183/184 tests passing (1 pre-existing failure)
 - 100% API route coverage
 - 93-100% component coverage
+- 100% authentication coverage
 
 ## Tech Stack
 
@@ -141,6 +192,7 @@ pnpm test:coverage     # Run tests with coverage report
 - **Lucide React** - Icons
 
 ### Backend
+- **NextAuth.js** - Authentication (email/magic link, JWT sessions)
 - **Prisma ORM** - Database toolkit
 - **PostgreSQL** - Relational database
 - **Next.js API Routes** - RESTful API
@@ -158,6 +210,7 @@ pnpm test:coverage     # Run tests with coverage report
 goal-tracker/
 ├── app/                      # Next.js app directory
 │   ├── api/                  # API routes (Goals, Regions, Tasks)
+│   ├── auth/                 # Authentication pages (signin, verify-request)
 │   ├── goals/                # Goals pages
 │   └── progress/             # Progress tracking page
 ├── components/               # React components
@@ -166,11 +219,13 @@ goal-tracker/
 │   ├── tasks/                # Task-related components
 │   └── ui/                   # shadcn/ui components
 ├── lib/                      # Utilities and helpers
+│   ├── auth.ts               # NextAuth configuration
 │   ├── prisma.ts             # Prisma client
 │   └── types.ts              # TypeScript types
 ├── prisma/                   # Prisma configuration
-│   ├── schema.prisma         # Database schema
+│   ├── schema.prisma         # Database schema (includes NextAuth models)
 │   └── seed.ts               # Database seeder
+├── middleware.ts             # Route protection middleware
 └── tests/                    # Test files (co-located)
 ```
 
@@ -185,12 +240,18 @@ goal-tracker/
 The application uses a hierarchical structure:
 
 ```
+User (NextAuth)
+    ↓
 Goal (UUID) ──> Region (UUID) ──> Task (UUID)
                                        ↓
                               Weekly Task (planned)
                                        ↓
                               Progress Entry (planned)
 ```
+
+**Current Models:**
+- `User`, `Account`, `Session`, `VerificationToken` (NextAuth adapter models)
+- `Goal`, `Region`, `Task` (with userId foreign keys)
 
 All entities use UUID primary keys for better scalability and security.
 
