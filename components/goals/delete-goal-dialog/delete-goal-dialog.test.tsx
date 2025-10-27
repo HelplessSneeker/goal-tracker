@@ -2,6 +2,12 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DeleteGoalDialog } from "./delete-goal-dialog";
 import { mockRouterPush, mockRouterRefresh } from "@/jest.setup";
+import * as goalsActions from "@/app/actions/goals";
+
+// Get the mocked action
+const mockDeleteGoalAction = goalsActions.deleteGoalAction as jest.MockedFunction<
+  typeof goalsActions.deleteGoalAction
+>;
 
 describe("DeleteGoalDialog", () => {
   const defaultProps = {
@@ -65,10 +71,10 @@ describe("DeleteGoalDialog", () => {
     expect(deleteButton).not.toBeDisabled();
   });
 
-  it("calls DELETE API when confirmed", async () => {
+  it("calls deleteGoalAction when confirmed", async () => {
     const user = userEvent.setup();
 
-    (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true });
+    mockDeleteGoalAction.mockResolvedValueOnce({ success: true });
 
     render(<DeleteGoalDialog {...defaultProps} />);
 
@@ -79,16 +85,14 @@ describe("DeleteGoalDialog", () => {
     await user.click(deleteButton);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith("/api/goals/123", {
-        method: "DELETE",
-      });
+      expect(mockDeleteGoalAction).toHaveBeenCalledWith("123");
     });
   });
 
   it("navigates to goals page after successful deletion", async () => {
     const user = userEvent.setup();
 
-    (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true });
+    mockDeleteGoalAction.mockResolvedValueOnce({ success: true });
 
     render(<DeleteGoalDialog {...defaultProps} />);
 
@@ -103,10 +107,10 @@ describe("DeleteGoalDialog", () => {
     });
   });
 
-  it("displays error message on API failure", async () => {
+  it("displays error message on failure", async () => {
     const user = userEvent.setup();
 
-    (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: false });
+    mockDeleteGoalAction.mockResolvedValueOnce({ error: "Failed to delete goal" });
 
     render(<DeleteGoalDialog {...defaultProps} />);
 
@@ -120,12 +124,14 @@ describe("DeleteGoalDialog", () => {
     });
   });
 
-  it("shows deleting state during API call", async () => {
+  it("shows deleting state during action", async () => {
     const user = userEvent.setup();
 
-    (global.fetch as jest.Mock).mockImplementation(
+    mockDeleteGoalAction.mockImplementation(
       () =>
-        new Promise((resolve) => setTimeout(() => resolve({ ok: true }), 100)),
+        new Promise((resolve) =>
+          setTimeout(() => resolve({ success: true }), 100),
+        ),
     );
 
     render(<DeleteGoalDialog {...defaultProps} />);
@@ -141,9 +147,11 @@ describe("DeleteGoalDialog", () => {
   it("disables buttons during deletion", async () => {
     const user = userEvent.setup();
 
-    (global.fetch as jest.Mock).mockImplementation(
+    mockDeleteGoalAction.mockImplementation(
       () =>
-        new Promise((resolve) => setTimeout(() => resolve({ ok: true }), 100)),
+        new Promise((resolve) =>
+          setTimeout(() => resolve({ success: true }), 100),
+        ),
     );
 
     render(<DeleteGoalDialog {...defaultProps} />);

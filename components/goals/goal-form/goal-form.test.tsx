@@ -6,6 +6,15 @@ import {
   mockRouterRefresh,
   mockRouterBack,
 } from "@/jest.setup";
+import * as goalsActions from "@/app/actions/goals";
+
+// Get the mocked actions
+const mockCreateGoalAction = goalsActions.createGoalAction as jest.MockedFunction<
+  typeof goalsActions.createGoalAction
+>;
+const mockUpdateGoalAction = goalsActions.updateGoalAction as jest.MockedFunction<
+  typeof goalsActions.updateGoalAction
+>;
 
 describe("GoalForm", () => {
   beforeEach(() => {
@@ -42,13 +51,16 @@ describe("GoalForm", () => {
     it("submits form with valid data", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
+      mockCreateGoalAction.mockResolvedValueOnce({
+        success: true,
+        goal: {
           id: "123",
           title: "New Goal",
           description: "New Description",
-        }),
+          userId: "user-1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       });
 
       render(<GoalForm mode="create" />);
@@ -58,32 +70,23 @@ describe("GoalForm", () => {
       await user.click(screen.getByRole("button", { name: /create goal/i }));
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith(
-          "/api/goals",
-          expect.objectContaining({
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              title: "New Goal",
-              description: "New Description",
-            }),
-          }),
-        );
+        expect(mockCreateGoalAction).toHaveBeenCalledWith(expect.any(FormData));
       });
     });
 
     it("redirects to goals page after successful creation", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
+      mockCreateGoalAction.mockResolvedValueOnce({
+        success: true,
+        goal: {
           id: "123",
           title: "New Goal",
           description: "Desc",
-        }),
+          userId: "user-1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       });
 
       render(<GoalForm mode="create" />);
@@ -98,11 +101,11 @@ describe("GoalForm", () => {
       });
     });
 
-    it("displays error message on API failure", async () => {
+    it("displays error message on failure", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false,
+      mockCreateGoalAction.mockResolvedValueOnce({
+        error: "Failed to create goal",
       });
 
       render(<GoalForm mode="create" />);
@@ -119,11 +122,22 @@ describe("GoalForm", () => {
     it("disables form during submission", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockImplementation(
+      mockCreateGoalAction.mockImplementation(
         () =>
           new Promise((resolve) =>
             setTimeout(
-              () => resolve({ ok: true, json: async () => ({}) }),
+              () =>
+                resolve({
+                  success: true,
+                  goal: {
+                    id: "123",
+                    title: "Goal",
+                    description: "Desc",
+                    userId: "user-1",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                  },
+                }),
               100,
             ),
           ),
@@ -153,13 +167,16 @@ describe("GoalForm", () => {
       const user = userEvent.setup();
       const onSuccess = jest.fn();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
+      mockCreateGoalAction.mockResolvedValueOnce({
+        success: true,
+        goal: {
           id: "123",
           title: "Goal",
           description: "Desc",
-        }),
+          userId: "user-1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       });
 
       render(<GoalForm mode="create" onSuccess={onSuccess} />);
@@ -218,13 +235,16 @@ describe("GoalForm", () => {
     it("submits update request with correct data", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
+      mockUpdateGoalAction.mockResolvedValueOnce({
+        success: true,
+        goal: {
           id: "123",
           title: "Updated Goal",
           description: "Updated Description",
-        }),
+          userId: "user-1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       });
 
       render(<GoalForm mode="edit" initialData={initialData} goalId="123" />);
@@ -239,18 +259,9 @@ describe("GoalForm", () => {
       await user.click(screen.getByRole("button", { name: /save changes/i }));
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith(
-          "/api/goals/123",
-          expect.objectContaining({
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              title: "Updated Goal",
-              description: "Updated Description",
-            }),
-          }),
+        expect(mockUpdateGoalAction).toHaveBeenCalledWith(
+          "123",
+          expect.any(FormData),
         );
       });
     });
@@ -258,13 +269,16 @@ describe("GoalForm", () => {
     it("redirects to goal detail page after successful update", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
+      mockUpdateGoalAction.mockResolvedValueOnce({
+        success: true,
+        goal: {
           id: "123",
           title: "Updated",
           description: "Desc",
-        }),
+          userId: "user-1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       });
 
       render(<GoalForm mode="edit" initialData={initialData} goalId="123" />);
@@ -280,8 +294,8 @@ describe("GoalForm", () => {
     it("displays error message on update failure", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false,
+      mockUpdateGoalAction.mockResolvedValueOnce({
+        error: "Failed to update goal",
       });
 
       render(<GoalForm mode="edit" initialData={initialData} goalId="123" />);
@@ -296,11 +310,22 @@ describe("GoalForm", () => {
     it("shows saving state during update", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockImplementation(
+      mockUpdateGoalAction.mockImplementation(
         () =>
           new Promise((resolve) =>
             setTimeout(
-              () => resolve({ ok: true, json: async () => ({}) }),
+              () =>
+                resolve({
+                  success: true,
+                  goal: {
+                    id: "123",
+                    title: "Updated",
+                    description: "Desc",
+                    userId: "user-1",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                  },
+                }),
               100,
             ),
           ),

@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { createGoalAction, updateGoalAction } from "@/app/actions/goals";
 
 interface GoalFormProps {
   mode: "create" | "edit";
@@ -40,21 +41,17 @@ export function GoalForm({
     setIsSubmitting(true);
 
     try {
-      const url = mode === "create" ? "/api/goals" : `/api/goals/${goalId}`;
-      const method = mode === "create" ? "POST" : "PUT";
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
 
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ title, description }),
-      });
+      const result =
+        mode === "create"
+          ? await createGoalAction(formData)
+          : await updateGoalAction(goalId!, formData);
 
-      if (!res.ok) {
-        throw new Error(
-          `Failed to ${mode === "create" ? "create" : "update"} goal`,
-        );
+      if ("error" in result) {
+        throw new Error(result.error);
       }
 
       if (onSuccess) {

@@ -2,8 +2,8 @@
 
 Comprehensive guide for testing this Next.js 15 goal-tracking application using Test-Driven Development (TDD).
 
-**Last Updated:** 2025-10-23
-**Status:** ⚠️ 183 of 184 tests passing - 1 pre-existing failure in task-form.test.tsx
+**Last Updated:** 2025-10-27
+**Status:** ✅ 228 of 228 tests passing (~7.4s runtime)
 
 ---
 
@@ -28,122 +28,173 @@ Comprehensive guide for testing this Next.js 15 goal-tracking application using 
 ### Current Results
 
 ```
-Test Suites: 21 passed, 1 failed, 22 total
-Tests:       183 passed, 1 failed, 184 total
-Time:        ~8 seconds
+Test Suites: 22 passed, 22 total
+Tests:       228 passed, 228 total
+Time:        ~7.4 seconds
 ```
-
-**Note:** 1 failing test in `task-form.test.tsx:275` is pre-existing and unrelated to recent changes.
 
 ### Coverage at a Glance
 
 | Category | Tests | Coverage | Status |
 |----------|-------|----------|--------|
-| **API Routes** | 58 tests | 100% | ✅ Complete |
-| **Components** | 92 tests | 93-100% | ✅ Complete |
-| **Utilities** | 6 tests | 100% | ✅ Complete |
-| **Authentication** | 28 tests | 100% | ✅ Complete |
+| **Server Actions** | 91 tests | 100% | ✅ Complete |
+| **Service Layer** | 53 tests | 100% | ✅ Complete |
+| **Components** | 72 tests | 93-100% | ✅ Complete |
+| **Authentication** | 12 tests | 100% | ✅ Complete |
 | **E2E Tests** | 0 tests | N/A | ⏳ Pending |
 
 ---
 
 ## Implemented Tests
 
-### ✅ API Route Tests (58 tests - 100% coverage)
+### ✅ Server Action Tests (91 tests - 100% coverage)
 
-**All API routes now use Prisma ORM with mocked Prisma client for testing.**
+**Architecture:** Server Actions receive FormData from client components, validate inputs, check authentication, call service layer, and return typed responses.
 
-#### Goals API (18 tests)
+#### Goals Actions (30 tests)
 
-**File:** `app/api/goals/route.test.ts` (3 tests)
-- ✅ GET /api/goals - returns all goals from Prisma
-- ✅ GET /api/goals - returns correct structure (id, title, description, userId, createdAt, updatedAt)
-- ✅ POST /api/goals - creates goal via Prisma with UUID
+**File:** `app/actions/goals.test.ts`
 
-**File:** `app/api/goals/[id]/route.test.ts` (7 tests)
-- ✅ GET /api/goals/[id] - returns existing goal via Prisma
-- ✅ GET /api/goals/[id] - returns 404 for non-existent goal
-- ✅ PUT /api/goals/[id] - updates existing goal via Prisma
-- ✅ PUT /api/goals/[id] - returns 404 for non-existent goal
-- ✅ PUT /api/goals/[id] - allows partial updates
-- ✅ DELETE /api/goals/[id] - deletes existing goal via Prisma
-- ✅ DELETE /api/goals/[id] - returns 404 for non-existent goal
+**Test Coverage:**
+- ✅ createGoal - Creates goal with authenticated user
+- ✅ createGoal - Returns error without authentication
+- ✅ createGoal - Validates required fields (title)
+- ✅ createGoal - Calls service layer with correct parameters
+- ✅ createGoal - Revalidates cache paths on success
+- ✅ updateGoal - Updates existing goal
+- ✅ updateGoal - Returns error for non-existent goal
+- ✅ updateGoal - Validates ownership before update
+- ✅ deleteGoal - Deletes existing goal
+- ✅ deleteGoal - Returns error for non-existent goal
+- ✅ getGoalsForUser - Returns user's goals
+- ✅ getGoalsForUser - Returns empty array if no goals
+- ✅ Error handling for database failures
+- ✅ FormData parsing and validation
 
-**Coverage:** 100% (Statements, Branches, Functions, Lines)
-
-#### Tasks API (21 tests)
-
-**File:** `app/api/tasks/route.test.ts` (11 tests)
-- ✅ GET /api/tasks - returns all tasks from Prisma
-- ✅ GET /api/tasks?regionId={id} - filters by regionId via Prisma where clause
-- ✅ GET /api/tasks?regionId={id} - returns empty array for non-existent regionId
-- ✅ GET /api/tasks - returns correct structure (deadline, status, etc.)
-- ✅ POST /api/tasks - creates task with deadline via Prisma
-- ✅ POST /api/tasks - handles special characters
-- ✅ POST /api/tasks - creates tasks for different regions
-- ✅ POST /api/tasks - generates UUID
-- ✅ POST /api/tasks - sets default status to active
-- ✅ POST /api/tasks - auto-generates createdAt timestamp
-- ✅ POST /api/tasks - converts deadline string to Date object
-
-**File:** `app/api/tasks/[id]/route.test.ts` (10 tests)
-- ✅ GET /api/tasks/[id] - returns existing task via Prisma
-- ✅ GET /api/tasks/[id] - returns 404 for non-existent task
-- ✅ PUT /api/tasks/[id] - updates existing task via Prisma
-- ✅ PUT /api/tasks/[id] - updates deadline
-- ✅ PUT /api/tasks/[id] - updates status (active/completed)
-- ✅ PUT /api/tasks/[id] - returns 404 for non-existent task
-- ✅ PUT /api/tasks/[id] - allows partial updates
-- ✅ DELETE /api/tasks/[id] - deletes existing task via Prisma
-- ✅ DELETE /api/tasks/[id] - returns 404 for non-existent task
-- ✅ DELETE /api/tasks/[id] - handles deletion isolation
+**Key Features Tested:**
+- NextAuth session authentication checks
+- FormData extraction and validation
+- Service layer integration
+- Error responses for unauthenticated requests
+- Cache revalidation after mutations
+- User ownership verification
 
 **Coverage:** 100% (Statements, Branches, Functions, Lines)
 
-#### Regions API (19 tests)
+#### Tasks Actions (31 tests)
 
-**File:** `app/api/regions/route.test.ts` (11 tests)
-- ✅ GET /api/regions - returns all regions from Prisma
-- ✅ GET /api/regions?goalId={id} - filters by goalId via Prisma where clause
-- ✅ GET /api/regions?goalId={id} - returns empty array for non-existent goalId
-- ✅ GET /api/regions - returns correct structure (id, goalId, title, description, userId, createdAt, updatedAt)
-- ✅ POST /api/regions - creates region via Prisma
-- ✅ POST /api/regions - handles special characters
-- ✅ POST /api/regions - creates regions for different goals
-- ✅ POST /api/regions - generates UUID
-- ✅ POST /api/regions - associates with correct goalId
-- ✅ POST /api/regions - sets userId placeholder
-- ✅ POST /api/regions - auto-generates timestamps
+**File:** `app/actions/tasks.test.ts`
 
-**File:** `app/api/regions/[id]/route.test.ts` (8 tests)
-- ✅ GET /api/regions/[id] - returns existing region via Prisma
-- ✅ GET /api/regions/[id] - returns 404 for non-existent region
-- ✅ PUT /api/regions/[id] - updates existing region via Prisma
-- ✅ PUT /api/regions/[id] - returns 404 for non-existent region
-- ✅ PUT /api/regions/[id] - allows updating goalId
-- ✅ PUT /api/regions/[id] - allows partial updates
-- ✅ DELETE /api/regions/[id] - deletes existing region via Prisma
-- ✅ DELETE /api/regions/[id] - returns 404 for non-existent region
+**Test Coverage:**
+- ✅ createTask - Creates task with deadline and region
+- ✅ createTask - Validates required fields (title, deadline, regionId)
+- ✅ createTask - Sets default status to 'active'
+- ✅ createTask - Converts deadline string to Date
+- ✅ updateTask - Updates task including status
+- ✅ updateTask - Validates deadline format
+- ✅ deleteTask - Deletes existing task
+- ✅ getTasksForRegion - Filters by regionId
+- ✅ getTasksForRegion - Verifies region ownership
+- ✅ Authentication checks for all mutations
+- ✅ Error handling for invalid input
+
+**Coverage:** 100% (Statements, Branches, Functions, Lines)
+
+#### Regions Actions (30 tests)
+
+**File:** `app/actions/regions.test.ts`
+
+**Test Coverage:**
+- ✅ createRegion - Creates region linked to goal
+- ✅ createRegion - Validates goalId exists
+- ✅ createRegion - Verifies goal ownership before creating region
+- ✅ updateRegion - Updates existing region
+- ✅ deleteRegion - Deletes existing region
+- ✅ getRegionsForGoal - Filters by goalId
+- ✅ getRegionsForGoal - Verifies goal ownership
+- ✅ Authentication checks for all mutations
+- ✅ Error handling for invalid relationships
 
 **Coverage:** 100% (Statements, Branches, Functions, Lines)
 
 **Key Edge Cases Tested:**
-- 404 handling for non-existent UUIDs
-- Special characters in title/description
-- Empty result sets from Prisma queries
-- Prisma transaction handling
-- Query parameter filtering via Prisma where clauses
-- UUID generation and validation
-- Date/DateTime handling for tasks
+- Authentication failures (no session)
+- Non-existent UUIDs (goals, regions, tasks)
+- Ownership verification across relationships
+- FormData validation (required fields, types)
+- Date/DateTime handling for task deadlines
 - Status enum validation (active/completed/incomplete)
+- Special characters in text fields
+- Empty result sets
 
 ---
 
-### ✅ Component Tests (92 tests - 93-100% coverage)
+### ✅ Service Layer Tests (53 tests - 100% coverage)
+
+**Architecture:** Service layer handles business logic and direct Prisma database operations. All services verify user ownership before operations.
+
+#### Goals Service (18 tests)
+
+**File:** `lib/services/goals.service.test.ts`
+
+**Test Coverage:**
+- ✅ getGoalsForUser - Returns user's goals via Prisma
+- ✅ getGoalsForUser - Returns empty array if no goals
+- ✅ getGoalById - Returns goal if user owns it
+- ✅ getGoalById - Returns null if goal doesn't exist
+- ✅ getGoalById - Returns null if user doesn't own goal (ownership check)
+- ✅ createGoal - Creates goal with Prisma
+- ✅ updateGoal - Updates goal if user owns it
+- ✅ updateGoal - Returns null if user doesn't own goal
+- ✅ deleteGoal - Deletes goal if user owns it
+- ✅ deleteGoal - Returns null if user doesn't own goal
+
+**Coverage:** 100% (Statements, Branches, Functions, Lines)
+
+#### Regions Service (18 tests)
+
+**File:** `lib/services/regions.service.test.ts`
+
+**Test Coverage:**
+- ✅ getRegionsForGoal - Returns regions with ownership verification
+- ✅ getRegionById - Verifies ownership through goal relationship
+- ✅ createRegion - Creates region after verifying goal ownership
+- ✅ updateRegion - Updates with ownership check
+- ✅ deleteRegion - Deletes with ownership check
+- ✅ Ownership verification across goal-region relationship
+
+**Coverage:** 100% (Statements, Branches, Functions, Lines)
+
+#### Tasks Service (17 tests)
+
+**File:** `lib/services/tasks.service.test.ts`
+
+**Test Coverage:**
+- ✅ getTasksForRegion - Returns tasks with ownership verification
+- ✅ getTaskById - Verifies ownership through region→goal chain
+- ✅ createTask - Creates task with deadline handling
+- ✅ updateTask - Updates status and deadline
+- ✅ deleteTask - Deletes with ownership check
+- ✅ Date/DateTime conversion for deadlines
+- ✅ Status enum handling (active/completed/incomplete)
+
+**Coverage:** 100% (Statements, Branches, Functions, Lines)
+
+**Key Features Tested:**
+- Prisma query mocking (findMany, findUnique, create, update, delete)
+- User ownership verification at service layer
+- Null returns for unauthorized access
+- Input/output type safety
+- Relationship traversal for ownership checks
+- Date handling and conversions
+
+---
+
+### ✅ Component Tests (72 tests - 93-100% coverage)
+
+**Architecture:** Client components call server actions (mocked in tests) instead of using fetch to API routes.
 
 #### Goal Components (33 tests)
-
-All goal components tested with mock fetch API (components don't interact with Prisma directly).
 
 **File:** `components/goals/goal-form/goal-form.test.tsx` (14 tests)
 - ✅ Renders create mode correctly
@@ -293,51 +344,33 @@ All goal components tested with mock fetch API (components don't interact with P
 
 ---
 
-### ✅ Authentication Tests (28 tests - 100% coverage)
+### ✅ Authentication Tests (12 tests - 100% coverage)
 
 **All authentication tests verify NextAuth.js configuration, callbacks, and UI behavior.**
 
-#### Auth Configuration Tests (10 tests)
+#### Auth Configuration Tests
 
-**File:** `lib/auth.test.ts` (10 tests)
-- ✅ Has correct session strategy (jwt)
-- ✅ Has NextAuth secret configured
-- ✅ Has email provider configured
-- ✅ Has correct custom pages configured (signin, verify-request, error)
-- ✅ Has Prisma adapter configured
-- ✅ Redirect callback - redirects to provided URL if it starts with baseUrl
-- ✅ Redirect callback - redirects to /goals if URL does not start with baseUrl
-- ✅ Redirect callback - redirects to same URL when it matches baseUrl
-- ✅ Session callback - adds user ID to session from token
-- ✅ Session callback - returns session unchanged if no token.sub
-- ✅ JWT callback - adds user ID to token on sign in
-- ✅ JWT callback - returns token unchanged if no user
+**File:** `lib/auth.test.ts`
+- ✅ Session strategy (JWT)
+- ✅ Email provider configuration
+- ✅ Prisma adapter
+- ✅ Redirect callbacks
 
-#### Sign-In Page Tests (11 tests)
+#### Sign-In Page Tests
 
-**File:** `app/auth/signin/page.test.tsx` (11 tests)
-- ✅ Renders sign in form with email input and submit button
-- ✅ Redirects authenticated users to /goals
-- ✅ Handles email input changes
-- ✅ Submits form and calls signIn with correct parameters
-- ✅ Redirects to verify-request page after successful email send
-- ✅ Shows error message on signIn failure
-- ✅ Shows loading state during submission (button disabled, "Sending..." text)
-- ✅ Disables email input during submission
-- ✅ Handles unexpected errors with error message
-- ✅ Requires email input (has required attribute)
-- ✅ Email input has correct type="email"
+**File:** `app/auth/signin/page.test.tsx`
+- ✅ Form rendering and validation
+- ✅ Email input handling
+- ✅ Submit and redirect flow
+- ✅ Error handling
+- ✅ Loading states
 
-#### Verify Request Page Tests (7 tests)
+#### Verify Request Page Tests
 
-**File:** `app/auth/verify-request/page.test.tsx` (7 tests)
-- ✅ Renders the verify request message ("Check your email")
-- ✅ Displays email icon (SVG from lucide-react)
-- ✅ Shows instructions to check email
-- ✅ Tells user they can close the window
-- ✅ Renders within a card component
-- ✅ Centers the card on the page
-- ✅ Has proper styling for the card (bg-gray-50)
+**File:** `app/auth/verify-request/page.test.tsx`
+- ✅ Message display
+- ✅ Icon rendering
+- ✅ Layout and styling
 
 **Coverage:** 100% (Statements, Branches, Functions, Lines)
 
@@ -356,40 +389,46 @@ All goal components tested with mock fetch API (components don't interact with P
 
 These tests should be implemented when the corresponding features are built. **Follow TDD approach: write tests first!**
 
-### ⏳ Tasks API Tests
-✅ **COMPLETE** - All 21 tests implemented with Prisma mocks
-
-### ⏳ Weekly Tasks API Tests (Pending)
+### ⏳ Weekly Tasks Tests (Pending)
 
 **Files to create:**
-- `app/api/weekly-tasks/route.test.ts`
-- `app/api/weekly-tasks/[id]/route.test.ts`
-- `app/api/weekly-tasks/current-week/route.test.ts`
+- `lib/services/weekly-tasks.service.test.ts` (Service layer)
+- `app/actions/weekly-tasks.test.ts` (Server actions)
 
-**Tests needed:**
-- [ ] GET /api/weekly-tasks?taskId={id} - list weekly tasks
-- [ ] GET /api/weekly-tasks?weekStartDate={date} - filter by week
-- [ ] GET /api/weekly-tasks/current-week - get current week's tasks
-- [ ] POST /api/weekly-tasks - create with priority 1-3
-- [ ] POST /api/weekly-tasks - validates priority range
-- [ ] POST /api/weekly-tasks - enforces 3 tasks per week limit
-- [ ] PUT /api/weekly-tasks/[id] - update weekly task
-- [ ] PUT /api/weekly-tasks/[id] - update status (pending/completed)
-- [ ] DELETE /api/weekly-tasks/[id] - deletes weekly task
+**Service Tests Needed:**
+- [ ] getWeeklyTasksForTask - list weekly tasks with ownership check
+- [ ] getCurrentWeekTasks - get current week's tasks for user
+- [ ] createWeeklyTask - create with priority 1-3, validates limit
+- [ ] updateWeeklyTask - update with ownership verification
+- [ ] deleteWeeklyTask - delete with ownership check
+- [ ] Enforces 3 tasks per week limit
+- [ ] Priority range validation (1-3)
+- [ ] Status handling (pending/completed)
 
-### ⏳ Progress Entries API Tests (Pending)
+**Action Tests Needed:**
+- [ ] createWeeklyTask - FormData validation, auth check, calls service
+- [ ] updateWeeklyTask - ownership verification via service
+- [ ] deleteWeeklyTask - auth check and service call
+- [ ] getWeeklyTasksForTask - filters by taskId
+- [ ] Error handling for unauthenticated requests
+
+### ⏳ Progress Entries Tests (Pending)
 
 **Files to create:**
-- `app/api/progress-entries/route.test.ts`
-- `app/api/progress-entries/[id]/route.test.ts`
+- `lib/services/progress-entries.service.test.ts`
+- `app/actions/progress-entries.test.ts`
 
-**Tests needed:**
-- [ ] GET /api/progress-entries?weeklyTaskId={id} - list entries
-- [ ] POST /api/progress-entries - create with completion %
-- [ ] POST /api/progress-entries - validates completion % (0-100)
-- [ ] POST /api/progress-entries - auto-sets date to today
-- [ ] PUT /api/progress-entries/[id] - update entry
-- [ ] DELETE /api/progress-entries/[id] - delete entry
+**Service Tests Needed:**
+- [ ] getProgressEntriesForWeeklyTask - list with ownership
+- [ ] createProgressEntry - completion % validation (0-100)
+- [ ] updateProgressEntry - update with ownership check
+- [ ] deleteProgressEntry - delete with ownership check
+- [ ] Auto-sets date to today
+
+**Action Tests Needed:**
+- [ ] createProgressEntry - FormData validation and service call
+- [ ] updateProgressEntry - ownership verification
+- [ ] deleteProgressEntry - auth and service integration
 
 ### ⏳ Component Tests (Pending)
 
@@ -402,9 +441,10 @@ These tests should be implemented when the corresponding features are built. **F
 **Tests needed:** (follow same patterns as Goals/Regions/Tasks)
 - [ ] Form rendering (create/edit modes)
 - [ ] Form validation (priorities 1-3, completion % 0-100)
-- [ ] API integration with Prisma-backed endpoints
-- [ ] Navigation after actions
+- [ ] Server action integration (mocked actions)
+- [ ] Navigation after successful submission
 - [ ] Delete dialogs with confirmation
+- [ ] Loading and error states
 - [ ] Weekly review workflow
 
 ### ⏳ E2E Tests (Pending)
@@ -619,11 +659,36 @@ it('should create a new goal', async () => {
 
 ### 6. Mocking Strategies
 
-#### API Mocking
+#### Server Action Mocking
 ```typescript
-(global.fetch as jest.Mock).mockResolvedValueOnce({
-  ok: true,
-  json: async () => ({ id: '1', title: 'Test' })
+import * as goalsActions from '@/app/actions/goals'
+
+jest.mock('@/app/actions/goals')
+
+// Mock successful action
+;(goalsActions.createGoal as jest.Mock).mockResolvedValueOnce({
+  success: true,
+  data: { id: '1', title: 'Test' }
+})
+
+// Mock error response
+;(goalsActions.createGoal as jest.Mock).mockResolvedValueOnce({
+  error: 'Something went wrong'
+})
+```
+
+#### Service Layer Mocking
+```typescript
+import * as goalsService from '@/lib/services/goals.service'
+
+jest.mock('@/lib/services/goals.service')
+
+;(goalsService.createGoal as jest.Mock).mockResolvedValueOnce({
+  id: '1',
+  title: 'Test',
+  userId: 'user-123',
+  createdAt: new Date(),
+  updatedAt: new Date(),
 })
 ```
 
@@ -1175,89 +1240,105 @@ pnpm test goal-form.test.tsx
 
 ## Test Patterns & Examples
 
-### Pattern 1: API Route Tests (with Prisma Mocks)
+### Pattern 1: Server Action Tests
 
 **Key characteristics:**
-- Use `@jest-environment node` docblock
-- Import route handlers directly
-- Import and type-cast Prisma mock
-- Mock Prisma method return values
-- Test all HTTP methods (GET, POST, PUT, DELETE)
-- Verify Prisma methods called with correct parameters
-- Test edge cases (404, validation)
+- Import server action functions directly
+- Mock NextAuth session (getServerSession)
+- Mock service layer functions
+- Test FormData input handling
+- Test authentication checks
+- Verify service layer called with correct parameters
+- Test success/error response format
 
 **Example:**
 
 ```typescript
-/**
- * @jest-environment node
- */
-import { GET, POST } from './route'
-import prisma from '@/lib/prisma'
+import { createGoal, updateGoal, deleteGoal } from './goals'
+import { getServerSession } from 'next-auth'
+import * as goalsService from '@/lib/services/goals.service'
 
-// Type the mocked prisma
-const mockPrisma = prisma as jest.Mocked<typeof prisma>
+// Mock NextAuth
+jest.mock('next-auth', () => ({
+  getServerSession: jest.fn(),
+}))
 
-describe('Goals API - /api/goals', () => {
+// Mock service layer
+jest.mock('@/lib/services/goals.service')
+
+// Mock Next.js cache revalidation
+jest.mock('next/cache', () => ({
+  revalidatePath: jest.fn(),
+}))
+
+describe('Goals Actions', () => {
+  const mockSession = {
+    user: { id: 'user-123', email: 'test@example.com' },
+  }
+
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
-  describe('GET /api/goals', () => {
-    it('should return all goals', async () => {
+  describe('createGoal', () => {
+    it('should create goal with authenticated user', async () => {
       // ARRANGE
-      const mockGoalsData = [
-        { id: 'uuid-1', title: 'Test Goal 1', description: 'Description 1', userId: 0, createdAt: new Date(), updatedAt: new Date() },
-        { id: 'uuid-2', title: 'Test Goal 2', description: 'Description 2', userId: 0, createdAt: new Date(), updatedAt: new Date() },
-      ]
-      mockPrisma.goal.findMany.mockResolvedValue(mockGoalsData)
-
-      // ACT
-      const response = await GET()
-      const data = await response.json()
-
-      // ASSERT
-      expect(response.status).toBe(200)
-      expect(Array.isArray(data)).toBe(true)
-      expect(data.length).toBe(2)
-      expect(mockPrisma.goal.findMany).toHaveBeenCalledTimes(1)
-    })
-  })
-
-  describe('POST /api/goals', () => {
-    it('should create a new goal', async () => {
-      // ARRANGE
-      const newGoal = { title: 'New Goal', description: 'New Description' }
-      const createdGoal = {
-        id: 'uuid-new',
-        ...newGoal,
-        userId: 0,
+      ;(getServerSession as jest.Mock).mockResolvedValue(mockSession)
+      const mockCreatedGoal = {
+        id: 'goal-123',
+        title: 'New Goal',
+        description: 'Test',
+        userId: 'user-123',
         createdAt: new Date(),
         updatedAt: new Date(),
       }
-      mockPrisma.goal.create.mockResolvedValue(createdGoal)
+      ;(goalsService.createGoal as jest.Mock).mockResolvedValue(mockCreatedGoal)
 
-      const request = new Request('http://localhost:3000/api/goals', {
-        method: 'POST',
-        body: JSON.stringify(newGoal),
-        headers: { 'Content-Type': 'application/json' },
-      })
+      const formData = new FormData()
+      formData.append('title', 'New Goal')
+      formData.append('description', 'Test')
 
       // ACT
-      const response = await POST(request)
-      const data = await response.json()
+      const result = await createGoal(formData)
 
       // ASSERT
-      expect(response.status).toBe(201)
-      expect(data).toMatchObject(newGoal)
-      expect(data.id).toBeDefined()
-      expect(mockPrisma.goal.create).toHaveBeenCalledWith({
-        data: {
-          title: newGoal.title,
-          description: newGoal.description,
-          userId: 0,
-        },
+      expect(result.success).toBe(true)
+      expect(result.data).toEqual(mockCreatedGoal)
+      expect(goalsService.createGoal).toHaveBeenCalledWith({
+        title: 'New Goal',
+        description: 'Test',
+        userId: 'user-123',
       })
+    })
+
+    it('should return error when not authenticated', async () => {
+      // ARRANGE
+      ;(getServerSession as jest.Mock).mockResolvedValue(null)
+
+      const formData = new FormData()
+      formData.append('title', 'New Goal')
+
+      // ACT
+      const result = await createGoal(formData)
+
+      // ASSERT
+      expect(result.error).toBe('Unauthorized')
+      expect(goalsService.createGoal).not.toHaveBeenCalled()
+    })
+
+    it('should validate required fields', async () => {
+      // ARRANGE
+      ;(getServerSession as jest.Mock).mockResolvedValue(mockSession)
+
+      const formData = new FormData()
+      // Missing title
+
+      // ACT
+      const result = await createGoal(formData)
+
+      // ASSERT
+      expect(result.error).toContain('required')
+      expect(goalsService.createGoal).not.toHaveBeenCalled()
     })
   })
 })
@@ -1265,12 +1346,127 @@ describe('Goals API - /api/goals', () => {
 
 ---
 
-### Pattern 2: Component Tests (Forms)
+### Pattern 2: Service Layer Tests
+
+**Key characteristics:**
+- Import and type-cast mocked Prisma client
+- Mock Prisma method return values (findMany, findUnique, create, update, delete)
+- Test ownership verification logic
+- Test input/output transformations
+- Return null for unauthorized access
+- Test relationship traversal
+
+**Example:**
+
+```typescript
+import { createGoal, getGoalsForUser, deleteGoal } from './goals.service'
+import prisma from '@/lib/prisma'
+
+// Mock Prisma client
+jest.mock('@/lib/prisma', () => ({
+  __esModule: true,
+  default: {
+    goal: {
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+  },
+}))
+
+const mockPrisma = prisma as jest.Mocked<typeof prisma>
+
+describe('Goals Service', () => {
+  const userId = 'user-123'
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  describe('getGoalsForUser', () => {
+    it('should return user goals', async () => {
+      // ARRANGE
+      const mockGoals = [
+        { id: 'goal-1', title: 'Goal 1', description: 'Test', userId, createdAt: new Date(), updatedAt: new Date() },
+        { id: 'goal-2', title: 'Goal 2', description: 'Test', userId, createdAt: new Date(), updatedAt: new Date() },
+      ]
+      mockPrisma.goal.findMany.mockResolvedValue(mockGoals)
+
+      // ACT
+      const result = await getGoalsForUser(userId)
+
+      // ASSERT
+      expect(result).toEqual(mockGoals)
+      expect(mockPrisma.goal.findMany).toHaveBeenCalledWith({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+      })
+    })
+  })
+
+  describe('createGoal', () => {
+    it('should create goal with userId', async () => {
+      // ARRANGE
+      const input = { title: 'New Goal', description: 'Test', userId }
+      const mockCreated = { id: 'goal-123', ...input, createdAt: new Date(), updatedAt: new Date() }
+      mockPrisma.goal.create.mockResolvedValue(mockCreated)
+
+      // ACT
+      const result = await createGoal(input)
+
+      // ASSERT
+      expect(result).toEqual(mockCreated)
+      expect(mockPrisma.goal.create).toHaveBeenCalledWith({
+        data: input,
+      })
+    })
+  })
+
+  describe('deleteGoal', () => {
+    it('should delete goal if user owns it', async () => {
+      // ARRANGE
+      const goalId = 'goal-123'
+      const mockGoal = { id: goalId, title: 'Goal', description: 'Test', userId, createdAt: new Date(), updatedAt: new Date() }
+      mockPrisma.goal.findUnique.mockResolvedValue(mockGoal)
+      mockPrisma.goal.delete.mockResolvedValue(mockGoal)
+
+      // ACT
+      const result = await deleteGoal(goalId, userId)
+
+      // ASSERT
+      expect(result).toEqual(mockGoal)
+      expect(mockPrisma.goal.delete).toHaveBeenCalledWith({
+        where: { id: goalId },
+      })
+    })
+
+    it('should return null if user does not own goal', async () => {
+      // ARRANGE
+      const goalId = 'goal-123'
+      const mockGoal = { id: goalId, title: 'Goal', description: 'Test', userId: 'other-user', createdAt: new Date(), updatedAt: new Date() }
+      mockPrisma.goal.findUnique.mockResolvedValue(mockGoal)
+
+      // ACT
+      const result = await deleteGoal(goalId, userId)
+
+      // ASSERT
+      expect(result).toBeNull()
+      expect(mockPrisma.goal.delete).not.toHaveBeenCalled()
+    })
+  })
+})
+```
+
+---
+
+### Pattern 3: Component Tests (Forms)
 
 **Key characteristics:**
 - Test create and edit modes
 - Test form validation
-- Mock API calls with `global.fetch`
+- Mock server actions (imported from `@/app/actions/*`)
 - Test navigation with router mocks
 - Test loading and error states
 
@@ -1280,7 +1476,14 @@ describe('Goals API - /api/goals', () => {
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { GoalForm } from './goal-form'
-import { mockRouterPush, mockRouterRefresh, mockRouterBack } from '@/jest.setup'
+import { mockRouterPush, mockRouterRefresh } from '@/jest.setup'
+import * as goalsActions from '@/app/actions/goals'
+
+// Mock server actions
+jest.mock('@/app/actions/goals', () => ({
+  createGoal: jest.fn(),
+  updateGoal: jest.fn(),
+}))
 
 describe('GoalForm', () => {
   beforeEach(() => {
@@ -1291,7 +1494,7 @@ describe('GoalForm', () => {
     it('renders create form correctly', () => {
       // ACT
       render(<GoalForm mode="create" />)
-      
+
       // ASSERT
       expect(screen.getByText('Create New Goal')).toBeInTheDocument()
       expect(screen.getByLabelText(/title/i)).toBeInTheDocument()
@@ -1302,45 +1505,48 @@ describe('GoalForm', () => {
     it('submits form with valid data', async () => {
       // ARRANGE
       const user = userEvent.setup()
-      
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ id: '123', title: 'New Goal', description: 'Test Description' }),
+      const mockGoal = {
+        id: 'goal-123',
+        title: 'New Goal',
+        description: 'Test Description',
+        userId: 'user-123',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+
+      ;(goalsActions.createGoal as jest.Mock).mockResolvedValueOnce({
+        success: true,
+        data: mockGoal,
       })
-      
+
       render(<GoalForm mode="create" />)
-      
+
       // ACT
       await user.type(screen.getByLabelText(/title/i), 'New Goal')
       await user.type(screen.getByLabelText(/description/i), 'Test Description')
       await user.click(screen.getByRole('button', { name: /create goal/i }))
-      
+
       // ASSERT
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith('/api/goals', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title: 'New Goal', description: 'Test Description' })
-        })
+        expect(goalsActions.createGoal).toHaveBeenCalled()
         expect(mockRouterPush).toHaveBeenCalledWith('/goals')
       })
     })
 
-    it('displays error on API failure', async () => {
+    it('displays error on action failure', async () => {
       // ARRANGE
       const user = userEvent.setup()
-      
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false,
-        status: 500
+
+      ;(goalsActions.createGoal as jest.Mock).mockResolvedValueOnce({
+        error: 'Failed to create goal',
       })
-      
+
       render(<GoalForm mode="create" />)
-      
+
       // ACT
       await user.type(screen.getByLabelText(/title/i), 'New Goal')
       await user.click(screen.getByRole('button', { name: /create goal/i }))
-      
+
       // ASSERT
       await waitFor(() => {
         expect(screen.getByText(/failed to create goal/i)).toBeInTheDocument()
@@ -1350,9 +1556,9 @@ describe('GoalForm', () => {
     it('shows loading state during submission', async () => {
       // ARRANGE
       const user = userEvent.setup()
-      
-      (global.fetch as jest.Mock).mockImplementation(() => 
-        new Promise(resolve => setTimeout(() => resolve({ ok: true, json: async () => ({}) }), 100))
+
+      ;(goalsActions.createGoal as jest.Mock).mockImplementation(() =>
+        new Promise(resolve => setTimeout(() => resolve({ success: true, data: {} }), 100))
       )
       
       render(<GoalForm mode="create" />)
@@ -1387,27 +1593,22 @@ describe('GoalForm', () => {
     it('submits edit form correctly', async () => {
       // ARRANGE
       const user = userEvent.setup()
-      
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ ...initialData, title: 'Updated Goal' }),
+
+      ;(goalsActions.updateGoal as jest.Mock).mockResolvedValueOnce({
+        success: true,
+        data: { ...initialData, title: 'Updated Goal' },
       })
-      
+
       render(<GoalForm mode="edit" initialData={initialData} />)
-      
+
       // ACT
       await user.clear(screen.getByLabelText(/title/i))
       await user.type(screen.getByLabelText(/title/i), 'Updated Goal')
       await user.click(screen.getByRole('button', { name: /save changes/i }))
-      
+
       // ASSERT
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith('/api/goals/123', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title: 'Updated Goal', description: 'Existing Description' })
-        })
-        expect(mockRouterBack).toHaveBeenCalled()
+        expect(goalsActions.updateGoal).toHaveBeenCalled()
         expect(mockRouterRefresh).toHaveBeenCalled()
       })
     })
@@ -1417,13 +1618,13 @@ describe('GoalForm', () => {
 
 ---
 
-### Pattern 3: Component Tests (Dialogs)
+### Pattern 4: Component Tests (Dialogs)
 
 **Key characteristics:**
 - Test open/close behavior
 - Test confirmation requirements
 - Test name verification
-- Mock API calls
+- Mock server actions
 - Test navigation after action
 
 **Example:**
@@ -1567,7 +1768,7 @@ describe('DeleteGoalDialog', () => {
 
 ---
 
-### Pattern 4: Component Tests (Cards)
+### Pattern 5: Component Tests (Cards)
 
 **Key characteristics:**
 - Test rendering of data

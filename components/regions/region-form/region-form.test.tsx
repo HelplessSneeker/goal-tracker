@@ -6,6 +6,16 @@ import {
   mockRouterRefresh,
   mockRouterBack,
 } from "@/jest.setup";
+import { createRegionAction, updateRegionAction } from "@/app/actions/regions";
+
+jest.mock("@/app/actions/regions");
+
+const mockCreateRegionAction = createRegionAction as jest.MockedFunction<
+  typeof createRegionAction
+>;
+const mockUpdateRegionAction = updateRegionAction as jest.MockedFunction<
+  typeof updateRegionAction
+>;
 
 describe("RegionForm", () => {
   const goalId = "goal-123";
@@ -26,14 +36,16 @@ describe("RegionForm", () => {
     it("submits form with valid data including goalId", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
+      mockCreateRegionAction.mockResolvedValueOnce({
+        success: true,
+        region: {
           id: "region-1",
           goalId: "goal-123",
           title: "New Region",
           description: "New Description",
-        }),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       });
 
       render(<RegionForm mode="create" goalId={goalId} />);
@@ -43,16 +55,8 @@ describe("RegionForm", () => {
       await user.click(screen.getByRole("button", { name: /create region/i }));
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith(
-          "/api/regions",
-          expect.objectContaining({
-            method: "POST",
-            body: JSON.stringify({
-              title: "New Region",
-              description: "New Description",
-              goalId: "goal-123",
-            }),
-          }),
+        expect(mockCreateRegionAction).toHaveBeenCalledWith(
+          expect.any(FormData),
         );
       });
     });
@@ -60,14 +64,16 @@ describe("RegionForm", () => {
     it("redirects to goal detail page after successful creation", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
+      mockCreateRegionAction.mockResolvedValueOnce({
+        success: true,
+        region: {
           id: "region-1",
           goalId,
           title: "Region",
           description: "Desc",
-        }),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       });
 
       render(<RegionForm mode="create" goalId={goalId} />);
@@ -114,17 +120,19 @@ describe("RegionForm", () => {
       expect(screen.getByDisplayValue("Existing Region")).toBeInTheDocument();
     });
 
-    it("submits update request with correct data and goalId", async () => {
+    it("submits update request with correct data", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
+      mockUpdateRegionAction.mockResolvedValueOnce({
+        success: true,
+        region: {
           id: regionId,
           goalId,
           title: "Updated Region",
           description: "Updated Description",
-        }),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       });
 
       render(
@@ -146,16 +154,9 @@ describe("RegionForm", () => {
       await user.click(screen.getByRole("button", { name: /save changes/i }));
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith(
-          `/api/regions/${regionId}`,
-          expect.objectContaining({
-            method: "PUT",
-            body: JSON.stringify({
-              title: "Updated Region",
-              description: "Updated Description",
-              goalId: "goal-123",
-            }),
-          }),
+        expect(mockUpdateRegionAction).toHaveBeenCalledWith(
+          regionId,
+          expect.any(FormData),
         );
       });
     });
@@ -163,14 +164,16 @@ describe("RegionForm", () => {
     it("redirects to goal detail page after successful update", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
+      mockUpdateRegionAction.mockResolvedValueOnce({
+        success: true,
+        region: {
           id: regionId,
           goalId,
           title: "Updated",
           description: "Desc",
-        }),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       });
 
       render(

@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Region } from "@/lib/types";
 import { RegionForm } from "@/components/regions";
+import { getRegionAction } from "@/app/actions/regions";
 
 export default function EditRegionPage({
   params,
@@ -33,14 +33,15 @@ export default function EditRegionPage({
 
     const fetchRegion = async () => {
       try {
-        const res = await fetch(`/api/regions/${regionId}`);
-        if (!res.ok) {
-          throw new Error("Failed to fetch region");
+        const result = await getRegionAction(regionId);
+
+        if ("error" in result || !result.region) {
+          throw new Error(result.error || "Failed to fetch region");
         }
-        const region: Region = await res.json();
+
         setRegionData({
-          title: region.title,
-          description: region.description,
+          title: result.region.title,
+          description: result.region.description,
         });
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load region");

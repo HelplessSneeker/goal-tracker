@@ -11,6 +11,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  createRegionAction,
+  updateRegionAction,
+} from "@/app/actions/regions";
 
 interface RegionFormProps {
   mode: "create" | "edit";
@@ -42,21 +46,20 @@ export function RegionForm({
     setIsSubmitting(true);
 
     try {
-      const url = mode === "create" ? "/api/regions" : `/api/regions/${regionId}`;
-      const method = mode === "create" ? "POST" : "PUT";
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      if (mode === "create") {
+        formData.append("goalId", goalId);
+      }
 
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ title, description, goalId }),
-      });
+      const result =
+        mode === "create"
+          ? await createRegionAction(formData)
+          : await updateRegionAction(regionId!, formData);
 
-      if (!res.ok) {
-        throw new Error(
-          `Failed to ${mode === "create" ? "create" : "update"} region`,
-        );
+      if ("error" in result) {
+        throw new Error(result.error);
       }
 
       if (onSuccess) {

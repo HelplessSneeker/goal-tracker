@@ -1,58 +1,34 @@
-import { Goal, Region } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { ChevronLeft, Plus } from "lucide-react";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { GoalDetailHeader } from "@/components/goals";
 import { Button } from "@/components/ui/button";
 import { RegionCard } from "@/components/regions";
-
-async function getGoal(id: string): Promise<Goal | null> {
-  try {
-    const res = await fetch(`http://localhost:3000/api/goals/${id}`, {
-      cache: "no-store",
-    });
-    if (!res.ok) {
-      return null;
-    }
-    return res.json();
-  } catch (error) {
-    console.error("Failed to fetch goal:", error);
-    return null;
-  }
-}
-
-async function getRegions(goalId: string): Promise<Region[]> {
-  try {
-    const res = await fetch(
-      `http://localhost:3000/api/regions?goalId=${goalId}`,
-      {
-        cache: "no-store",
-      },
-    );
-    if (!res.ok) {
-      return [];
-    }
-    return res.json();
-  } catch (error) {
-    console.error("Failed to fetch regions:", error);
-    return [];
-  }
-}
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { getGoalById } from "@/lib/services/goals.service";
+import { getRegionsForGoal } from "@/lib/services/regions.service";
 
 export default async function GoalDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    redirect("/auth/signin");
+  }
+
   const { id } = await params;
-  const goal = await getGoal(id);
+  const goal = await getGoalById(id, session.user.id);
 
   if (!goal) {
     notFound();
   }
 
-  const regions = await getRegions(id);
+  const regions = await getRegionsForGoal(id, session.user.id);
 
   return (
     <div className="container mx-auto p-6 max-w-4xl animate-fade-in">

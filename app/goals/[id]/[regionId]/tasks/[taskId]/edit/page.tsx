@@ -6,6 +6,7 @@ import { ChevronLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Task } from "@/lib/types";
 import { TaskForm } from "@/components/tasks";
+import { getTaskAction } from "@/app/actions/tasks";
 
 export default function EditTaskPage({
   params,
@@ -32,12 +33,13 @@ export default function EditTaskPage({
 
     const fetchTask = async () => {
       try {
-        const res = await fetch(`/api/tasks/${taskId}`);
-        if (!res.ok) {
-          throw new Error("Failed to fetch task");
+        const result = await getTaskAction(taskId);
+
+        if ("error" in result || !result.task) {
+          throw new Error(result.error || "Failed to fetch task");
         }
-        const task: Task = await res.json();
-        setTaskData(task);
+
+        setTaskData(result.task);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load task");
       } finally {

@@ -6,6 +6,16 @@ import {
   mockRouterRefresh,
   mockRouterBack,
 } from "@/jest.setup";
+import { createTaskAction, updateTaskAction } from "@/app/actions/tasks";
+
+jest.mock("@/app/actions/tasks");
+
+const mockCreateTaskAction = createTaskAction as jest.MockedFunction<
+  typeof createTaskAction
+>;
+const mockUpdateTaskAction = updateTaskAction as jest.MockedFunction<
+  typeof updateTaskAction
+>;
 
 describe("TaskForm", () => {
   beforeEach(() => {
@@ -31,17 +41,19 @@ describe("TaskForm", () => {
     it("should submit form with valid data", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
+      mockCreateTaskAction.mockResolvedValueOnce({
+        success: true,
+        task: {
           id: "123",
           regionId: "region-1",
           title: "New Task",
           description: "Test Description",
-          deadline: "2025-12-01",
+          deadline: new Date("2025-12-01"),
           status: "active",
-          createdAt: new Date().toISOString(),
-        }),
+          userId: "user-1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       });
 
       render(<TaskForm mode="create" regionId="region-1" goalId="goal-1" />);
@@ -55,11 +67,7 @@ describe("TaskForm", () => {
       await user.click(screen.getByRole("button", { name: /create task/i }));
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith("/api/tasks", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: expect.stringContaining("2025-12-01"),
-        });
+        expect(mockCreateTaskAction).toHaveBeenCalledWith(expect.any(FormData));
         expect(mockRouterPush).toHaveBeenCalledWith("/goals/goal-1/region-1");
         expect(mockRouterRefresh).toHaveBeenCalled();
       });
@@ -87,9 +95,19 @@ describe("TaskForm", () => {
     it("should call correct API endpoint", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ id: "1", title: "Test" }),
+      mockCreateTaskAction.mockResolvedValueOnce({
+        success: true,
+        task: {
+          id: "1",
+          title: "Test",
+          regionId: "region-1",
+          description: "",
+          deadline: new Date(),
+          status: "active",
+          userId: "user-1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       });
 
       render(<TaskForm mode="create" regionId="region-1" goalId="goal-1" />);
@@ -100,19 +118,26 @@ describe("TaskForm", () => {
       await user.click(screen.getByRole("button", { name: /create task/i }));
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith(
-          "/api/tasks",
-          expect.any(Object),
-        );
+        expect(mockCreateTaskAction).toHaveBeenCalledWith(expect.any(FormData));
       });
     });
 
     it("should navigate after successful create", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ id: "1" }),
+      mockCreateTaskAction.mockResolvedValueOnce({
+        success: true,
+        task: {
+          id: "1",
+          regionId: "region-1",
+          title: "Task",
+          description: "Desc",
+          deadline: new Date(),
+          status: "active",
+          userId: "user-1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       });
 
       render(<TaskForm mode="create" regionId="region-1" goalId="goal-1" />);
@@ -127,12 +152,11 @@ describe("TaskForm", () => {
       });
     });
 
-    it("should display error when API fails", async () => {
+    it("should display error when action fails", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false,
-        status: 500,
+      mockCreateTaskAction.mockResolvedValueOnce({
+        error: "Failed to create task",
       });
 
       render(<TaskForm mode="create" regionId="region-1" />);
@@ -150,11 +174,25 @@ describe("TaskForm", () => {
     it("should show loading state during submission", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockImplementation(
+      mockCreateTaskAction.mockImplementation(
         () =>
           new Promise((resolve) =>
             setTimeout(
-              () => resolve({ ok: true, json: async () => ({}) }),
+              () =>
+                resolve({
+                  success: true,
+                  task: {
+                    id: "1",
+                    regionId: "region-1",
+                    title: "Task",
+                    description: "Desc",
+                    deadline: new Date(),
+                    status: "active",
+                    userId: "user-1",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                  },
+                }),
               100,
             ),
           ),
@@ -242,9 +280,15 @@ describe("TaskForm", () => {
     it("should submit form with valid data", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ ...initialData, title: "Updated Task" }),
+      mockUpdateTaskAction.mockResolvedValueOnce({
+        success: true,
+        task: {
+          ...initialData,
+          title: "Updated Task",
+          deadline: new Date(initialData.deadline),
+          userId: "user-1",
+          updatedAt: new Date(),
+        },
       });
 
       render(
@@ -262,17 +306,10 @@ describe("TaskForm", () => {
       await user.click(screen.getByRole("button", { name: /save changes/i }));
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith("/api/tasks/123", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            regionId: "region-1",
-            title: "Updated Task",
-            description: "Existing Description",
-            deadline: "2025-12-01T00:00:00.000Z",
-          }),
-        });
-        expect(mockRouterBack).toHaveBeenCalled();
+        expect(mockUpdateTaskAction).toHaveBeenCalledWith("123", expect.any(FormData));
+        expect(mockRouterPush).toHaveBeenCalledWith(
+          "/goals/goal-1/region-1/tasks/123"
+        );
         expect(mockRouterRefresh).toHaveBeenCalled();
       });
     });
@@ -280,9 +317,14 @@ describe("TaskForm", () => {
     it("should call correct API endpoint", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({}),
+      mockUpdateTaskAction.mockResolvedValueOnce({
+        success: true,
+        task: {
+          ...initialData,
+          deadline: new Date(initialData.deadline),
+          userId: "user-1",
+          updatedAt: new Date(),
+        },
       });
 
       render(
@@ -297,19 +339,21 @@ describe("TaskForm", () => {
       await user.click(screen.getByRole("button", { name: /save changes/i }));
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith(
-          "/api/tasks/123",
-          expect.any(Object),
-        );
+        expect(mockUpdateTaskAction).toHaveBeenCalledWith("123", expect.any(FormData));
       });
     });
 
     it("should navigate after successful edit", async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({}),
+      mockUpdateTaskAction.mockResolvedValueOnce({
+        success: true,
+        task: {
+          ...initialData,
+          deadline: new Date(initialData.deadline),
+          userId: "user-1",
+          updatedAt: new Date(),
+        },
       });
 
       render(

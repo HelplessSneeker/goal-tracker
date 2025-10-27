@@ -18,11 +18,13 @@ Next.js 15 goal-tracking application using App Router, React 19, TypeScript, Tai
 5. **Progress Entry** (daily) → Daily progress notes with completion %
 
 **Implementation Status:**
-- ✅ Goals, Regions, Tasks (CRUD + full test coverage)
+- ✅ Goals, Regions, Tasks (CRUD + Server Actions + Service Layer + full test coverage)
 - ✅ Database (Prisma + PostgreSQL with UUID primary keys)
 - ✅ Authentication (NextAuth.js with email/magic link, JWT sessions)
-- ✅ Testing (Jest + React Testing Library - 183/184 tests passing)
+- ✅ Testing (Jest + React Testing Library - 228/228 tests passing, 100% service coverage)
 - ⏳ Weekly Tasks, Progress Entries (TODO - use TDD)
+
+**Architecture:** Migrated from API routes to **Server Actions + Service Layer** for improved type safety and performance.
 
 See [TODOs.md](./TODOs.md) for roadmap and [TESTING.md](./TESTING.md) for testing guide.
 
@@ -48,12 +50,11 @@ pnpm prisma studio      # Database GUI
 
 **⚠️ IMPORTANT: Follow Test-Driven Development for all new features.**
 
-**Current Status:** 183/184 tests passing (~8s)
-- ✅ 58 API tests (100% coverage)
-- ✅ 92 component tests (93-100% coverage)
-- ✅ 6 utility tests (100% coverage)
-- ✅ 28 authentication tests (100% coverage)
-- ⚠️ 1 failing test (pre-existing, task-form.test.tsx:275)
+**Current Status:** 228/228 tests passing (~7.4s)
+- ✅ 91 action tests (100% coverage)
+- ✅ 53 service tests (100% coverage)
+- ✅ 72 component tests (93-100% coverage)
+- ✅ 12 authentication tests (100% coverage)
 
 **TDD Workflow:**
 1. 🔴 **RED**: Write failing test first
@@ -61,10 +62,11 @@ pnpm prisma studio      # Database GUI
 3. ♻️ **REFACTOR**: Improve code while tests stay green
 
 **Test Organization:**
-- API tests: `app/api/**/*.test.ts` (co-located with routes)
+- Action tests: `app/actions/*.test.ts` (test FormData → Service flow)
+- Service tests: `lib/services/*.service.test.ts` (test business logic + Prisma)
 - Component tests: `components/**/[component-name]/[component-name].test.tsx`
-- Use Prisma mocks for API tests (configured in `jest.setup.ts`)
-- Components use global Next.js mocks (router, Link)
+- Use Prisma + NextAuth mocks (configured in `jest.setup.ts`)
+- Components use global Next.js and server action mocks
 
 **Component Structure:**
 ```
@@ -77,13 +79,17 @@ components/
 │   └── ...
 ```
 
-**Import Pattern:** Always import from feature index
+**Import Patterns:**
 ```typescript
+// Components: Always import from feature index
 // ✅ Good
 import { TaskForm, TaskCard } from "@/components/tasks";
 
 // ❌ Bad
 import { TaskForm } from "@/components/tasks/task-form/task-form";
+
+// Server Actions: Import directly from actions
+import { createGoal, updateGoal } from "@/app/actions/goals";
 ```
 
 See [TESTING.md](./TESTING.md) for detailed patterns and examples.
@@ -99,10 +105,11 @@ See [TESTING.md](./TESTING.md) for detailed patterns and examples.
 - **Icons:** Lucide React
 
 ### Key Patterns
-- **Server Components** (default): Data fetching, static UI
+- **Server Components** (default): Data fetching via services, static UI
 - **Client Components** (`"use client"`): Forms, dialogs, interactivity
-- Server Components fetch from API routes (`fetch` with `cache: "no-store"`)
-- API routes use Prisma for database operations
+- Server Components call service layer directly for data
+- Client Components call Server Actions for mutations
+- Server Actions → Service Layer → Prisma for all data operations
 - Path alias: `@/*` for root directory
 
 ### Authentication
@@ -113,27 +120,36 @@ See [TESTING.md](./TESTING.md) for detailed patterns and examples.
 - **Pages:** `/auth/signin`, `/auth/verify-request`
 - **Adapter:** Prisma adapter for NextAuth
 
-### API Routes (All use Prisma)
+### Server Actions & Service Layer
 
-**Goals:** ✅ Complete
-- `GET/POST /api/goals`
-- `GET/PUT/DELETE /api/goals/[id]`
+**Data Flow:** `Client Component → Server Action → Service Layer → Prisma → Database`
 
-**Regions:** ✅ Complete
-- `GET/POST /api/regions` (filter by `?goalId={id}`)
-- `GET/PUT/DELETE /api/regions/[id]`
+**Server Actions** (`app/actions/`):
+- `goals.ts` - Create, read, update, delete goals
+- `regions.ts` - Create, read, update, delete regions
+- `tasks.ts` - Create, read, update, delete tasks
 
-**Tasks:** ✅ Complete
-- `GET/POST /api/tasks` (filter by `?regionId={id}`)
-- `GET/PUT/DELETE /api/tasks/[id]`
+Actions handle:
+- FormData validation from client components
+- Authentication (NextAuth session)
+- Calling service layer with typed inputs
+- Cache revalidation (`revalidatePath`)
+- Error handling and response formatting
 
-**Weekly Tasks:** ⏳ TODO
-- Add `WeeklyTask` model to `prisma/schema.prisma` first
-- Implement CRUD API with TDD approach
+**Service Layer** (`lib/services/`):
+- `goals.service.ts` - Business logic + Prisma queries for goals
+- `regions.service.ts` - Business logic + Prisma queries for regions
+- `tasks.service.ts` - Business logic + Prisma queries for tasks
 
-**Progress Entries:** ⏳ TODO
-- Add `ProgressEntry` model to `prisma/schema.prisma` first
-- Implement CRUD API with TDD approach
+Services handle:
+- Direct Prisma database operations
+- User ownership verification
+- Input/output type safety
+- Null returns for unauthorized access
+
+**Weekly Tasks & Progress Entries:** ⏳ TODO
+- Add models to `prisma/schema.prisma` first
+- Implement actions + services with TDD approach
 
 ### Database Models (Prisma)
 
@@ -150,8 +166,12 @@ See [TESTING.md](./TESTING.md) for detailed patterns and examples.
 ## Development Workflow
 
 ### Implementing New Features
-1. 🔴 **Write tests first** (API + component tests)
-2. 🟢 **Implement feature** using Prisma for data operations
+1. 🔴 **Write tests first** (action + service + component tests)
+2. 🟢 **Implement feature**:
+   - Add Prisma schema if needed
+   - Create service layer functions
+   - Create server actions
+   - Update components to use actions
 3. ♻️ **Refactor** while keeping tests green
 4. Run `pnpm test` to verify no regressions
 5. Run `pnpm lint` before committing

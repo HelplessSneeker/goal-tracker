@@ -2,6 +2,13 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DeleteTaskDialog } from "./delete-task-dialog";
 import { mockRouterPush, mockRouterRefresh } from "@/jest.setup";
+import { deleteTaskAction } from "@/app/actions/tasks";
+
+jest.mock("@/app/actions/tasks");
+
+const mockDeleteTaskAction = deleteTaskAction as jest.MockedFunction<
+  typeof deleteTaskAction
+>;
 
 describe("DeleteTaskDialog", () => {
   const defaultProps = {
@@ -57,10 +64,10 @@ describe("DeleteTaskDialog", () => {
     expect(deleteButton).not.toBeDisabled();
   });
 
-  it("calls DELETE API when confirmed", async () => {
+  it("calls deleteTaskAction when confirmed", async () => {
     const user = userEvent.setup();
 
-    (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true });
+    mockDeleteTaskAction.mockResolvedValueOnce({ success: true });
 
     render(<DeleteTaskDialog {...defaultProps} />);
 
@@ -71,16 +78,14 @@ describe("DeleteTaskDialog", () => {
     await user.click(deleteButton);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith("/api/tasks/task-123", {
-        method: "DELETE",
-      });
+      expect(mockDeleteTaskAction).toHaveBeenCalledWith("task-123");
     });
   });
 
   it("navigates to region detail page after successful deletion", async () => {
     const user = userEvent.setup();
 
-    (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true });
+    mockDeleteTaskAction.mockResolvedValueOnce({ success: true });
 
     render(<DeleteTaskDialog {...defaultProps} />);
 
@@ -97,10 +102,10 @@ describe("DeleteTaskDialog", () => {
     });
   });
 
-  it("displays error message on API failure", async () => {
+  it("displays error message on action failure", async () => {
     const user = userEvent.setup();
 
-    (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: false });
+    mockDeleteTaskAction.mockResolvedValueOnce({ error: "Failed to delete task" });
 
     render(<DeleteTaskDialog {...defaultProps} />);
 
@@ -118,10 +123,10 @@ describe("DeleteTaskDialog", () => {
     const user = userEvent.setup();
     const onOpenChange = jest.fn();
 
-    (global.fetch as jest.Mock).mockImplementation(
+    mockDeleteTaskAction.mockImplementation(
       () =>
         new Promise((resolve) =>
-          setTimeout(() => resolve({ ok: true }), 100),
+          setTimeout(() => resolve({ success: true }), 100),
         ),
     );
 

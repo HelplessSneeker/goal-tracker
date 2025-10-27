@@ -1,61 +1,34 @@
-import { Region, Task } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { ChevronLeft, Plus } from "lucide-react";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { TaskCard } from "@/components/tasks";
 import { RegionDetailHeader } from "@/components/regions";
-
-async function getRegion(regionId: string): Promise<Region | null> {
-  try {
-    const res = await fetch(
-      `http://localhost:3000/api/regions/${regionId}`,
-      {
-        cache: "no-store",
-      }
-    );
-    if (!res.ok) {
-      return null;
-    }
-    return res.json();
-  } catch (error) {
-    console.error("Failed to fetch region:", error);
-    return null;
-  }
-}
-
-async function getTasks(regionId: string): Promise<Task[]> {
-  try {
-    const res = await fetch(
-      `http://localhost:3000/api/tasks?regionId=${regionId}`,
-      {
-        cache: "no-store",
-      }
-    );
-    if (!res.ok) {
-      return [];
-    }
-    return res.json();
-  } catch (error) {
-    console.error("Failed to fetch tasks:", error);
-    return [];
-  }
-}
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { getRegionById } from "@/lib/services/regions.service";
+import { getTasksForRegion } from "@/lib/services/tasks.service";
 
 export default async function RegionDetailPage({
   params,
 }: {
   params: Promise<{ id: string; regionId: string }>;
 }) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    redirect("/auth/signin");
+  }
+
   const { id, regionId } = await params;
-  const region = await getRegion(regionId);
+  const region = await getRegionById(regionId, session.user.id);
 
   if (!region) {
     notFound();
   }
 
-  const tasks = await getTasks(regionId);
+  const tasks = await getTasksForRegion(regionId, session.user.id);
 
   return (
     <div className="container mx-auto p-6 max-w-4xl animate-fade-in">

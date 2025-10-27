@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { deleteGoalAction } from "@/app/actions/goals";
 
 interface DeleteGoalDialogProps {
   open: boolean;
@@ -40,12 +41,10 @@ export function DeleteGoalDialog({
     setIsDeleting(true);
 
     try {
-      const res = await fetch(`/api/goals/${goalId}`, {
-        method: "DELETE",
-      });
+      const result = await deleteGoalAction(goalId);
 
-      if (!res.ok) {
-        throw new Error("Failed to delete goal");
+      if ("error" in result) {
+        throw new Error(result.error);
       }
 
       router.push("/goals");

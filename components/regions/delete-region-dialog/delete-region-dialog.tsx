@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { deleteRegionAction } from "@/app/actions/regions";
 
 interface DeleteRegionDialogProps {
   open: boolean;
@@ -43,12 +44,10 @@ export function DeleteRegionDialog({
     setError(null);
 
     try {
-      const res = await fetch(`/api/regions/${regionId}`, {
-        method: "DELETE",
-      });
+      const result = await deleteRegionAction(regionId);
 
-      if (!res.ok) {
-        throw new Error("Failed to delete region");
+      if ("error" in result) {
+        throw new Error(result.error);
       }
 
       onOpenChange(false);

@@ -1,32 +1,25 @@
-import { Task } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { TaskDetailHeader } from "@/components/tasks";
-
-async function getTask(taskId: string): Promise<Task | null> {
-  try {
-    const res = await fetch(`http://localhost:3000/api/tasks/${taskId}`, {
-      cache: "no-store",
-    });
-    if (!res.ok) {
-      return null;
-    }
-    return res.json();
-  } catch (error) {
-    console.error("Failed to fetch task:", error);
-    return null;
-  }
-}
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { getTaskById } from "@/lib/services/tasks.service";
 
 export default async function TaskDetailPage({
   params,
 }: {
   params: Promise<{ id: string; regionId: string; taskId: string }>;
 }) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    redirect("/auth/signin");
+  }
+
   const { id, regionId, taskId } = await params;
-  const task = await getTask(taskId);
+  const task = await getTaskById(taskId, session.user.id);
 
   if (!task) {
     notFound();

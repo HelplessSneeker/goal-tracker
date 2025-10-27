@@ -54,6 +54,7 @@ jest.mock("@/lib/prisma", () => ({
     goal: {
       findMany: jest.fn(),
       findUnique: jest.fn(),
+      findFirst: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
@@ -62,6 +63,7 @@ jest.mock("@/lib/prisma", () => ({
     region: {
       findMany: jest.fn(),
       findUnique: jest.fn(),
+      findFirst: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
@@ -70,6 +72,7 @@ jest.mock("@/lib/prisma", () => ({
     task: {
       findMany: jest.fn(),
       findUnique: jest.fn(),
+      findFirst: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
@@ -78,12 +81,44 @@ jest.mock("@/lib/prisma", () => ({
   },
 }));
 
+// Mock NextAuth
+export const mockGetServerSession = jest.fn();
+jest.mock("next-auth", () => ({
+  getServerSession: mockGetServerSession,
+}));
+
+// Mock Server Actions for component tests
+jest.mock("@/app/actions/goals", () => ({
+  createGoalAction: jest.fn(),
+  updateGoalAction: jest.fn(),
+  deleteGoalAction: jest.fn(),
+  getGoalsAction: jest.fn(),
+  getGoalAction: jest.fn(),
+}));
+
+jest.mock("@/app/actions/regions", () => ({
+  createRegionAction: jest.fn(),
+  updateRegionAction: jest.fn(),
+  deleteRegionAction: jest.fn(),
+  getRegionsAction: jest.fn(),
+  getRegionAction: jest.fn(),
+}));
+
+jest.mock("@/app/actions/tasks", () => ({
+  createTaskAction: jest.fn(),
+  updateTaskAction: jest.fn(),
+  deleteTaskAction: jest.fn(),
+  getTasksAction: jest.fn(),
+  getTaskAction: jest.fn(),
+}));
+
 // Setup global mocks
 beforeEach(() => {
   // Clear all mocks before each test
   mockRouterPush.mockClear();
   mockRouterRefresh.mockClear();
   mockRouterBack.mockClear();
+  mockGetServerSession.mockClear();
 
   // Setup fetch mock
   global.fetch = jest.fn();

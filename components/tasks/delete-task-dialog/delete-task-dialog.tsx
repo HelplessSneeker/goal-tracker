@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { deleteTaskAction } from "@/app/actions/tasks";
 
 interface DeleteTaskDialogProps {
   open: boolean;
@@ -45,12 +46,10 @@ export function DeleteTaskDialog({
     setError(null);
 
     try {
-      const res = await fetch(`/api/tasks/${taskId}`, {
-        method: "DELETE",
-      });
+      const result = await deleteTaskAction(taskId);
 
-      if (!res.ok) {
-        throw new Error("Failed to delete task");
+      if ("error" in result) {
+        throw new Error(result.error);
       }
 
       onOpenChange(false);

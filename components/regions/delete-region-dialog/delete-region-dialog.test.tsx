@@ -2,6 +2,13 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DeleteRegionDialog } from "./delete-region-dialog";
 import { mockRouterPush, mockRouterRefresh } from "@/jest.setup";
+import { deleteRegionAction } from "@/app/actions/regions";
+
+jest.mock("@/app/actions/regions");
+
+const mockDeleteRegionAction = deleteRegionAction as jest.MockedFunction<
+  typeof deleteRegionAction
+>;
 
 describe("DeleteRegionDialog", () => {
   const defaultProps = {
@@ -59,10 +66,10 @@ describe("DeleteRegionDialog", () => {
     expect(deleteButton).not.toBeDisabled();
   });
 
-  it("calls DELETE API when confirmed", async () => {
+  it("calls deleteRegionAction when confirmed", async () => {
     const user = userEvent.setup();
 
-    (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true });
+    mockDeleteRegionAction.mockResolvedValueOnce({ success: true });
 
     render(<DeleteRegionDialog {...defaultProps} />);
 
@@ -73,16 +80,14 @@ describe("DeleteRegionDialog", () => {
     await user.click(deleteButton);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith("/api/regions/region-123", {
-        method: "DELETE",
-      });
+      expect(mockDeleteRegionAction).toHaveBeenCalledWith("region-123");
     });
   });
 
   it("navigates to goal detail page after successful deletion", async () => {
     const user = userEvent.setup();
 
-    (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true });
+    mockDeleteRegionAction.mockResolvedValueOnce({ success: true });
 
     render(<DeleteRegionDialog {...defaultProps} />);
 
@@ -97,10 +102,10 @@ describe("DeleteRegionDialog", () => {
     });
   });
 
-  it("displays error message on API failure", async () => {
+  it("displays error message on action failure", async () => {
     const user = userEvent.setup();
 
-    (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: false });
+    mockDeleteRegionAction.mockResolvedValueOnce({ error: "Failed to delete region" });
 
     render(<DeleteRegionDialog {...defaultProps} />);
 

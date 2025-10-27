@@ -2,23 +2,25 @@
 
 This document tracks the implementation progress and remaining work for the goal tracking system.
 
-**Last Updated:** 2025-10-23
+**Last Updated:** 2025-10-27
 
 ---
 
-## Current Branch Status
+## Current Status
 
 **Branch:** `authentication`
 
-**Recent Changes (not yet merged):**
-- ✅ NextAuth.js authentication implemented (email/magic link)
-- ✅ Centralized auth configuration (`lib/auth.ts`)
-- ✅ Sign-in and verify-request pages
-- ✅ Middleware for route protection
-- ✅ Authentication tests (28 tests, 100% coverage)
-- ✅ Documentation updated (TESTING.md, TODOs.md, CLAUDE.md, README.md)
-- ⚠️ Prisma seed script needs fixing for user relations
-- ⚠️ 1 pre-existing test failure (task-form.test.tsx:275)
+**Architecture:** Server Actions + Service Layer (migrated from API routes)
+
+**Test Status:** ✅ 228/228 tests passing (~7.4s, 100% service coverage)
+
+**Completed:**
+- Goals, Regions, Tasks (CRUD with Server Actions + Service Layer)
+- PostgreSQL + Prisma ORM with UUID primary keys
+- NextAuth.js authentication (email/magic link, JWT sessions)
+- Comprehensive test coverage (actions, services, components)
+
+**Next:** Weekly Tasks and Progress Entries implementation
 
 ---
 
@@ -29,111 +31,39 @@ The system follows a 4-level hierarchy:
 
 ---
 
-## Completed Phases ✅
+## Completed Work ✅
 
-### Phase 1: Goals & Regions (Foundation) ✅ COMPLETE
-**Completed:** 2025-10-20
+**Phases 1-4 Complete** (Goals, Regions, Tasks, Database, Authentication)
 
-#### Goals CRUD ✅
-- [x] API routes (`POST/GET/PUT/DELETE /api/goals`)
-- [x] UI pages (list, create, detail, edit)
-- [x] Components (GoalCard, GoalForm, GoalDetailHeader, DeleteGoalDialog)
-- [x] 18 API tests (100% coverage)
-- [x] 33 component tests (93-100% coverage)
+- ✅ **CRUD Operations:** Goals, Regions, Tasks with full UI
+- ✅ **Architecture:** Server Actions + Service Layer (migrated from API routes)
+  - Actions: `app/actions/goals.ts`, `regions.ts`, `tasks.ts`
+  - Services: `lib/services/goals.service.ts`, `regions.service.ts`, `tasks.service.ts`
+- ✅ **Database:** PostgreSQL + Prisma ORM with UUID primary keys
+- ✅ **Authentication:** NextAuth.js with email provider, JWT sessions, middleware protection
+- ✅ **Testing:** 228/228 tests passing (actions, services, components, auth)
+- ✅ **Components:** Forms, cards, dialogs for all entities
+- ✅ **User Ownership:** Service layer verifies user ownership on all operations
 
-#### Regions CRUD ✅
-- [x] API routes (`POST/GET/PUT/DELETE /api/regions`)
-- [x] UI pages (list, create, detail, edit)
-- [x] Components (RegionCard, RegionForm, DeleteRegionDialog)
-- [x] 19 API tests (100% coverage)
-- [x] 18 component tests (93-100% coverage)
-
-#### Testing Infrastructure ✅
-- [x] Jest + React Testing Library setup
-- [x] Prisma mocks configured globally
-- [x] Test coverage tracking with v8
-- [x] TESTING.md documentation created
-
----
-
-### Phase 2: Tasks Implementation ✅ COMPLETE
-**Completed:** 2025-10-21
-
-#### Tasks CRUD ✅
-- [x] API routes (`POST/GET/PUT/DELETE /api/tasks`)
-- [x] UI pages (list, create, detail, edit)
-- [x] Components (TaskCard, TaskForm, TaskDetailHeader, DeleteTaskDialog)
-- [x] Deadline tracking with date picker
-- [x] Status badges (active/completed/incomplete)
-- [x] Visual indicators for approaching/overdue deadlines
-- [x] 21 API tests (100% coverage)
-- [x] 41 component tests (93-100% coverage)
-
----
-
-### Phase 3: Database Integration (Prisma + PostgreSQL) ✅ COMPLETE
-**Completed:** 2025-10-21
-
-#### Implementation ✅
-- [x] PostgreSQL database with Docker Compose
-- [x] Prisma ORM integration
-- [x] Database schema with UUID primary keys
-- [x] Migrated all API routes from mock data to Prisma
-- [x] Database seeding script (`prisma/seed.ts`)
-- [x] Updated all 58 API tests to use Prisma mocks
-- [x] 100% API test coverage maintained
-
----
-
-### Phase 4: Authentication & User Management ⏳ IN PROGRESS
-**Started:** 2025-10-23
-
-#### Completed ✅
-- [x] NextAuth.js setup with email provider
-- [x] Centralized auth configuration (`lib/auth.ts`)
-- [x] JWT session strategy
-- [x] Prisma adapter for NextAuth
-- [x] Sign-in page with magic link flow
-- [x] Verify request page
-- [x] Middleware for route protection
-- [x] Authentication tests (28 tests - 100% coverage)
-  - [x] Auth configuration tests (10 tests)
-  - [x] Sign-in page tests (11 tests)
-  - [x] Verify request page tests (7 tests)
-
-#### Remaining 🔲
+**Remaining Auth Tasks:**
 - [ ] Sign-out functionality
-- [ ] User model in Prisma schema with relations
-- [ ] Update API routes to filter by userId
-- [ ] Add user authentication checks to API routes
 - [ ] User profile menu in UI
 - [ ] User settings page
-- [ ] Update tests to handle user context
-- [ ] Verify Goals/Regions/Tasks properly scoped to users
-
-**Current Status:** Basic authentication working with magic link email flow. Need to add user scoping to database models and API routes.
-
----
-
-## Currently Implementing
-
-**Phase 4: Authentication** - Sign-in works, magic links work. Need to add user scoping to data models and logout functionality.
 
 ---
 
 ## Open Phases
 
 ### Phase 5: Weekly Tasks Implementation 📅
-**Status:** Not started (blocked by Phase 4 completion)
+**Status:** Ready to start
 
 #### Data Layer
 - [ ] Add `WeeklyTask` model to Prisma schema
-- [ ] Create API routes
-  - [ ] `GET /api/weekly-tasks?taskId={id}&weekStartDate={date}`
-  - [ ] `GET /api/weekly-tasks/current-week`
-  - [ ] `POST /api/weekly-tasks` - Create with priority 1-3
-  - [ ] `PUT /api/weekly-tasks/[id]` - Update
-  - [ ] `DELETE /api/weekly-tasks/[id]` - Delete
+  - Fields: id, taskId, title, description, priority (1-3), weekStartDate, status, userId
+- [ ] Create service layer: `lib/services/weekly-tasks.service.ts`
+  - getWeeklyTasksForTask, getCurrentWeekTasks, createWeeklyTask, updateWeeklyTask, deleteWeeklyTask
+- [ ] Create server actions: `app/actions/weekly-tasks.ts`
+  - Handle FormData, auth checks, call service layer, revalidate paths
 
 #### UI/Components
 - [ ] WeeklyTaskForm component (enforce 3 tasks per week)
@@ -143,7 +73,8 @@ The system follows a 4-level hierarchy:
 - [ ] Visual distinction for different priorities
 
 #### Testing (TDD Approach)
-- [ ] Write API tests first (following Tasks pattern)
+- [ ] Write service tests first (Prisma mocks)
+- [ ] Write action tests first (FormData → Service)
 - [ ] Write component tests first
 - [ ] Implement features to pass tests
 
@@ -153,11 +84,9 @@ The system follows a 4-level hierarchy:
 
 #### Data Layer
 - [ ] Add `ProgressEntry` model to Prisma schema
-- [ ] Create API routes
-  - [ ] `GET /api/progress-entries?weeklyTaskId={id}`
-  - [ ] `POST /api/progress-entries`
-  - [ ] `PUT /api/progress-entries/[id]`
-  - [ ] `DELETE /api/progress-entries/[id]`
+  - Fields: id, weeklyTaskId, date, notes, completionPercentage (0-100), userId
+- [ ] Create service layer: `lib/services/progress-entries.service.ts`
+- [ ] Create server actions: `app/actions/progress-entries.ts`
 
 #### UI/Components
 - [ ] Progress entry form with notes and completion percentage
@@ -166,7 +95,8 @@ The system follows a 4-level hierarchy:
 - [ ] Daily entry reminders
 
 #### Testing (TDD Approach)
-- [ ] Write API tests first
+- [ ] Write service tests first
+- [ ] Write action tests first
 - [ ] Write component tests first
 - [ ] Implement features to pass tests
 
@@ -263,15 +193,13 @@ The system follows a 4-level hierarchy:
 ## Bug Fixes & Tech Debt 🐛
 
 ### High Priority
-- [ ] Fix failing test in `task-form.test.tsx:275` (pre-existing issue)
-- [ ] Fix Prisma seed script (needs updating for authentication/user relations)
-- [ ] Add proper TypeScript types for all API responses
-- [ ] Improve error handling in API routes
-- [ ] Add request validation/sanitization
+- [ ] Add proper TypeScript types for all action responses
+- [ ] Improve error handling in server actions
+- [ ] Add input validation/sanitization for FormData
 
 ### Medium Priority
 - [ ] Add error boundaries
-- [ ] Add API rate limiting (if needed)
+- [ ] Optimize service layer queries (select only needed fields)
 
 ### Low Priority (Future)
 - [ ] Security audit (XSS, CSRF, etc.)
@@ -285,7 +213,9 @@ The system follows a 4-level hierarchy:
 - [x] Testing documentation (TESTING.md) ✅
 - [x] Project instructions (CLAUDE.md) ✅
 - [x] README with setup instructions ✅
-- [ ] API documentation
+- [x] Architecture migration documented ✅
+- [ ] Server Actions documentation
+- [ ] Service Layer documentation
 - [ ] Component documentation
 - [ ] User guide / help section
 - [ ] Deployment guide
@@ -294,12 +224,11 @@ The system follows a 4-level hierarchy:
 
 ## Test Status 🧪
 
-**Current:** 183 of 184 tests passing (~8 seconds)
-- ✅ 58 API tests (100% coverage)
-- ✅ 92 component tests (93-100% coverage)
-- ✅ 6 utility tests (100% coverage)
-- ✅ 28 authentication tests (100% coverage)
-- ⚠️ 1 failing test (pre-existing, unrelated to recent work)
+**Current:** 228 of 228 tests passing (~7.4 seconds)
+- ✅ 91 action tests (100% coverage)
+- ✅ 53 service tests (100% coverage)
+- ✅ 72 component tests (93-100% coverage)
+- ✅ 12 authentication tests (100% coverage)
 
 See [TESTING.md](./TESTING.md) for comprehensive testing guide.
 
@@ -307,20 +236,22 @@ See [TESTING.md](./TESTING.md) for comprehensive testing guide.
 
 ## Immediate Next Steps (Priority Order)
 
-1. **Complete Phase 4: Authentication** 🎯
+1. **Complete Remaining Auth Features** 🎯
    - Add sign-out functionality
-   - Add User model to Prisma with relations
-   - Update API routes to enforce user scoping
-   - Fix failing test in task-form.test.tsx
+   - User profile menu in UI
+   - User settings page
 
-2. **Phase 5: Weekly Tasks**
-   - Use TDD approach (write tests first)
-   - Follow Tasks implementation pattern
+2. **Phase 5: Weekly Tasks** 🚀
+   - Add Prisma schema model
+   - Create service layer (TDD)
+   - Create server actions (TDD)
+   - Create UI components (TDD)
    - Enforce 3 tasks per week per task
 
 3. **Phase 6: Progress Entries**
+   - Add Prisma schema model
+   - Create service layer + actions (TDD)
    - Daily journaling with completion percentage
-   - Use TDD approach
 
 4. **Phase 7: Redesign Progress Page**
    - Focus on current week

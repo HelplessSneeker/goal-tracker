@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Goal } from "@/lib/types";
 import { GoalForm } from "@/components/goals";
+import { getGoalAction } from "@/app/actions/goals";
 
 export default function EditGoalPage({
   params,
@@ -31,14 +31,15 @@ export default function EditGoalPage({
 
     const fetchGoal = async () => {
       try {
-        const res = await fetch(`/api/goals/${id}`);
-        if (!res.ok) {
-          throw new Error("Failed to fetch goal");
+        const result = await getGoalAction(id);
+
+        if ("error" in result || !result.goal) {
+          throw new Error(result.error || "Failed to fetch goal");
         }
-        const goal: Goal = await res.json();
+
         setGoalData({
-          title: goal.title,
-          description: goal.description,
+          title: result.goal.title,
+          description: result.goal.description,
         });
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load goal");

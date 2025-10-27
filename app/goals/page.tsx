@@ -1,32 +1,30 @@
-import { Goal, Region } from "@/lib/types";
+import { Region } from "@/lib/types";
 import { GoalCard } from "@/components/goals";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-async function getGoals(): Promise<Goal[]> {
-  const res = await fetch("http://localhost:3000/api/goals", {
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    throw new Error("Failed to fetch goals");
-  }
-  return res.json();
-}
-
-async function getRegions(): Promise<Region[]> {
-  const res = await fetch("http://localhost:3000/api/regions", {
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    throw new Error("Failed to fetch regions");
-  }
-  return res.json();
-}
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { getGoalsForUser } from "@/lib/services/goals.service";
+import { getRegionsForGoal } from "@/lib/services/regions.service";
 
 export default async function GoalsPage() {
-  const goals = await getGoals();
-  const regions = await getRegions();
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    redirect("/auth/signin");
+  }
+
+  // Use service layer for goals
+  const goals = await getGoalsForUser(session.user.id);
+
+  // Fetch regions for each goal using service layer with ownership verification
+  const regionsPromises = goals.map((goal) =>
+    getRegionsForGoal(goal.id, session.user!.id)
+  );
+  const regionsArrays = await Promise.all(regionsPromises);
+  const regions = regionsArrays.flat();
 
   return (
     <div className="container mx-auto p-6 animate-fade-in">

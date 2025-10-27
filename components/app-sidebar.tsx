@@ -24,6 +24,8 @@ import {
   CollapsibleContent,
 } from "@/components/ui/collapsible";
 import { useEffect, useState } from "react";
+import { getGoalsAction } from "@/app/actions/goals";
+import { getRegionsAction } from "@/app/actions/regions";
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -36,19 +38,17 @@ export function AppSidebar() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [goalsRes, regionsRes] = await Promise.all([
-          fetch("/api/goals", { cache: "no-store" }),
-          fetch("/api/regions", { cache: "no-store" }),
+        const [goalsResult, regionsResult] = await Promise.all([
+          getGoalsAction(),
+          getRegionsAction(),
         ]);
 
-        if (goalsRes.ok) {
-          const goalsData = await goalsRes.json();
-          setGoals(goalsData);
+        if ("goals" in goalsResult) {
+          setGoals(goalsResult.goals);
         }
 
-        if (regionsRes.ok) {
-          const regionsData = await regionsRes.json();
-          setRegions(regionsData);
+        if ("regions" in regionsResult) {
+          setRegions(regionsResult.regions);
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);

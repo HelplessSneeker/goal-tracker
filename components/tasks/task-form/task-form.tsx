@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { createTaskAction, updateTaskAction } from "@/app/actions/tasks";
 
 interface TaskFormProps {
   mode: "create" | "edit";
@@ -55,29 +56,21 @@ export function TaskForm({
     setIsSubmitting(true);
 
     try {
-      const url = mode === "create" ? "/api/tasks" : `/api/tasks/${taskId}`;
-      const method = mode === "create" ? "POST" : "PUT";
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("deadline", deadline);
+      if (mode === "create") {
+        formData.append("regionId", regionId);
+      }
 
-      // Convert date to ISO string for API
-      const deadlineISO = new Date(deadline).toISOString();
+      const result =
+        mode === "create"
+          ? await createTaskAction(formData)
+          : await updateTaskAction(taskId!, formData);
 
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          regionId,
-          title,
-          description,
-          deadline: deadlineISO,
-        }),
-      });
-
-      if (!res.ok) {
-        throw new Error(
-          `Failed to ${mode === "create" ? "create" : "update"} task`
-        );
+      if ("error" in result) {
+        throw new Error(result.error);
       }
 
       if (onSuccess) {

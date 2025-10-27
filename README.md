@@ -13,9 +13,10 @@ This project serves a dual purpose: it's a practical application to help me stay
 
 This is a full-stack application with:
 - ✅ **Complete CRUD operations** for Goals, Regions, and Tasks
+- ✅ **Server Actions + Service Layer** architecture (migrated from API routes)
 - ✅ **PostgreSQL database** with Prisma ORM
 - ✅ **Authentication** with NextAuth.js (email/magic link)
-- ✅ **Comprehensive test coverage** (183/184 tests, 100% API coverage)
+- ✅ **Comprehensive test coverage** (228/228 tests, 100% service coverage)
 - ✅ **Modern UI** with shadcn/ui components
 - ⏳ **Weekly Tasks and Progress Tracking** (planned)
 
@@ -176,10 +177,10 @@ pnpm test:coverage     # Run tests with coverage report
 ```
 
 **Current Test Status:**
-- 183/184 tests passing (1 pre-existing failure)
-- 100% API route coverage
+- 228/228 tests passing (~7.4s)
+- 100% server action coverage
+- 100% service layer coverage
 - 93-100% component coverage
-- 100% authentication coverage
 
 ## Tech Stack
 
@@ -192,10 +193,11 @@ pnpm test:coverage     # Run tests with coverage report
 - **Lucide React** - Icons
 
 ### Backend
+- **Next.js Server Actions** - Type-safe server mutations
+- **Service Layer** - Business logic and data access
 - **NextAuth.js** - Authentication (email/magic link, JWT sessions)
 - **Prisma ORM** - Database toolkit
 - **PostgreSQL** - Relational database
-- **Next.js API Routes** - RESTful API
 
 ### Development
 - **Turbopack** - Fast bundler
@@ -209,7 +211,8 @@ pnpm test:coverage     # Run tests with coverage report
 ```
 goal-tracker/
 ├── app/                      # Next.js app directory
-│   ├── api/                  # API routes (Goals, Regions, Tasks)
+│   ├── actions/              # Server Actions (goals, regions, tasks)
+│   ├── api/auth/             # NextAuth API route only
 │   ├── auth/                 # Authentication pages (signin, verify-request)
 │   ├── goals/                # Goals pages
 │   └── progress/             # Progress tracking page
@@ -219,6 +222,7 @@ goal-tracker/
 │   ├── tasks/                # Task-related components
 │   └── ui/                   # shadcn/ui components
 ├── lib/                      # Utilities and helpers
+│   ├── services/             # Service Layer (business logic + Prisma)
 │   ├── auth.ts               # NextAuth configuration
 │   ├── prisma.ts             # Prisma client
 │   └── types.ts              # TypeScript types
@@ -226,7 +230,7 @@ goal-tracker/
 │   ├── schema.prisma         # Database schema (includes NextAuth models)
 │   └── seed.ts               # Database seeder
 ├── middleware.ts             # Route protection middleware
-└── tests/                    # Test files (co-located)
+└── tests/                    # Test files (co-located with source)
 ```
 
 ## Documentation
