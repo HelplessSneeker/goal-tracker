@@ -6,12 +6,16 @@ import { ChevronLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { RegionForm } from "@/components/regions";
 import { getRegionAction } from "@/app/actions/regions";
+import { useTranslations } from "next-intl";
 
 export default function EditRegionPage({
   params,
 }: {
   params: Promise<{ id: string; regionId: string }>;
 }) {
+  const t = useTranslations("regions");
+  const tNav = useTranslations("navigation");
+  const tCommon = useTranslations("common");
   const [goalId, setGoalId] = useState<string | null>(null);
   const [regionId, setRegionId] = useState<string | null>(null);
   const [regionData, setRegionData] = useState<{
@@ -44,21 +48,21 @@ export default function EditRegionPage({
           description: result.region.description,
         });
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load region");
+        setError(err instanceof Error ? err.message : t("failedToLoad"));
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchRegion();
-  }, [regionId]);
+  }, [regionId, t]);
 
   if (isLoading) {
     return (
       <div className="container mx-auto p-6 max-w-2xl animate-fade-in">
         <Card>
           <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">Loading...</p>
+            <p className="text-center text-muted-foreground">{tCommon("loading")}</p>
           </CardContent>
         </Card>
       </div>
@@ -71,7 +75,7 @@ export default function EditRegionPage({
         <Card>
           <CardContent className="pt-6">
             <p className="text-center text-destructive">
-              {error || "Failed to load region"}
+              {error || t("failedToLoad")}
             </p>
           </CardContent>
         </Card>
@@ -86,7 +90,7 @@ export default function EditRegionPage({
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
       >
         <ChevronLeft className="h-4 w-4 mr-1" />
-        Back to Region
+        {tNav("backToRegion")}
       </Link>
 
       <RegionForm

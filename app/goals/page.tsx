@@ -1,4 +1,3 @@
-import { Region } from "@/lib/types";
 import { GoalCard } from "@/components/goals";
 import Link from "next/link";
 import { Plus } from "lucide-react";
@@ -8,8 +7,10 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getGoalsForUser } from "@/lib/services/goals.service";
 import { getRegionsForGoal } from "@/lib/services/regions.service";
+import { getTranslations } from "next-intl/server";
 
 export default async function GoalsPage() {
+  const t = await getTranslations("goals");
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.id) {
@@ -29,11 +30,11 @@ export default async function GoalsPage() {
   return (
     <div className="container mx-auto p-6 animate-fade-in">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">My Goals</h1>
+        <h1 className="text-3xl font-bold">{t("myGoals")}</h1>
         <Link href="/goals/create">
           <Button size="sm" className="gap-2">
             <Plus className="h-4 w-4" />
-            New Goal
+            {t("newGoal")}
           </Button>
         </Link>
       </div>

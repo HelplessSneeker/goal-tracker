@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -39,6 +40,7 @@ export function TaskForm({
   onSuccess,
 }: TaskFormProps) {
   const router = useRouter();
+  const t = useTranslations();
   const [title, setTitle] = useState(initialData?.title || "");
   const [description, setDescription] = useState(
     initialData?.description || ""
@@ -86,7 +88,7 @@ export function TaskForm({
         router.refresh();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : t("common.error"));
       setIsSubmitting(false);
     }
   };
@@ -95,12 +97,14 @@ export function TaskForm({
     <Card>
       <CardHeader>
         <CardTitle>
-          {mode === "create" ? "Create New Task" : "Edit Task"}
+          {mode === "create"
+            ? t("tasks.createNew")
+            : t("tasks.editTask")}
         </CardTitle>
         <CardDescription>
           {mode === "create"
-            ? "Add a new task with a deadline to create urgency"
-            : "Update your task information"}
+            ? t("tasks.createDescription")
+            : t("tasks.editDescription")}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -110,12 +114,12 @@ export function TaskForm({
               htmlFor="title"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Title
+              {t("common.title")}
             </label>
             <Input
               id="title"
               type="text"
-              placeholder="e.g., Build 3 projects using Server Components"
+              placeholder={t("tasks.titlePlaceholder")}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -128,11 +132,11 @@ export function TaskForm({
               htmlFor="description"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Description
+              {t("common.description")}
             </label>
             <textarea
               id="description"
-              placeholder="Describe this task..."
+              placeholder={t("tasks.descriptionPlaceholder")}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
@@ -147,7 +151,7 @@ export function TaskForm({
               htmlFor="deadline"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Deadline
+              {t("common.deadline")}
             </label>
             <Input
               id="deadline"
@@ -172,16 +176,16 @@ export function TaskForm({
               onClick={() => router.back()}
               disabled={isSubmitting}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting
                 ? mode === "create"
-                  ? "Creating..."
-                  : "Saving..."
+                  ? t("common.creating")
+                  : t("common.saving")
                 : mode === "create"
-                  ? "Create Task"
-                  : "Save Changes"}
+                  ? t("tasks.createButton")
+                  : t("tasks.saveButton")}
             </Button>
           </div>
         </form>

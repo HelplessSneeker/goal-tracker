@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DeleteRegionDialog } from "@/components/regions";
@@ -13,6 +14,7 @@ interface RegionDetailHeaderProps {
 }
 
 export function RegionDetailHeader({ region, goalId }: RegionDetailHeaderProps) {
+  const t = useTranslations();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   return (
@@ -24,7 +26,7 @@ export function RegionDetailHeader({ region, goalId }: RegionDetailHeaderProps) 
             <Link href={`/goals/${goalId}/${region.id}/edit`}>
               <Button size="sm" variant="outline" className="gap-2">
                 <Pencil className="h-4 w-4" />
-                Edit
+                {t("common.edit")}
               </Button>
             </Link>
             <Button
@@ -34,7 +36,7 @@ export function RegionDetailHeader({ region, goalId }: RegionDetailHeaderProps) 
               onClick={() => setDeleteDialogOpen(true)}
             >
               <Trash2 className="h-4 w-4" />
-              Delete
+              {t("common.delete")}
             </Button>
           </div>
         </div>

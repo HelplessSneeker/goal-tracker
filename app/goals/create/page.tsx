@@ -3,8 +3,11 @@
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { GoalForm } from "@/components/goals";
+import { useTranslations } from "next-intl";
 
 export default function CreateGoalPage() {
+  const t = useTranslations("navigation");
+
   return (
     <div className="container mx-auto p-6 max-w-2xl animate-fade-in">
       <Link
@@ -12,7 +15,7 @@ export default function CreateGoalPage() {
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
       >
         <ChevronLeft className="h-4 w-4 mr-1" />
-        Back to Goals
+        {t("backToGoals")}
       </Link>
 
       <GoalForm mode="create" />

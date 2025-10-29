@@ -6,12 +6,15 @@ import { TaskDetailHeader } from "@/components/tasks";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getTaskById } from "@/lib/services/tasks.service";
+import { getTranslations } from "next-intl/server";
 
 export default async function TaskDetailPage({
   params,
 }: {
   params: Promise<{ id: string; regionId: string; taskId: string }>;
 }) {
+  const t = await getTranslations("tasks");
+  const tNav = await getTranslations("navigation");
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.id) {
@@ -32,21 +35,21 @@ export default async function TaskDetailPage({
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
       >
         <ChevronLeft className="h-4 w-4 mr-1" />
-        Back to Region
+        {tNav("backToRegion")}
       </Link>
 
       <TaskDetailHeader task={task} goalId={id} />
 
       <Card>
         <CardHeader>
-          <CardTitle>Weekly Tasks</CardTitle>
+          <CardTitle>{t("weeklyTasks")}</CardTitle>
           <CardDescription>
-            Break this task down into weekly action items
+            {t("weeklyTasksDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground text-center py-4">
-            Weekly tasks feature coming soon...
+            {t("weeklyTasksComingSoon")}
           </p>
         </CardContent>
       </Card>

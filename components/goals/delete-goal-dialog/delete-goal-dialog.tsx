@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -28,6 +29,7 @@ export function DeleteGoalDialog({
   goalTitle,
 }: DeleteGoalDialogProps) {
   const router = useRouter();
+  const t = useTranslations();
   const [confirmText, setConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +52,9 @@ export function DeleteGoalDialog({
       router.push("/goals");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(
+        err instanceof Error ? err.message : t("common.error")
+      );
       setIsDeleting(false);
     }
   };
@@ -67,26 +71,25 @@ export function DeleteGoalDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete Goal</DialogTitle>
+          <DialogTitle>{t("delete.goal.title")}</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete <strong>{goalTitle}</strong>?
+            {t("delete.goal.warning")} <strong>{goalTitle}</strong>?
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="bg-destructive/10 border border-destructive/20 rounded-md p-4">
             <p className="text-sm text-destructive font-medium mb-2">
-              Warning: This action cannot be undone
+              {t("delete.goal.warningStrong")}
             </p>
             <p className="text-sm text-muted-foreground">
-              This will permanently delete the goal and everything associated
-              with it, including:
+              {t("delete.goal.description")}
             </p>
             <ul className="text-sm text-muted-foreground list-disc list-inside mt-2 space-y-1">
-              <li>All regions</li>
-              <li>All tasks</li>
-              <li>All weekly tasks</li>
-              <li>All progress entries</li>
+              <li>{t("delete.goal.consequence1")}</li>
+              <li>{t("delete.goal.consequence2")}</li>
+              <li>{t("delete.goal.consequence3")}</li>
+              <li>{t("delete.goal.consequence4")}</li>
             </ul>
           </div>
 
@@ -95,12 +98,12 @@ export function DeleteGoalDialog({
               htmlFor="confirm-title"
               className="text-sm font-medium leading-none"
             >
-              To confirm, type the goal title: <strong>{goalTitle}</strong>
+              {t("delete.goal.confirmPrompt")} <strong>{goalTitle}</strong>
             </label>
             <Input
               id="confirm-title"
               type="text"
-              placeholder="Type goal title to confirm"
+              placeholder={t("delete.goal.confirmPlaceholder")}
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
               disabled={isDeleting}
@@ -121,14 +124,14 @@ export function DeleteGoalDialog({
             onClick={() => handleOpenChange(false)}
             disabled={isDeleting}
           >
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             variant="destructive"
             onClick={handleDelete}
             disabled={!isConfirmValid || isDeleting}
           >
-            {isDeleting ? "Deleting..." : "Delete Goal"}
+            {isDeleting ? t("common.deleting") : t("delete.goal.deleteButton")}
           </Button>
         </DialogFooter>
       </DialogContent>

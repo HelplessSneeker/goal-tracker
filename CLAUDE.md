@@ -21,6 +21,7 @@ Next.js 15 goal-tracking application using App Router, React 19, TypeScript, Tai
 - ✅ Goals, Regions, Tasks (CRUD + Server Actions + Service Layer + full test coverage)
 - ✅ Database (Prisma + PostgreSQL with UUID primary keys)
 - ✅ Authentication (NextAuth.js with email/magic link, JWT sessions)
+- ✅ Internationalization (next-intl with English & German, European date format)
 - ✅ Testing (Jest + React Testing Library - 228/228 tests passing, 100% service coverage)
 - ⏳ Weekly Tasks, Progress Entries (TODO - use TDD)
 
@@ -100,6 +101,7 @@ See [TESTING.md](./TESTING.md) for detailed patterns and examples.
 - **Framework:** Next.js 15 with App Router
 - **Database:** PostgreSQL + Prisma ORM (UUID primary keys)
 - **Authentication:** NextAuth.js with email provider (JWT sessions)
+- **i18n:** next-intl v4.4.0 (English, German)
 - **Styling:** Tailwind CSS v4 + shadcn/ui components
 - **Testing:** Jest + React Testing Library
 - **Icons:** Lucide React
@@ -162,6 +164,32 @@ Services handle:
 **TODO:**
 - `WeeklyTask`: id, taskId, title, description, priority (1-3), weekStartDate, status
 - `ProgressEntry`: id, weeklyTaskId, date, notes, completionPercentage (0-100)
+
+## Internationalization (i18n)
+
+**Status:** ✅ next-intl v4.4.0 | **Languages:** English (en), German (de) | **Date Format:** dd.MM.yyyy
+
+**Files:**
+- Config: `lib/i18n.ts`, `middleware.ts`, `next.config.ts`
+- Translations: `messages/en.json`, `messages/de.json`
+- Date utility: `formatDate()` in `lib/utils.ts`
+
+**Usage:**
+```typescript
+// Client components
+import { useTranslations } from "next-intl";
+const t = useTranslations("goals");
+
+// Server components
+import { getTranslations } from "next-intl/server";
+const t = await getTranslations("goals");
+
+// Date formatting
+import { formatDate } from "@/lib/utils";
+formatDate(task.deadline); // "01.12.2025"
+```
+
+**Adding translations:** Add keys to both `messages/en.json` and `messages/de.json`, then update `jest.setup.ts` mocks.
 
 ## Development Workflow
 

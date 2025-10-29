@@ -1,9 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Task } from "@/lib/types";
+import { formatDate } from "@/lib/utils";
 
 interface TaskCardProps {
   task: Task;
@@ -12,16 +14,7 @@ interface TaskCardProps {
 
 export function TaskCard({ task, goalId }: TaskCardProps) {
   const router = useRouter();
-
-  // Format deadline for display
-  const formatDeadline = (deadline: string) => {
-    const date = new Date(deadline);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
+  const t = useTranslations();
 
   const handleCardClick = () => {
     router.push(`/goals/${goalId}/${task.regionId}/tasks/${task.id}`);
@@ -36,7 +29,7 @@ export function TaskCard({ task, goalId }: TaskCardProps) {
         <CardTitle className="text-lg">{task.title}</CardTitle>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Calendar className="h-3 w-3" />
-          <span>{formatDeadline(task.deadline)}</span>
+          <span>{formatDate(task.deadline)}</span>
           <span
             className={`ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
               task.status === "completed"
@@ -44,7 +37,7 @@ export function TaskCard({ task, goalId }: TaskCardProps) {
                 : "bg-blue-100 text-blue-800"
             }`}
           >
-            {task.status}
+            {t(`tasks.status.${task.status}`)}
           </span>
         </div>
       </CardHeader>

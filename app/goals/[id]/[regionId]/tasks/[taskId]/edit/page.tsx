@@ -7,12 +7,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Task } from "@/lib/types";
 import { TaskForm } from "@/components/tasks";
 import { getTaskAction } from "@/app/actions/tasks";
+import { useTranslations } from "next-intl";
 
 export default function EditTaskPage({
   params,
 }: {
   params: Promise<{ id: string; regionId: string; taskId: string }>;
 }) {
+  const t = useTranslations("tasks");
+  const tNav = useTranslations("navigation");
+  const tCommon = useTranslations("common");
   const [goalId, setGoalId] = useState<string | null>(null);
   const [regionId, setRegionId] = useState<string | null>(null);
   const [taskId, setTaskId] = useState<string | null>(null);
@@ -41,21 +45,21 @@ export default function EditTaskPage({
 
         setTaskData(result.task);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load task");
+        setError(err instanceof Error ? err.message : t("failedToLoad"));
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchTask();
-  }, [taskId]);
+  }, [taskId, t]);
 
   if (isLoading) {
     return (
       <div className="container mx-auto p-6 max-w-2xl animate-fade-in">
         <Card>
           <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">Loading...</p>
+            <p className="text-center text-muted-foreground">{tCommon("loading")}</p>
           </CardContent>
         </Card>
       </div>
@@ -68,7 +72,7 @@ export default function EditTaskPage({
         <Card>
           <CardContent className="pt-6">
             <p className="text-center text-destructive">
-              {error || "Failed to load task"}
+              {error || t("failedToLoad")}
             </p>
           </CardContent>
         </Card>
@@ -83,7 +87,7 @@ export default function EditTaskPage({
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
       >
         <ChevronLeft className="h-4 w-4 mr-1" />
-        Back to Task
+        {tNav("backToTask")}
       </Link>
 
       <TaskForm

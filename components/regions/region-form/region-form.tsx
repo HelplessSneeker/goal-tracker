@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -35,6 +36,7 @@ export function RegionForm({
   onSuccess,
 }: RegionFormProps) {
   const router = useRouter();
+  const t = useTranslations();
   const [title, setTitle] = useState(initialData.title);
   const [description, setDescription] = useState(initialData.description);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,7 +71,9 @@ export function RegionForm({
         router.refresh();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(
+        err instanceof Error ? err.message : t("common.error")
+      );
       setIsSubmitting(false);
     }
   };
@@ -78,12 +82,14 @@ export function RegionForm({
     <Card>
       <CardHeader>
         <CardTitle>
-          {mode === "create" ? "Create New Region" : "Edit Region"}
+          {mode === "create"
+            ? t("regions.createNew")
+            : t("regions.editRegion")}
         </CardTitle>
         <CardDescription>
           {mode === "create"
-            ? "Add a new region to organize your work"
-            : "Update your region information"}
+            ? t("regions.createDescription")
+            : t("regions.editDescription")}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -93,12 +99,12 @@ export function RegionForm({
               htmlFor="title"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Title
+              {t("common.title")}
             </label>
             <Input
               id="title"
               type="text"
-              placeholder="e.g., Master Server Components"
+              placeholder={t("regions.titlePlaceholder")}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -111,11 +117,11 @@ export function RegionForm({
               htmlFor="description"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Description
+              {t("common.description")}
             </label>
             <textarea
               id="description"
-              placeholder="Describe this region..."
+              placeholder={t("regions.descriptionPlaceholder")}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
@@ -138,16 +144,16 @@ export function RegionForm({
               onClick={() => router.back()}
               disabled={isSubmitting}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting
                 ? mode === "create"
-                  ? "Creating..."
-                  : "Saving..."
+                  ? t("common.creating")
+                  : t("common.saving")
                 : mode === "create"
-                  ? "Create Region"
-                  : "Save Changes"}
+                  ? t("regions.createButton")
+                  : t("regions.saveButton")}
             </Button>
           </div>
         </form>

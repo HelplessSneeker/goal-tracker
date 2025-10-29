@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Goal, Region } from "@/lib/types";
 import { ChevronRight, Target, ChevronsDownUp, TrendingUp } from "lucide-react";
 import {
@@ -29,6 +30,7 @@ import { getRegionsAction } from "@/app/actions/regions";
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const t = useTranslations();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [regions, setRegions] = useState<Region[]>([]);
   const [openGoals, setOpenGoals] = useState<Set<string>>(new Set());
@@ -115,7 +117,7 @@ export function AppSidebar() {
             <button
               onClick={collapseAll}
               className="size-7 p-1 hover:bg-sidebar-accent rounded-md cursor-pointer flex items-center justify-center group-data-[collapsible=icon]:hidden"
-              title="Collapse all"
+              title={t("navigation.collapseAll")}
             >
               <ChevronsDownUp className="size-4" />
             </button>
@@ -124,18 +126,18 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("navigation.sidebar")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
                   isActive={pathname === "/progress"}
-                  tooltip="Progress"
+                  tooltip={t("navigation.progress")}
                 >
                   <Link href="/progress">
                     <TrendingUp />
-                    <span>Progress</span>
+                    <span>{t("navigation.progress")}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -148,12 +150,12 @@ export function AppSidebar() {
                     <SidebarMenuButton
                       asChild
                       isActive={pathname.startsWith("/goals")}
-                      tooltip="Goals"
+                      tooltip={t("navigation.goals")}
                       className="cursor-pointer flex-1"
                     >
                       <Link href="/goals">
                         <Target />
-                        <span>Goals</span>
+                        <span>{t("navigation.goals")}</span>
                       </Link>
                     </SidebarMenuButton>
                     <button

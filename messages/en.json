@@ -1,0 +1,136 @@
+{
+  "common": {
+    "title": "Title",
+    "description": "Description",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "loading": "Loading...",
+    "creating": "Creating...",
+    "saving": "Saving...",
+    "deleting": "Deleting...",
+    "error": "An error occurred",
+    "deadline": "Deadline"
+  },
+  "navigation": {
+    "sidebar": "Navigation",
+    "progress": "Progress",
+    "goals": "Goals",
+    "collapseAll": "Collapse all",
+    "backToGoals": "Back to Goals",
+    "backToGoal": "Back to Goal",
+    "backToRegion": "Back to Region",
+    "backToTask": "Back to Task"
+  },
+  "goals": {
+    "myGoals": "My Goals",
+    "newGoal": "New Goal",
+    "createNew": "Create New Goal",
+    "editGoal": "Edit Goal",
+    "createDescription": "Add a new goal to track your progress",
+    "editDescription": "Update your goal information",
+    "titlePlaceholder": "e.g., Learn Next.js",
+    "descriptionPlaceholder": "Describe your goal...",
+    "createButton": "Create Goal",
+    "saveButton": "Save Changes",
+    "failedToLoad": "Failed to load goal",
+    "regionsLabel": "Regions:",
+    "regions": "Regions",
+    "noRegions": "No regions for this goal yet."
+  },
+  "regions": {
+    "newRegion": "New Region",
+    "createNew": "Create New Region",
+    "editRegion": "Edit Region",
+    "createDescription": "Add a new region to organize your work",
+    "editDescription": "Update your region information",
+    "titlePlaceholder": "e.g., Master Server Components",
+    "descriptionPlaceholder": "Describe this region...",
+    "createButton": "Create Region",
+    "saveButton": "Save Changes",
+    "failedToLoad": "Failed to load region",
+    "noTasks": "No tasks for this region yet."
+  },
+  "tasks": {
+    "newTask": "New Task",
+    "createNew": "Create New Task",
+    "editTask": "Edit Task",
+    "createDescription": "Add a new task with a deadline to create urgency",
+    "editDescription": "Update your task information",
+    "titlePlaceholder": "e.g., Build 3 projects using Server Components",
+    "descriptionPlaceholder": "Describe this task...",
+    "createButton": "Create Task",
+    "saveButton": "Save Changes",
+    "failedToLoad": "Failed to load task",
+    "tasks": "Tasks",
+    "weeklyTasks": "Weekly Tasks",
+    "weeklyTasksDescription": "Break this task down into weekly action items",
+    "weeklyTasksComingSoon": "Weekly tasks feature coming soon...",
+    "status": {
+      "active": "active",
+      "completed": "completed"
+    }
+  },
+  "delete": {
+    "goal": {
+      "title": "Delete Goal",
+      "warning": "Are you sure you want to delete",
+      "warningStrong": "Warning: This action cannot be undone",
+      "description": "This will permanently delete the goal and everything associated with it, including:",
+      "consequence1": "All regions",
+      "consequence2": "All tasks",
+      "consequence3": "All weekly tasks",
+      "consequence4": "All progress entries",
+      "confirmPrompt": "To confirm, type the goal title:",
+      "confirmPlaceholder": "Type goal title to confirm",
+      "deleteButton": "Delete Goal"
+    },
+    "region": {
+      "title": "Delete Region",
+      "warning": "Are you sure you want to delete",
+      "warningStrong": "Warning: This action cannot be undone",
+      "description": "This will permanently delete the region and everything associated with it, including:",
+      "consequence1": "All tasks in this region",
+      "consequence2": "All weekly tasks for those tasks",
+      "consequence3": "All progress entries for those weekly tasks",
+      "confirmPrompt": "To confirm, type the region title:",
+      "confirmPlaceholder": "Type region title to confirm",
+      "deleteButton": "Delete Region",
+      "errorMismatch": "Region name does not match"
+    },
+    "task": {
+      "title": "Delete Task",
+      "warning": "This action cannot be undone. This will permanently delete the task",
+      "consequence1": "All weekly tasks associated with this task",
+      "consequence2": "All progress entries for those weekly tasks",
+      "confirmPrompt": "Please type {title} to confirm:",
+      "confirmPlaceholder": "Type task title to confirm",
+      "errorMismatch": "Task name does not match",
+      "deleteButton": "Delete Task"
+    }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Sign In / Sign Up",
+      "description": "Enter your email to receive a magic link. Works for both new and existing accounts.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "sending": "Sending...",
+      "submitButton": "Send Magic Link",
+      "errorEmail": "Failed to send email. Please try again.",
+      "errorUnexpected": "An unexpected error occurred. Please try again."
+    },
+    "verifyRequest": {
+      "title": "Check your email",
+      "message1": "A sign in link has been sent to your email address",
+      "message2": "Click the link in the email to sign in to your account.",
+      "message3": "You can close this window and check your email inbox."
+    }
+  },
+  "errors": {
+    "unauthorized": "Unauthorized",
+    "notFound": "Not found",
+    "invalidInput": "Invalid input",
+    "serverError": "Server error"
+  }
+}

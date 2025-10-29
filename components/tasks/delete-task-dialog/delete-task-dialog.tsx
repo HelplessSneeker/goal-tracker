@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -32,13 +33,14 @@ export function DeleteTaskDialog({
   regionId,
 }: DeleteTaskDialogProps) {
   const router = useRouter();
+  const t = useTranslations();
   const [confirmText, setConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleDelete = async () => {
     if (confirmText !== taskTitle) {
-      setError("Task name does not match");
+      setError(t("delete.task.errorMismatch"));
       return;
     }
 
@@ -56,7 +58,7 @@ export function DeleteTaskDialog({
       router.push(`/goals/${goalId}/${regionId}`);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : t("common.error"));
       setIsDeleting(false);
     }
   };
@@ -73,18 +75,16 @@ export function DeleteTaskDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete Task</DialogTitle>
+          <DialogTitle>{t("delete.task.title")}</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete the task{" "}
-            <strong>&quot;{taskTitle}&quot;</strong> and all associated data
-            including:
+            {t("delete.task.warning")} <strong>&quot;{taskTitle}&quot;</strong>:
           </DialogDescription>
         </DialogHeader>
 
         <div className="py-4">
           <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground mb-4">
-            <li>All weekly tasks associated with this task</li>
-            <li>All progress entries for those weekly tasks</li>
+            <li>{t("delete.task.consequence1")}</li>
+            <li>{t("delete.task.consequence2")}</li>
           </ul>
 
           <div className="space-y-2">
@@ -92,7 +92,7 @@ export function DeleteTaskDialog({
               htmlFor="confirm-text"
               className="text-sm font-medium leading-none"
             >
-              Please type <strong>{taskTitle}</strong> to confirm:
+              {t("delete.task.confirmPrompt", { title: taskTitle })}
             </label>
             <Input
               id="confirm-text"
@@ -117,14 +117,14 @@ export function DeleteTaskDialog({
             onClick={() => handleOpenChange(false)}
             disabled={isDeleting}
           >
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             variant="destructive"
             onClick={handleDelete}
             disabled={isDeleting || confirmText !== taskTitle}
           >
-            {isDeleting ? "Deleting..." : "Delete Task"}
+            {isDeleting ? t("common.deleting") : t("delete.task.deleteButton")}
           </Button>
         </DialogFooter>
       </DialogContent>

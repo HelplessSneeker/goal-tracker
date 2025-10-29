@@ -6,8 +6,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Mail } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
-export default function VerifyRequestPage() {
+export default async function VerifyRequestPage() {
+  const t = await getTranslations("auth.verifyRequest");
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-md">
@@ -16,16 +18,16 @@ export default function VerifyRequestPage() {
             <Mail className="h-6 w-6 text-blue-600" />
           </div>
           <CardTitle className="text-center text-2xl font-bold">
-            Check your email
+            {t("title")}
           </CardTitle>
           <CardDescription className="text-center">
-            A sign in link has been sent to your email address
+            {t("message1")}
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center text-sm text-gray-600">
-          <p>Click the link in the email to sign in to your account.</p>
+          <p>{t("message2")}</p>
           <p className="mt-2">
-            You can close this window and check your email inbox.
+            {t("message3")}
           </p>
         </CardContent>
       </Card>

@@ -28,7 +28,7 @@ describe("TaskDetailHeader", () => {
   it("displays formatted deadline", () => {
     render(<TaskDetailHeader task={mockTask} goalId={goalId} />);
 
-    expect(screen.getByText(/Dec 1, 2025/i)).toBeInTheDocument();
+    expect(screen.getByText(/01\.12\.2025/)).toBeInTheDocument();
   });
 
   it("displays task status badge", () => {

@@ -6,12 +6,16 @@ import { ChevronLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { GoalForm } from "@/components/goals";
 import { getGoalAction } from "@/app/actions/goals";
+import { useTranslations } from "next-intl";
 
 export default function EditGoalPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = useTranslations("goals");
+  const tNav = useTranslations("navigation");
+  const tCommon = useTranslations("common");
   const [id, setId] = useState<string | null>(null);
   const [goalData, setGoalData] = useState<{
     title: string;
@@ -42,21 +46,21 @@ export default function EditGoalPage({
           description: result.goal.description,
         });
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load goal");
+        setError(err instanceof Error ? err.message : t("failedToLoad"));
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchGoal();
-  }, [id]);
+  }, [id, t]);
 
   if (isLoading) {
     return (
       <div className="container mx-auto p-6 max-w-2xl animate-fade-in">
         <Card>
           <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">Loading...</p>
+            <p className="text-center text-muted-foreground">{tCommon("loading")}</p>
           </CardContent>
         </Card>
       </div>
@@ -69,7 +73,7 @@ export default function EditGoalPage({
         <Card>
           <CardContent className="pt-6">
             <p className="text-center text-destructive">
-              {error || "Failed to load goal"}
+              {error || t("failedToLoad")}
             </p>
           </CardContent>
         </Card>
@@ -84,7 +88,7 @@ export default function EditGoalPage({
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
       >
         <ChevronLeft className="h-4 w-4 mr-1" />
-        Back to Goal
+        {tNav("backToGoal")}
       </Link>
 
       <GoalForm mode="edit" initialData={goalData} goalId={id || undefined} />

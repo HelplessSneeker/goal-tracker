@@ -9,12 +9,16 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getRegionById } from "@/lib/services/regions.service";
 import { getTasksForRegion } from "@/lib/services/tasks.service";
+import { getTranslations } from "next-intl/server";
 
 export default async function RegionDetailPage({
   params,
 }: {
   params: Promise<{ id: string; regionId: string }>;
 }) {
+  const t = await getTranslations("tasks");
+  const tRegions = await getTranslations("regions");
+  const tNav = await getTranslations("navigation");
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.id) {
@@ -37,18 +41,18 @@ export default async function RegionDetailPage({
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
       >
         <ChevronLeft className="h-4 w-4 mr-1" />
-        Back to Goal
+        {tNav("backToGoal")}
       </Link>
 
       <RegionDetailHeader region={region} goalId={id} />
 
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-semibold">Tasks</h2>
+          <h2 className="text-2xl font-semibold">{t("tasks")}</h2>
           <Link href={`/goals/${id}/${regionId}/addTask`}>
             <Button size="sm" className="gap-2">
               <Plus className="h-4 w-4" />
-              New Task
+              {t("newTask")}
             </Button>
           </Link>
         </div>
@@ -62,7 +66,7 @@ export default async function RegionDetailPage({
           <Card>
             <CardContent className="pt-6">
               <p className="text-muted-foreground text-center">
-                No tasks for this region yet.
+                {tRegions("noTasks")}
               </p>
             </CardContent>
           </Card>

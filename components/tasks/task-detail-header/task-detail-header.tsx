@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Pencil, Trash2, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DeleteTaskDialog } from "@/components/tasks";
 import { Task } from "@/lib/types";
+import { formatDate } from "@/lib/utils";
 
 interface TaskDetailHeaderProps {
   task: Task;
@@ -14,16 +16,7 @@ interface TaskDetailHeaderProps {
 
 export function TaskDetailHeader({ task, goalId }: TaskDetailHeaderProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
-  // Format deadline for display
-  const formatDeadline = (deadline: string) => {
-    const date = new Date(deadline);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
+  const t = useTranslations();
 
   return (
     <>
@@ -34,7 +27,7 @@ export function TaskDetailHeader({ task, goalId }: TaskDetailHeaderProps) {
             <div className="flex items-center gap-3 text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                <span className="text-base">{formatDeadline(task.deadline)}</span>
+                <span className="text-base">{formatDate(task.deadline)}</span>
               </div>
               <span
                 className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
@@ -43,7 +36,7 @@ export function TaskDetailHeader({ task, goalId }: TaskDetailHeaderProps) {
                     : "bg-blue-100 text-blue-800"
                 }`}
               >
-                {task.status}
+                {t(`tasks.status.${task.status}`)}
               </span>
             </div>
           </div>
@@ -51,7 +44,7 @@ export function TaskDetailHeader({ task, goalId }: TaskDetailHeaderProps) {
             <Link href={`/goals/${goalId}/${task.regionId}/tasks/${task.id}/edit`}>
               <Button size="sm" variant="outline" className="gap-2">
                 <Pencil className="h-4 w-4" />
-                Edit
+                {t("common.edit")}
               </Button>
             </Link>
             <Button
@@ -61,7 +54,7 @@ export function TaskDetailHeader({ task, goalId }: TaskDetailHeaderProps) {
               onClick={() => setDeleteDialogOpen(true)}
             >
               <Trash2 className="h-4 w-4" />
-              Delete
+              {t("common.delete")}
             </Button>
           </div>
         </div>

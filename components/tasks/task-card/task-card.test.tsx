@@ -35,7 +35,7 @@ describe("TaskCard", () => {
   it("should display deadline date", () => {
     render(<TaskCard task={mockTask} goalId="goal-1" />);
 
-    expect(screen.getByText(/Dec 1, 2025/i)).toBeInTheDocument();
+    expect(screen.getByText(/01\.12\.2025/)).toBeInTheDocument();
   });
 
   it("should navigate to task detail when card is clicked", async () => {

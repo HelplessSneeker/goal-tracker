@@ -1,0 +1,136 @@
+{
+  "common": {
+    "title": "Titel",
+    "description": "Beschreibung",
+    "cancel": "Abbrechen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "loading": "Lädt...",
+    "creating": "Erstellt...",
+    "saving": "Speichert...",
+    "deleting": "Löscht...",
+    "error": "Ein Fehler ist aufgetreten",
+    "deadline": "Frist"
+  },
+  "navigation": {
+    "sidebar": "Navigation",
+    "progress": "Fortschritt",
+    "goals": "Ziele",
+    "collapseAll": "Alle einklappen",
+    "backToGoals": "Zurück zu Zielen",
+    "backToGoal": "Zurück zum Ziel",
+    "backToRegion": "Zurück zum Bereich",
+    "backToTask": "Zurück zur Aufgabe"
+  },
+  "goals": {
+    "myGoals": "Meine Ziele",
+    "newGoal": "Neues Ziel",
+    "createNew": "Neues Ziel erstellen",
+    "editGoal": "Ziel bearbeiten",
+    "createDescription": "Fügen Sie ein neues Ziel hinzu, um Ihren Fortschritt zu verfolgen",
+    "editDescription": "Aktualisieren Sie Ihre Zielinformationen",
+    "titlePlaceholder": "z.B. Next.js lernen",
+    "descriptionPlaceholder": "Beschreiben Sie Ihr Ziel...",
+    "createButton": "Ziel erstellen",
+    "saveButton": "Änderungen speichern",
+    "failedToLoad": "Ziel konnte nicht geladen werden",
+    "regionsLabel": "Bereiche:",
+    "regions": "Bereiche",
+    "noRegions": "Noch keine Bereiche für dieses Ziel vorhanden."
+  },
+  "regions": {
+    "newRegion": "Neuer Bereich",
+    "createNew": "Neuen Bereich erstellen",
+    "editRegion": "Bereich bearbeiten",
+    "createDescription": "Fügen Sie einen neuen Bereich hinzu, um Ihre Arbeit zu organisieren",
+    "editDescription": "Aktualisieren Sie Ihre Bereichsinformationen",
+    "titlePlaceholder": "z.B. Server Components meistern",
+    "descriptionPlaceholder": "Beschreiben Sie diesen Bereich...",
+    "createButton": "Bereich erstellen",
+    "saveButton": "Änderungen speichern",
+    "failedToLoad": "Bereich konnte nicht geladen werden",
+    "noTasks": "Noch keine Aufgaben für diesen Bereich vorhanden."
+  },
+  "tasks": {
+    "newTask": "Neue Aufgabe",
+    "createNew": "Neue Aufgabe erstellen",
+    "editTask": "Aufgabe bearbeiten",
+    "createDescription": "Fügen Sie eine neue Aufgabe mit einer Frist hinzu, um Dringlichkeit zu schaffen",
+    "editDescription": "Aktualisieren Sie Ihre Aufgabeninformationen",
+    "titlePlaceholder": "z.B. 3 Projekte mit Server Components erstellen",
+    "descriptionPlaceholder": "Beschreiben Sie diese Aufgabe...",
+    "createButton": "Aufgabe erstellen",
+    "saveButton": "Änderungen speichern",
+    "failedToLoad": "Aufgabe konnte nicht geladen werden",
+    "tasks": "Aufgaben",
+    "weeklyTasks": "Wöchentliche Aufgaben",
+    "weeklyTasksDescription": "Teilen Sie diese Aufgabe in wöchentliche Aktionspunkte auf",
+    "weeklyTasksComingSoon": "Funktion für wöchentliche Aufgaben kommt bald...",
+    "status": {
+      "active": "aktiv",
+      "completed": "abgeschlossen"
+    }
+  },
+  "delete": {
+    "goal": {
+      "title": "Ziel löschen",
+      "warning": "Sind Sie sicher, dass Sie löschen möchten",
+      "warningStrong": "Warnung: Diese Aktion kann nicht rückgängig gemacht werden",
+      "description": "Dies wird das Ziel und alles damit Verbundene dauerhaft löschen, einschließlich:",
+      "consequence1": "Alle Bereiche",
+      "consequence2": "Alle Aufgaben",
+      "consequence3": "Alle wöchentlichen Aufgaben",
+      "consequence4": "Alle Fortschrittseinträge",
+      "confirmPrompt": "Zur Bestätigung geben Sie den Zieltitel ein:",
+      "confirmPlaceholder": "Zieltitel zur Bestätigung eingeben",
+      "deleteButton": "Ziel löschen"
+    },
+    "region": {
+      "title": "Bereich löschen",
+      "warning": "Sind Sie sicher, dass Sie löschen möchten",
+      "warningStrong": "Warnung: Diese Aktion kann nicht rückgängig gemacht werden",
+      "description": "Dies wird den Bereich und alles damit Verbundene dauerhaft löschen, einschließlich:",
+      "consequence1": "Alle Aufgaben in diesem Bereich",
+      "consequence2": "Alle wöchentlichen Aufgaben für diese Aufgaben",
+      "consequence3": "Alle Fortschrittseinträge für diese wöchentlichen Aufgaben",
+      "confirmPrompt": "Zur Bestätigung geben Sie den Bereichstitel ein:",
+      "confirmPlaceholder": "Bereichstitel zur Bestätigung eingeben",
+      "deleteButton": "Bereich löschen",
+      "errorMismatch": "Bereichsname stimmt nicht überein"
+    },
+    "task": {
+      "title": "Aufgabe löschen",
+      "warning": "Diese Aktion kann nicht rückgängig gemacht werden. Dies wird die Aufgabe dauerhaft löschen",
+      "consequence1": "Alle wöchentlichen Aufgaben, die mit dieser Aufgabe verbunden sind",
+      "consequence2": "Alle Fortschrittseinträge für diese wöchentlichen Aufgaben",
+      "confirmPrompt": "Bitte geben Sie {title} zur Bestätigung ein:",
+      "confirmPlaceholder": "Aufgabentitel zur Bestätigung eingeben",
+      "errorMismatch": "Aufgabenname stimmt nicht überein",
+      "deleteButton": "Aufgabe löschen"
+    }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Anmelden / Registrieren",
+      "description": "Geben Sie Ihre E-Mail-Adresse ein, um einen Magic Link zu erhalten. Funktioniert sowohl für neue als auch für bestehende Konten.",
+      "emailLabel": "E-Mail",
+      "emailPlaceholder": "ihre@email.de",
+      "sending": "Sendet...",
+      "submitButton": "Magic Link senden",
+      "errorEmail": "E-Mail konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+      "errorUnexpected": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+    },
+    "verifyRequest": {
+      "title": "Überprüfen Sie Ihre E-Mail",
+      "message1": "Ein Anmeldelink wurde an Ihre E-Mail-Adresse gesendet",
+      "message2": "Klicken Sie auf den Link in der E-Mail, um sich bei Ihrem Konto anzumelden.",
+      "message3": "Sie können dieses Fenster schließen und Ihren E-Mail-Posteingang überprüfen."
+    }
+  },
+  "errors": {
+    "unauthorized": "Nicht autorisiert",
+    "notFound": "Nicht gefunden",
+    "invalidInput": "Ungültige Eingabe",
+    "serverError": "Serverfehler"
+  }
+}

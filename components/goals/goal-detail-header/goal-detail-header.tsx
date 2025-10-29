@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DeleteGoalDialog } from "@/components/goals";
@@ -13,6 +14,7 @@ interface GoalDetailHeaderProps {
 
 export function GoalDetailHeader({ goal }: GoalDetailHeaderProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const t = useTranslations();
 
   return (
     <>
@@ -23,7 +25,7 @@ export function GoalDetailHeader({ goal }: GoalDetailHeaderProps) {
             <Link href={`/goals/${goal.id}/edit`}>
               <Button size="sm" variant="outline" className="gap-2">
                 <Pencil className="h-4 w-4" />
-                Edit
+                {t("common.edit")}
               </Button>
             </Link>
             <Button
@@ -33,7 +35,7 @@ export function GoalDetailHeader({ goal }: GoalDetailHeaderProps) {
               onClick={() => setDeleteDialogOpen(true)}
             >
               <Trash2 className="h-4 w-4" />
-              Delete
+              {t("common.delete")}
             </Button>
           </div>
         </div>

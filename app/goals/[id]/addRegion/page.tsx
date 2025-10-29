@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { RegionForm } from "@/components/regions";
+import { useTranslations } from "next-intl";
 
 export default function AddRegionPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = useTranslations("navigation");
   const [goalId, setGoalId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ export default function AddRegionPage({
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
       >
         <ChevronLeft className="h-4 w-4 mr-1" />
-        Back to Goal
+        {t("backToGoal")}
       </Link>
 
       <RegionForm mode="create" goalId={goalId} />

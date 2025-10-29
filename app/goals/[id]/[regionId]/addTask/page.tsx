@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { TaskForm } from "@/components/tasks";
+import { useTranslations } from "next-intl";
 
 export default function AddTaskPage({
   params,
 }: {
   params: Promise<{ id: string; regionId: string }>;
 }) {
+  const t = useTranslations("navigation");
   const [goalId, setGoalId] = useState<string | null>(null);
   const [regionId, setRegionId] = useState<string | null>(null);
 
@@ -31,7 +33,7 @@ export default function AddTaskPage({
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
       >
         <ChevronLeft className="h-4 w-4 mr-1" />
-        Back to Region
+        {t("backToRegion")}
       </Link>
 
       <TaskForm mode="create" regionId={regionId} goalId={goalId} />

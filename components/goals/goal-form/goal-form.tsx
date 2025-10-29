@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -30,6 +31,7 @@ export function GoalForm({
   onSuccess,
 }: GoalFormProps) {
   const router = useRouter();
+  const t = useTranslations();
   const [title, setTitle] = useState(initialData.title);
   const [description, setDescription] = useState(initialData.description);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,7 +65,9 @@ export function GoalForm({
         router.refresh();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(
+        err instanceof Error ? err.message : t("common.error")
+      );
       setIsSubmitting(false);
     }
   };
@@ -72,12 +76,14 @@ export function GoalForm({
     <Card>
       <CardHeader>
         <CardTitle>
-          {mode === "create" ? "Create New Goal" : "Edit Goal"}
+          {mode === "create"
+            ? t("goals.createNew")
+            : t("goals.editGoal")}
         </CardTitle>
         <CardDescription>
           {mode === "create"
-            ? "Add a new goal to track your progress"
-            : "Update your goal information"}
+            ? t("goals.createDescription")
+            : t("goals.editDescription")}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -87,12 +93,12 @@ export function GoalForm({
               htmlFor="title"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Title
+              {t("common.title")}
             </label>
             <Input
               id="title"
               type="text"
-              placeholder="e.g., Learn Next.js"
+              placeholder={t("goals.titlePlaceholder")}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -105,11 +111,11 @@ export function GoalForm({
               htmlFor="description"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Description
+              {t("common.description")}
             </label>
             <textarea
               id="description"
-              placeholder="Describe your goal..."
+              placeholder={t("goals.descriptionPlaceholder")}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
@@ -132,16 +138,16 @@ export function GoalForm({
               onClick={() => router.back()}
               disabled={isSubmitting}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting
                 ? mode === "create"
-                  ? "Creating..."
-                  : "Saving..."
+                  ? t("common.creating")
+                  : t("common.saving")
                 : mode === "create"
-                  ? "Create Goal"
-                  : "Save Changes"}
+                  ? t("goals.createButton")
+                  : t("goals.saveButton")}
             </Button>
           </div>
         </form>

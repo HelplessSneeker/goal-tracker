@@ -38,10 +38,10 @@ describe("DeleteRegionDialog", () => {
     render(<DeleteRegionDialog {...defaultProps} />);
 
     expect(
-      screen.getByText(/all tasks within this region/i),
+      screen.getByText(/all tasks in this region/i),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/all weekly tasks associated with those tasks/i),
+      screen.getByText(/all weekly tasks for those tasks/i),
     ).toBeInTheDocument();
     expect(
       screen.getByText(/all progress entries for those weekly tasks/i),

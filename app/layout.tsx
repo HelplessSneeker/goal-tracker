@@ -10,6 +10,8 @@ import {
 import { Providers } from "./providers";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,28 +34,31 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await getServerSession(authOptions);
+  const messages = await getMessages();
 
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
-          {session ? (
-            <SidebarProvider>
-              <AppSidebar />
-              <SidebarInset>
-                <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4 md:hidden">
-                  <SidebarTrigger />
-                  <h1 className="text-lg font-semibold">Goal Tracker</h1>
-                </header>
-                {children}
-              </SidebarInset>
-            </SidebarProvider>
-          ) : (
-            children
-          )}
-        </Providers>
+        <NextIntlClientProvider messages={messages}>
+          <Providers>
+            {session ? (
+              <SidebarProvider>
+                <AppSidebar />
+                <SidebarInset>
+                  <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4 md:hidden">
+                    <SidebarTrigger />
+                    <h1 className="text-lg font-semibold">Goal Tracker</h1>
+                  </header>
+                  {children}
+                </SidebarInset>
+              </SidebarProvider>
+            ) : (
+              children
+            )}
+          </Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

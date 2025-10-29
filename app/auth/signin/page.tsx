@@ -3,6 +3,7 @@
 import { signIn, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/card";
 
 export default function SignInPage() {
+  const t = useTranslations("auth.signIn");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -41,14 +43,14 @@ export default function SignInPage() {
       });
 
       if (result?.error) {
-        setError("Failed to send email. Please try again.");
+        setError(t("errorEmail"));
         setIsLoading(false);
       } else {
         // Successfully sent email, redirect to verify-request page
         router.push("/auth/verify-request");
       }
     } catch {
-      setError("An unexpected error occurred. Please try again.");
+      setError(t("errorUnexpected"));
       setIsLoading(false);
     }
   };
@@ -58,21 +60,20 @@ export default function SignInPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">
-            Sign In / Sign Up
+            {t("title")}
           </CardTitle>
           <CardDescription>
-            Enter your email to receive a magic link. Works for both new and
-            existing accounts.
+            {t("description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("emailLabel")}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder={t("emailPlaceholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -82,7 +83,7 @@ export default function SignInPage() {
             </div>
             {error && <p className="text-sm text-red-600">{error}</p>}
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Sending..." : "Send Magic Link"}
+              {isLoading ? t("sending") : t("submitButton")}
             </Button>
           </form>
         </CardContent>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +30,7 @@ export function DeleteRegionDialog({
   regionTitle,
   goalId,
 }: DeleteRegionDialogProps) {
+  const t = useTranslations();
   const router = useRouter();
   const [confirmText, setConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -36,7 +38,7 @@ export function DeleteRegionDialog({
 
   const handleDelete = async () => {
     if (confirmText !== regionTitle) {
-      setError("Region name does not match");
+      setError(t("delete.region.errorMismatch"));
       return;
     }
 
@@ -54,7 +56,7 @@ export function DeleteRegionDialog({
       router.push(`/goals/${goalId}`);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : t("common.error"));
       setIsDeleting(false);
     }
   };
@@ -71,19 +73,17 @@ export function DeleteRegionDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete Region</DialogTitle>
+          <DialogTitle>{t("delete.region.title")}</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete the
-            region <strong>&quot;{regionTitle}&quot;</strong> and all associated data
-            including:
+            {t("delete.region.warning")} <strong>&quot;{regionTitle}&quot;</strong>. {t("delete.region.warningStrong")}. {t("delete.region.description")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="py-4">
           <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground mb-4">
-            <li>All tasks within this region</li>
-            <li>All weekly tasks associated with those tasks</li>
-            <li>All progress entries for those weekly tasks</li>
+            <li>{t("delete.region.consequence1")}</li>
+            <li>{t("delete.region.consequence2")}</li>
+            <li>{t("delete.region.consequence3")}</li>
           </ul>
 
           <div className="space-y-2">
@@ -91,7 +91,7 @@ export function DeleteRegionDialog({
               htmlFor="confirm-text"
               className="text-sm font-medium leading-none"
             >
-              Please type <strong>{regionTitle}</strong> to confirm:
+              {t("delete.region.confirmPrompt")} <strong>{regionTitle}</strong>
             </label>
             <Input
               id="confirm-text"
@@ -116,14 +116,14 @@ export function DeleteRegionDialog({
             onClick={() => handleOpenChange(false)}
             disabled={isDeleting}
           >
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             variant="destructive"
             onClick={handleDelete}
             disabled={isDeleting || confirmText !== regionTitle}
           >
-            {isDeleting ? "Deleting..." : "Delete Region"}
+            {isDeleting ? t("common.deleting") : t("delete.region.deleteButton")}
           </Button>
         </DialogFooter>
       </DialogContent>
