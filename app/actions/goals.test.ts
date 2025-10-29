@@ -47,13 +47,13 @@ describe("Goals Server Actions", () => {
 
       const result = await createGoalAction(formData);
 
-      expect(result).toEqual({ error: "Unauthorized" });
+      expect(result).toEqual({ error: "Unauthorized", code: "UNAUTHORIZED" });
       expect(mockGoalsService.createGoal).not.toHaveBeenCalled();
     });
 
     it("should create a goal with valid data", async () => {
       const mockGoal = {
-        id: "goal-1",
+        id: "550e8400-e29b-41d4-a716-446655440000",
         title: "Test Goal",
         description: "Test Description",
         userId: mockUserId,
@@ -69,7 +69,7 @@ describe("Goals Server Actions", () => {
 
       const result = await createGoalAction(formData);
 
-      expect(result).toEqual({ success: true, goal: mockGoal });
+      expect(result).toEqual({ success: true, data: mockGoal });
       expect(mockGoalsService.createGoal).toHaveBeenCalledWith(mockUserId, {
         title: "Test Goal",
         description: "Test Description",
@@ -78,7 +78,7 @@ describe("Goals Server Actions", () => {
 
     it("should handle empty description", async () => {
       const mockGoal = {
-        id: "goal-1",
+        id: "550e8400-e29b-41d4-a716-446655440001",
         title: "Test Goal",
         description: null,
         userId: mockUserId,
@@ -93,10 +93,10 @@ describe("Goals Server Actions", () => {
 
       const result = await createGoalAction(formData);
 
-      expect(result).toEqual({ success: true, goal: mockGoal });
+      expect(result).toEqual({ success: true, data: mockGoal });
       expect(mockGoalsService.createGoal).toHaveBeenCalledWith(mockUserId, {
         title: "Test Goal",
-        description: "",
+        description: undefined,
       });
     });
 
@@ -105,7 +105,11 @@ describe("Goals Server Actions", () => {
 
       const result = await createGoalAction(formData);
 
-      expect(result).toEqual({ error: "Title is required" });
+      expect(result).toEqual({
+        error: "Validation failed. Please check your input.",
+        code: "VALIDATION_ERROR",
+        validationErrors: [{ field: "title", message: "Invalid input: expected string, received undefined" }],
+      });
       expect(mockGoalsService.createGoal).not.toHaveBeenCalled();
     });
 
@@ -119,7 +123,7 @@ describe("Goals Server Actions", () => {
 
       const result = await createGoalAction(formData);
 
-      expect(result).toEqual({ error: "Failed to create goal" });
+      expect(result).toEqual({ error: "Failed to create goal. Please try again.", code: "DATABASE_ERROR" });
     });
   });
 
@@ -130,15 +134,15 @@ describe("Goals Server Actions", () => {
       const formData = new FormData();
       formData.append("title", "Updated Title");
 
-      const result = await updateGoalAction("goal-1", formData);
+      const result = await updateGoalAction("550e8400-e29b-41d4-a716-446655440002", formData);
 
-      expect(result).toEqual({ error: "Unauthorized" });
+      expect(result).toEqual({ error: "Unauthorized", code: "UNAUTHORIZED" });
       expect(mockGoalsService.updateGoal).not.toHaveBeenCalled();
     });
 
     it("should update a goal with valid data", async () => {
       const mockGoal = {
-        id: "goal-1",
+        id: "550e8400-e29b-41d4-a716-446655440002",
         title: "Updated Title",
         description: "Updated Description",
         userId: mockUserId,
@@ -152,11 +156,11 @@ describe("Goals Server Actions", () => {
       formData.append("title", "Updated Title");
       formData.append("description", "Updated Description");
 
-      const result = await updateGoalAction("goal-1", formData);
+      const result = await updateGoalAction("550e8400-e29b-41d4-a716-446655440002", formData);
 
-      expect(result).toEqual({ success: true, goal: mockGoal });
+      expect(result).toEqual({ success: true, data: mockGoal });
       expect(mockGoalsService.updateGoal).toHaveBeenCalledWith(
-        "goal-1",
+        "550e8400-e29b-41d4-a716-446655440002",
         mockUserId,
         {
           title: "Updated Title",
@@ -167,7 +171,7 @@ describe("Goals Server Actions", () => {
 
     it("should allow partial updates (title only)", async () => {
       const mockGoal = {
-        id: "goal-1",
+        id: "550e8400-e29b-41d4-a716-446655440002",
         title: "New Title",
         description: "Old Description",
         userId: mockUserId,
@@ -180,9 +184,9 @@ describe("Goals Server Actions", () => {
       const formData = new FormData();
       formData.append("title", "New Title");
 
-      const result = await updateGoalAction("goal-1", formData);
+      const result = await updateGoalAction("550e8400-e29b-41d4-a716-446655440002", formData);
 
-      expect(result).toEqual({ success: true, goal: mockGoal });
+      expect(result).toEqual({ success: true, data: mockGoal });
     });
 
     it("should return error when goal not found", async () => {
@@ -191,17 +195,21 @@ describe("Goals Server Actions", () => {
       const formData = new FormData();
       formData.append("title", "Updated Title");
 
-      const result = await updateGoalAction("nonexistent", formData);
+      const result = await updateGoalAction("550e8400-e29b-41d4-a716-446655440099", formData);
 
-      expect(result).toEqual({ error: "Goal not found or unauthorized" });
+      expect(result).toEqual({ error: "Goal not found or unauthorized", code: "NOT_FOUND" });
     });
 
     it("should return error when title is missing", async () => {
       const formData = new FormData();
 
-      const result = await updateGoalAction("goal-1", formData);
+      const result = await updateGoalAction("550e8400-e29b-41d4-a716-446655440002", formData);
 
-      expect(result).toEqual({ error: "Title is required" });
+      expect(result).toEqual({
+        error: "Validation failed. Please check your input.",
+        code: "VALIDATION_ERROR",
+        validationErrors: [{ field: "title", message: "Invalid input: expected string, received undefined" }],
+      });
       expect(mockGoalsService.updateGoal).not.toHaveBeenCalled();
     });
 
@@ -213,9 +221,9 @@ describe("Goals Server Actions", () => {
       const formData = new FormData();
       formData.append("title", "Updated Title");
 
-      const result = await updateGoalAction("goal-1", formData);
+      const result = await updateGoalAction("550e8400-e29b-41d4-a716-446655440002", formData);
 
-      expect(result).toEqual({ error: "Failed to update goal" });
+      expect(result).toEqual({ error: "Failed to update goal. Please try again.", code: "DATABASE_ERROR" });
     });
   });
 
@@ -223,20 +231,20 @@ describe("Goals Server Actions", () => {
     it("should return error when user is not authenticated", async () => {
       mockGetServerSession.mockResolvedValue(null);
 
-      const result = await deleteGoalAction("goal-1");
+      const result = await deleteGoalAction("550e8400-e29b-41d4-a716-446655440002");
 
-      expect(result).toEqual({ error: "Unauthorized" });
+      expect(result).toEqual({ error: "Unauthorized", code: "UNAUTHORIZED" });
       expect(mockGoalsService.deleteGoal).not.toHaveBeenCalled();
     });
 
     it("should delete a goal successfully", async () => {
       mockGoalsService.deleteGoal.mockResolvedValue(true);
 
-      const result = await deleteGoalAction("goal-1");
+      const result = await deleteGoalAction("550e8400-e29b-41d4-a716-446655440002");
 
-      expect(result).toEqual({ success: true });
+      expect(result).toEqual({ success: true, data: { deleted: true } });
       expect(mockGoalsService.deleteGoal).toHaveBeenCalledWith(
-        "goal-1",
+        "550e8400-e29b-41d4-a716-446655440002",
         mockUserId
       );
     });
@@ -244,9 +252,9 @@ describe("Goals Server Actions", () => {
     it("should return error when goal not found", async () => {
       mockGoalsService.deleteGoal.mockResolvedValue(false);
 
-      const result = await deleteGoalAction("nonexistent");
+      const result = await deleteGoalAction("550e8400-e29b-41d4-a716-446655440099");
 
-      expect(result).toEqual({ error: "Goal not found or unauthorized" });
+      expect(result).toEqual({ error: "Goal not found or unauthorized", code: "NOT_FOUND" });
     });
 
     it("should handle service errors", async () => {
@@ -254,9 +262,9 @@ describe("Goals Server Actions", () => {
         new Error("Database error")
       );
 
-      const result = await deleteGoalAction("goal-1");
+      const result = await deleteGoalAction("550e8400-e29b-41d4-a716-446655440002");
 
-      expect(result).toEqual({ error: "Failed to delete goal" });
+      expect(result).toEqual({ error: "Failed to delete goal. Please try again.", code: "DATABASE_ERROR" });
     });
   });
 });

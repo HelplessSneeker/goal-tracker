@@ -158,8 +158,8 @@ Services handle:
 **Current:**
 - `User`: id, email, name, image (NextAuth adapter models)
 - `Goal`: id, title, description, userId, createdAt, updatedAt
-- `Region`: id, goalId, title, description, userId, createdAt, updatedAt
-- `Task`: id, regionId, title, description, deadline, status, userId, createdAt, updatedAt
+- `Region`: id, goalId, title, description, createdAt, updatedAt (userId via Goal)
+- `Task`: id, regionId, title, description, deadline, status, createdAt, updatedAt (userId via Region→Goal)
 
 **TODO:**
 - `WeeklyTask`: id, taskId, title, description, priority (1-3), weekStartDate, status

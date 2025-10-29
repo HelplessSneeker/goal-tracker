@@ -38,9 +38,9 @@ jest.mock("next/cache", () => ({
 
 describe("Tasks Actions", () => {
   const mockUserId = "clxyz123456789";
-  const mockRegionId = "region-123";
-  const mockGoalId = "goal-123";
-  const mockTaskId = "task-123";
+  const mockRegionId = "550e8400-e29b-41d4-a716-446655440030";
+  const mockGoalId = "550e8400-e29b-41d4-a716-446655440031";
+  const mockTaskId = "550e8400-e29b-41d4-a716-446655440040";
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -76,7 +76,7 @@ describe("Tasks Actions", () => {
 
       const result = await createTaskAction(formData);
 
-      expect(result).toEqual({ success: true, task: mockTask });
+      expect(result).toEqual({ success: true, data: mockTask });
       expect(mockCreateTask).toHaveBeenCalledWith(mockUserId, {
         regionId: mockRegionId,
         title: "Test Task",
@@ -98,7 +98,7 @@ describe("Tasks Actions", () => {
 
       const result = await createTaskAction(formData);
 
-      expect(result).toEqual({ error: "Unauthorized" });
+      expect(result).toEqual({ error: "Unauthorized", code: "UNAUTHORIZED" });
       expect(mockCreateTask).not.toHaveBeenCalled();
     });
 
@@ -115,7 +115,11 @@ describe("Tasks Actions", () => {
 
       const result = await createTaskAction(formData);
 
-      expect(result).toEqual({ error: "Region ID is required" });
+      expect(result).toEqual({
+        error: "Validation failed. Please check your input.",
+        code: "VALIDATION_ERROR",
+        validationErrors: [{ field: "regionId", message: "Invalid input: expected string, received undefined" }],
+      });
       expect(mockCreateTask).not.toHaveBeenCalled();
     });
 
@@ -133,7 +137,11 @@ describe("Tasks Actions", () => {
 
       const result = await createTaskAction(formData);
 
-      expect(result).toEqual({ error: "Title is required" });
+      expect(result).toEqual({
+        error: "Validation failed. Please check your input.",
+        code: "VALIDATION_ERROR",
+        validationErrors: [{ field: "title", message: "Title is required" }],
+      });
       expect(mockCreateTask).not.toHaveBeenCalled();
     });
 
@@ -150,7 +158,11 @@ describe("Tasks Actions", () => {
 
       const result = await createTaskAction(formData);
 
-      expect(result).toEqual({ error: "Deadline is required" });
+      expect(result).toEqual({
+        error: "Validation failed. Please check your input.",
+        code: "VALIDATION_ERROR",
+        validationErrors: [{ field: "deadline", message: "Invalid deadline date" }],
+      });
       expect(mockCreateTask).not.toHaveBeenCalled();
     });
 
@@ -172,6 +184,7 @@ describe("Tasks Actions", () => {
 
       expect(result).toEqual({
         error: "Region not found or unauthorized",
+        code: "NOT_FOUND",
       });
     });
 
@@ -243,7 +256,7 @@ describe("Tasks Actions", () => {
 
       const result = await updateTaskAction(mockTaskId, formData);
 
-      expect(result).toEqual({ success: true, task: mockTask });
+      expect(result).toEqual({ success: true, data: mockTask });
       expect(mockUpdateTask).toHaveBeenCalledWith(mockTaskId, mockUserId, {
         title: "Updated Task",
         description: "Updated Description",
@@ -263,7 +276,7 @@ describe("Tasks Actions", () => {
 
       const result = await updateTaskAction(mockTaskId, formData);
 
-      expect(result).toEqual({ error: "Unauthorized" });
+      expect(result).toEqual({ error: "Unauthorized", code: "UNAUTHORIZED" });
       expect(mockUpdateTask).not.toHaveBeenCalled();
     });
 
@@ -279,7 +292,15 @@ describe("Tasks Actions", () => {
 
       const result = await updateTaskAction(mockTaskId, formData);
 
-      expect(result).toEqual({ error: "Title is required" });
+      expect(result).toEqual({
+        error: "Validation failed. Please check your input.",
+        code: "VALIDATION_ERROR",
+        validationErrors: [
+          { field: "title", message: "Title is required" },
+          { field: "deadline", message: "Invalid deadline date" },
+          { field: "status", message: "Status must be active, incomplete, or completed" },
+        ],
+      });
       expect(mockUpdateTask).not.toHaveBeenCalled();
     });
 
@@ -294,11 +315,14 @@ describe("Tasks Actions", () => {
 
       const formData = new FormData();
       formData.append("title", "Updated Task");
+      formData.append("deadline", "2026-01-01");
+      formData.append("status", "active");
 
       const result = await updateTaskAction(mockTaskId, formData);
 
       expect(result).toEqual({
         error: "Task not found or unauthorized",
+        code: "NOT_FOUND",
       });
     });
   });
@@ -315,7 +339,7 @@ describe("Tasks Actions", () => {
 
       const result = await deleteTaskAction(mockTaskId);
 
-      expect(result).toEqual({ success: true });
+      expect(result).toEqual({ success: true, data: { deleted: true } });
       expect(mockDeleteTask).toHaveBeenCalledWith(mockTaskId, mockUserId);
       expect(mockRevalidatePath).toHaveBeenCalledWith("/goals");
     });
@@ -327,7 +351,7 @@ describe("Tasks Actions", () => {
 
       const result = await deleteTaskAction(mockTaskId);
 
-      expect(result).toEqual({ error: "Unauthorized" });
+      expect(result).toEqual({ error: "Unauthorized", code: "UNAUTHORIZED" });
       expect(mockDeleteTask).not.toHaveBeenCalled();
     });
 
@@ -344,6 +368,7 @@ describe("Tasks Actions", () => {
 
       expect(result).toEqual({
         error: "Task not found or unauthorized",
+        code: "NOT_FOUND",
       });
     });
   });
@@ -358,8 +383,8 @@ describe("Tasks Actions", () => {
 
       const mockTasks = [
         {
-          id: "task-1",
-          regionId: "region-1",
+          id: "550e8400-e29b-41d4-a716-446655440041",
+          regionId: "550e8400-e29b-41d4-a716-446655440032",
           title: "Task 1",
           description: "Description 1",
           deadline: new Date(),
@@ -369,8 +394,8 @@ describe("Tasks Actions", () => {
           updatedAt: new Date(),
         },
         {
-          id: "task-2",
-          regionId: "region-2",
+          id: "550e8400-e29b-41d4-a716-446655440042",
+          regionId: "550e8400-e29b-41d4-a716-446655440033",
           title: "Task 2",
           description: "Description 2",
           deadline: new Date(),
@@ -385,7 +410,7 @@ describe("Tasks Actions", () => {
 
       const result = await getTasksAction();
 
-      expect(result).toEqual({ tasks: mockTasks });
+      expect(result).toEqual({ success: true, data: mockTasks });
       expect(mockGetTasksForRegion).toHaveBeenCalledWith(undefined, mockUserId);
     });
 
@@ -398,7 +423,7 @@ describe("Tasks Actions", () => {
 
       const mockTasks = [
         {
-          id: "task-1",
+          id: "550e8400-e29b-41d4-a716-446655440041",
           regionId: mockRegionId,
           title: "Task 1",
           description: "Description 1",
@@ -414,7 +439,7 @@ describe("Tasks Actions", () => {
 
       const result = await getTasksAction(mockRegionId);
 
-      expect(result).toEqual({ tasks: mockTasks });
+      expect(result).toEqual({ success: true, data: mockTasks });
       expect(mockGetTasksForRegion).toHaveBeenCalledWith(
         mockRegionId,
         mockUserId
@@ -428,7 +453,7 @@ describe("Tasks Actions", () => {
 
       const result = await getTasksAction();
 
-      expect(result).toEqual({ error: "Unauthorized", tasks: [] });
+      expect(result).toEqual({ error: "Unauthorized", code: "UNAUTHORIZED" });
       expect(mockGetTasksForRegion).not.toHaveBeenCalled();
     });
   });
@@ -457,7 +482,7 @@ describe("Tasks Actions", () => {
 
       const result = await getTaskAction(mockTaskId);
 
-      expect(result).toEqual({ task: mockTask });
+      expect(result).toEqual({ success: true, data: mockTask });
       expect(mockGetTaskById).toHaveBeenCalledWith(mockTaskId, mockUserId);
     });
 
@@ -468,7 +493,7 @@ describe("Tasks Actions", () => {
 
       const result = await getTaskAction(mockTaskId);
 
-      expect(result).toEqual({ error: "Unauthorized", task: null });
+      expect(result).toEqual({ error: "Unauthorized", code: "UNAUTHORIZED" });
       expect(mockGetTaskById).not.toHaveBeenCalled();
     });
 
@@ -483,7 +508,7 @@ describe("Tasks Actions", () => {
 
       const result = await getTaskAction(mockTaskId);
 
-      expect(result).toEqual({ error: "Task not found", task: null });
+      expect(result).toEqual({ error: "Task not found", code: "NOT_FOUND" });
     });
   });
 });

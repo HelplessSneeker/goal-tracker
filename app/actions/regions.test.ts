@@ -45,8 +45,8 @@ jest.mock("next/cache", () => ({
 
 describe("Regions Actions", () => {
   const mockUserId = "clxyz123456789";
-  const mockGoalId = "goal-123";
-  const mockRegionId = "region-123";
+  const mockGoalId = "550e8400-e29b-41d4-a716-446655440010";
+  const mockRegionId = "550e8400-e29b-41d4-a716-446655440020";
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -78,7 +78,7 @@ describe("Regions Actions", () => {
 
       const result = await createRegionAction(formData);
 
-      expect(result).toEqual({ success: true, region: mockRegion });
+      expect(result).toEqual({ success: true, data: mockRegion });
       expect(mockCreateRegion).toHaveBeenCalledWith(mockUserId, {
         goalId: mockGoalId,
         title: "Test Region",
@@ -99,7 +99,7 @@ describe("Regions Actions", () => {
 
       const result = await createRegionAction(formData);
 
-      expect(result).toEqual({ error: "Unauthorized" });
+      expect(result).toEqual({ error: "Unauthorized", code: "UNAUTHORIZED" });
       expect(mockCreateRegion).not.toHaveBeenCalled();
     });
 
@@ -115,7 +115,11 @@ describe("Regions Actions", () => {
 
       const result = await createRegionAction(formData);
 
-      expect(result).toEqual({ error: "Goal ID is required" });
+      expect(result).toEqual({
+        error: "Validation failed. Please check your input.",
+        code: "VALIDATION_ERROR",
+        validationErrors: [{ field: "goalId", message: "Invalid input: expected string, received undefined" }],
+      });
       expect(mockCreateRegion).not.toHaveBeenCalled();
     });
 
@@ -132,7 +136,11 @@ describe("Regions Actions", () => {
 
       const result = await createRegionAction(formData);
 
-      expect(result).toEqual({ error: "Title is required" });
+      expect(result).toEqual({
+        error: "Validation failed. Please check your input.",
+        code: "VALIDATION_ERROR",
+        validationErrors: [{ field: "title", message: "Title is required" }],
+      });
       expect(mockCreateRegion).not.toHaveBeenCalled();
     });
 
@@ -153,6 +161,7 @@ describe("Regions Actions", () => {
 
       expect(result).toEqual({
         error: "Goal not found or unauthorized",
+        code: "NOT_FOUND",
       });
     });
 
@@ -214,7 +223,7 @@ describe("Regions Actions", () => {
 
       const result = await updateRegionAction(mockRegionId, formData);
 
-      expect(result).toEqual({ success: true, region: mockRegion });
+      expect(result).toEqual({ success: true, data: mockRegion });
       expect(mockUpdateRegion).toHaveBeenCalledWith(
         mockRegionId,
         mockUserId,
@@ -237,7 +246,7 @@ describe("Regions Actions", () => {
 
       const result = await updateRegionAction(mockRegionId, formData);
 
-      expect(result).toEqual({ error: "Unauthorized" });
+      expect(result).toEqual({ error: "Unauthorized", code: "UNAUTHORIZED" });
       expect(mockUpdateRegion).not.toHaveBeenCalled();
     });
 
@@ -253,7 +262,11 @@ describe("Regions Actions", () => {
 
       const result = await updateRegionAction(mockRegionId, formData);
 
-      expect(result).toEqual({ error: "Title is required" });
+      expect(result).toEqual({
+        error: "Validation failed. Please check your input.",
+        code: "VALIDATION_ERROR",
+        validationErrors: [{ field: "title", message: "Title is required" }],
+      });
       expect(mockUpdateRegion).not.toHaveBeenCalled();
     });
 
@@ -273,6 +286,7 @@ describe("Regions Actions", () => {
 
       expect(result).toEqual({
         error: "Region not found or unauthorized",
+        code: "NOT_FOUND",
       });
     });
   });
@@ -289,7 +303,7 @@ describe("Regions Actions", () => {
 
       const result = await deleteRegionAction(mockRegionId);
 
-      expect(result).toEqual({ success: true });
+      expect(result).toEqual({ success: true, data: { deleted: true } });
       expect(mockDeleteRegion).toHaveBeenCalledWith(mockRegionId, mockUserId);
       expect(mockRevalidatePath).toHaveBeenCalledWith("/goals");
     });
@@ -301,7 +315,7 @@ describe("Regions Actions", () => {
 
       const result = await deleteRegionAction(mockRegionId);
 
-      expect(result).toEqual({ error: "Unauthorized" });
+      expect(result).toEqual({ error: "Unauthorized", code: "UNAUTHORIZED" });
       expect(mockDeleteRegion).not.toHaveBeenCalled();
     });
 
@@ -318,6 +332,7 @@ describe("Regions Actions", () => {
 
       expect(result).toEqual({
         error: "Region not found or unauthorized",
+        code: "NOT_FOUND",
       });
     });
   });
@@ -332,16 +347,16 @@ describe("Regions Actions", () => {
 
       const mockRegions = [
         {
-          id: "region-1",
-          goalId: "goal-1",
+          id: "550e8400-e29b-41d4-a716-446655440021",
+          goalId: "550e8400-e29b-41d4-a716-446655440011",
           title: "Region 1",
           description: "Description 1",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          id: "region-2",
-          goalId: "goal-2",
+          id: "550e8400-e29b-41d4-a716-446655440022",
+          goalId: "550e8400-e29b-41d4-a716-446655440012",
           title: "Region 2",
           description: "Description 2",
           createdAt: new Date(),
@@ -353,7 +368,7 @@ describe("Regions Actions", () => {
 
       const result = await getRegionsAction();
 
-      expect(result).toEqual({ regions: mockRegions });
+      expect(result).toEqual({ success: true, data: mockRegions });
       expect(mockGetRegionsForGoal).toHaveBeenCalledWith(undefined, mockUserId);
     });
 
@@ -366,7 +381,7 @@ describe("Regions Actions", () => {
 
       const mockRegions = [
         {
-          id: "region-1",
+          id: "550e8400-e29b-41d4-a716-446655440021",
           goalId: mockGoalId,
           title: "Region 1",
           description: "Description 1",
@@ -379,7 +394,7 @@ describe("Regions Actions", () => {
 
       const result = await getRegionsAction(mockGoalId);
 
-      expect(result).toEqual({ regions: mockRegions });
+      expect(result).toEqual({ success: true, data: mockRegions });
       expect(mockGetRegionsForGoal).toHaveBeenCalledWith(mockGoalId, mockUserId);
     });
 
@@ -390,7 +405,7 @@ describe("Regions Actions", () => {
 
       const result = await getRegionsAction();
 
-      expect(result).toEqual({ error: "Unauthorized", regions: [] });
+      expect(result).toEqual({ error: "Unauthorized", code: "UNAUTHORIZED" });
       expect(mockGetRegionsForGoal).not.toHaveBeenCalled();
     });
   });
@@ -416,7 +431,7 @@ describe("Regions Actions", () => {
 
       const result = await getRegionAction(mockRegionId);
 
-      expect(result).toEqual({ region: mockRegion });
+      expect(result).toEqual({ success: true, data: mockRegion });
       expect(mockGetRegionById).toHaveBeenCalledWith(mockRegionId, mockUserId);
     });
 
@@ -427,7 +442,7 @@ describe("Regions Actions", () => {
 
       const result = await getRegionAction(mockRegionId);
 
-      expect(result).toEqual({ error: "Unauthorized", region: null });
+      expect(result).toEqual({ error: "Unauthorized", code: "UNAUTHORIZED" });
       expect(mockGetRegionById).not.toHaveBeenCalled();
     });
 
@@ -442,7 +457,7 @@ describe("Regions Actions", () => {
 
       const result = await getRegionAction(mockRegionId);
 
-      expect(result).toEqual({ error: "Region not found", region: null });
+      expect(result).toEqual({ error: "Region not found", code: "NOT_FOUND" });
     });
   });
 });

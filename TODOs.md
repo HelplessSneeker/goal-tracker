@@ -8,7 +8,7 @@ This document tracks the implementation progress and remaining work for the goal
 
 ## Current Status
 
-**Branch:** `authentication`
+**Branch:** `main`
 
 **Architecture:** Server Actions + Service Layer (migrated from API routes)
 
