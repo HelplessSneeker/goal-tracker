@@ -45,12 +45,12 @@ export function AppSidebar() {
           getRegionsAction(),
         ]);
 
-        if ("goals" in goalsResult) {
-          setGoals(goalsResult.goals);
+        if ("success" in goalsResult && goalsResult.success) {
+          setGoals(goalsResult.data);
         }
 
-        if ("regions" in regionsResult) {
-          setRegions(regionsResult.regions);
+        if ("success" in regionsResult && regionsResult.success) {
+          setRegions(regionsResult.data);
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);

@@ -10,143 +10,193 @@ import {
   getRegionById,
 } from "@/lib/services/regions.service";
 import { revalidatePath } from "next/cache";
+import {
+  type ActionResponse,
+  ActionErrorCode,
+  createError,
+  createSuccess,
+  isActionError,
+} from "@/lib/action-types";
+import {
+  regionSchemas,
+  validateFormData,
+  extractFormData,
+} from "@/lib/validation";
+import type { Region } from "@/generated/prisma";
 
-export async function createRegionAction(formData: FormData) {
+export async function createRegionAction(
+  formData: FormData
+): Promise<ActionResponse<Region>> {
   try {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-      return { error: "Unauthorized" };
+      return createError("Unauthorized", ActionErrorCode.UNAUTHORIZED);
     }
 
     // Extract and validate data
-    const goalId = formData.get("goalId") as string;
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
+    const data = extractFormData(formData);
+    const validated = validateFormData(regionSchemas.create, data);
 
-    if (!goalId || goalId.trim() === "") {
-      return { error: "Goal ID is required" };
-    }
-
-    if (!title || title.trim() === "") {
-      return { error: "Title is required" };
+    if (isActionError(validated)) {
+      return validated;
     }
 
     // Create region via service
     const region = await createRegion(session.user.id, {
-      goalId: goalId.trim(),
-      title: title.trim(),
-      description: description?.trim() || "",
+      goalId: validated.goalId,
+      title: validated.title,
+      description: validated.description,
     });
 
     if (!region) {
-      return { error: "Goal not found or unauthorized" };
+      return createError(
+        "Goal not found or unauthorized",
+        ActionErrorCode.NOT_FOUND
+      );
     }
 
     // Revalidate relevant pages to show the new region
     revalidatePath("/goals");
-    revalidatePath(`/goals/${goalId}`);
+    revalidatePath(`/goals/${validated.goalId}`);
 
-    return { success: true, region };
+    return createSuccess(region);
   } catch (error) {
-    console.error("Error creating region:", error);
-    return { error: "Failed to create region" };
+    console.error("[createRegionAction] Database error:", error);
+    return createError(
+      "Failed to create region. Please try again.",
+      ActionErrorCode.DATABASE_ERROR
+    );
   }
 }
 
-export async function updateRegionAction(id: string, formData: FormData) {
+export async function updateRegionAction(
+  id: string,
+  formData: FormData
+): Promise<ActionResponse<Region>> {
   try {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-      return { error: "Unauthorized" };
+      return createError("Unauthorized", ActionErrorCode.UNAUTHORIZED);
     }
 
-    // Extract and validate data
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
+    // Extract and validate data (including ID)
+    const data = { id, ...extractFormData(formData) };
+    const validated = validateFormData(regionSchemas.update, data);
 
-    if (!title || title.trim() === "") {
-      return { error: "Title is required" };
+    if (isActionError(validated)) {
+      return validated;
     }
 
     // Update region via service (includes ownership check)
-    const region = await updateRegion(id, session.user.id, {
-      title: title.trim(),
-      description: description?.trim() || "",
+    const region = await updateRegion(validated.id, session.user.id, {
+      title: validated.title,
+      description: validated.description,
     });
 
     if (!region) {
-      return { error: "Region not found or unauthorized" };
+      return createError(
+        "Region not found or unauthorized",
+        ActionErrorCode.NOT_FOUND
+      );
     }
 
     // Revalidate relevant pages
     revalidatePath("/goals");
     revalidatePath(`/goals/${region.goalId}`);
 
-    return { success: true, region };
+    return createSuccess(region);
   } catch (error) {
-    console.error("Error updating region:", error);
-    return { error: "Failed to update region" };
+    console.error("[updateRegionAction] Database error:", error);
+    return createError(
+      "Failed to update region. Please try again.",
+      ActionErrorCode.DATABASE_ERROR
+    );
   }
 }
 
-export async function deleteRegionAction(id: string) {
+export async function deleteRegionAction(
+  id: string
+): Promise<ActionResponse<{ deleted: true }>> {
   try {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-      return { error: "Unauthorized" };
+      return createError("Unauthorized", ActionErrorCode.UNAUTHORIZED);
+    }
+
+    // Validate ID
+    const validated = validateFormData(regionSchemas.delete, { id });
+
+    if (isActionError(validated)) {
+      return validated;
     }
 
     // Delete region via service (includes ownership check)
-    const success = await deleteRegion(id, session.user.id);
+    const success = await deleteRegion(validated.id, session.user.id);
 
     if (!success) {
-      return { error: "Region not found or unauthorized" };
+      return createError(
+        "Region not found or unauthorized",
+        ActionErrorCode.NOT_FOUND
+      );
     }
 
     // Revalidate the goals page
     revalidatePath("/goals");
 
-    return { success: true };
+    return createSuccess({ deleted: true });
   } catch (error) {
-    console.error("Error deleting region:", error);
-    return { error: "Failed to delete region" };
+    console.error("[deleteRegionAction] Database error:", error);
+    return createError(
+      "Failed to delete region. Please try again.",
+      ActionErrorCode.DATABASE_ERROR
+    );
   }
 }
 
-export async function getRegionsAction(goalId?: string) {
+export async function getRegionsAction(
+  goalId?: string
+): Promise<ActionResponse<Region[]>> {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-      return { error: "Unauthorized", regions: [] };
+      return createError("Unauthorized", ActionErrorCode.UNAUTHORIZED);
     }
 
     const regions = await getRegionsForGoal(goalId, session.user.id);
-    return { regions };
+    return createSuccess(regions);
   } catch (error) {
-    console.error("Error fetching regions:", error);
-    return { error: "Failed to fetch regions", regions: [] };
+    console.error("[getRegionsAction] Database error:", error);
+    return createError(
+      "Failed to fetch regions. Please try again.",
+      ActionErrorCode.DATABASE_ERROR
+    );
   }
 }
 
-export async function getRegionAction(id: string) {
+export async function getRegionAction(
+  id: string
+): Promise<ActionResponse<Region>> {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-      return { error: "Unauthorized", region: null };
+      return createError("Unauthorized", ActionErrorCode.UNAUTHORIZED);
     }
 
     const region = await getRegionById(id, session.user.id);
 
     if (!region) {
-      return { error: "Region not found", region: null };
+      return createError("Region not found", ActionErrorCode.NOT_FOUND);
     }
 
-    return { region };
+    return createSuccess(region);
   } catch (error) {
-    console.error("Error fetching region:", error);
-    return { error: "Failed to fetch region", region: null };
+    console.error("[getRegionAction] Database error:", error);
+    return createError(
+      "Failed to fetch region. Please try again.",
+      ActionErrorCode.DATABASE_ERROR
+    );
   }
 }

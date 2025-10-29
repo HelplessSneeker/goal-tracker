@@ -1,6 +1,7 @@
 /**
  * @jest-environment node
  */
+/* eslint-disable @typescript-eslint/no-explicit-any -- Mock types in tests require any for flexibility */
 import { getServerSession } from "next-auth";
 import {
   createRegion,

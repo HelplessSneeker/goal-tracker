@@ -10,132 +10,180 @@ import {
   getGoalById,
 } from "@/lib/services/goals.service";
 import { revalidatePath } from "next/cache";
+import {
+  type ActionResponse,
+  ActionErrorCode,
+  createError,
+  createSuccess,
+  isActionError,
+} from "@/lib/action-types";
+import {
+  goalSchemas,
+  validateFormData,
+  extractFormData,
+} from "@/lib/validation";
+import type { Goal } from "@/generated/prisma";
 
-export async function createGoalAction(formData: FormData) {
+export async function createGoalAction(
+  formData: FormData
+): Promise<ActionResponse<Goal>> {
   try {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-      return { error: "Unauthorized" };
+      return createError("Unauthorized", ActionErrorCode.UNAUTHORIZED);
     }
 
     // Extract and validate data
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
+    const data = extractFormData(formData);
+    const validated = validateFormData(goalSchemas.create, data);
 
-    if (!title || title.trim() === "") {
-      return { error: "Title is required" };
+    if (isActionError(validated)) {
+      return validated;
     }
 
     // Create goal via service
     const goal = await createGoal(session.user.id, {
-      title: title.trim(),
-      description: description?.trim() || "",
+      title: validated.title,
+      description: validated.description,
     });
 
     // Revalidate the goals page to show the new goal
     revalidatePath("/goals");
 
-    return { success: true, goal };
+    return createSuccess(goal);
   } catch (error) {
-    console.error("Error creating goal:", error);
-    return { error: "Failed to create goal" };
+    console.error("[createGoalAction] Database error:", error);
+    return createError(
+      "Failed to create goal. Please try again.",
+      ActionErrorCode.DATABASE_ERROR
+    );
   }
 }
 
-export async function updateGoalAction(id: string, formData: FormData) {
+export async function updateGoalAction(
+  id: string,
+  formData: FormData
+): Promise<ActionResponse<Goal>> {
   try {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-      return { error: "Unauthorized" };
+      return createError("Unauthorized", ActionErrorCode.UNAUTHORIZED);
     }
 
-    // Extract and validate data
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
+    // Extract and validate data (including ID)
+    const data = { id, ...extractFormData(formData) };
+    const validated = validateFormData(goalSchemas.update, data);
 
-    if (!title || title.trim() === "") {
-      return { error: "Title is required" };
+    if (isActionError(validated)) {
+      return validated;
     }
 
     // Update goal via service (includes ownership check)
-    const goal = await updateGoal(id, session.user.id, {
-      title: title.trim(),
-      description: description?.trim() || "",
+    const goal = await updateGoal(validated.id, session.user.id, {
+      title: validated.title,
+      description: validated.description,
     });
 
     if (!goal) {
-      return { error: "Goal not found or unauthorized" };
+      return createError(
+        "Goal not found or unauthorized",
+        ActionErrorCode.NOT_FOUND
+      );
     }
 
     // Revalidate relevant pages
     revalidatePath("/goals");
     revalidatePath(`/goals/${id}`);
 
-    return { success: true, goal };
+    return createSuccess(goal);
   } catch (error) {
-    console.error("Error updating goal:", error);
-    return { error: "Failed to update goal" };
+    console.error("[updateGoalAction] Database error:", error);
+    return createError(
+      "Failed to update goal. Please try again.",
+      ActionErrorCode.DATABASE_ERROR
+    );
   }
 }
 
-export async function deleteGoalAction(id: string) {
+export async function deleteGoalAction(
+  id: string
+): Promise<ActionResponse<{ deleted: true }>> {
   try {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-      return { error: "Unauthorized" };
+      return createError("Unauthorized", ActionErrorCode.UNAUTHORIZED);
+    }
+
+    // Validate ID
+    const validated = validateFormData(goalSchemas.delete, { id });
+
+    if (isActionError(validated)) {
+      return validated;
     }
 
     // Delete goal via service (includes ownership check)
-    const success = await deleteGoal(id, session.user.id);
+    const success = await deleteGoal(validated.id, session.user.id);
 
     if (!success) {
-      return { error: "Goal not found or unauthorized" };
+      return createError(
+        "Goal not found or unauthorized",
+        ActionErrorCode.NOT_FOUND
+      );
     }
 
     // Revalidate the goals page
     revalidatePath("/goals");
 
-    return { success: true };
+    return createSuccess({ deleted: true });
   } catch (error) {
-    console.error("Error deleting goal:", error);
-    return { error: "Failed to delete goal" };
+    console.error("[deleteGoalAction] Database error:", error);
+    return createError(
+      "Failed to delete goal. Please try again.",
+      ActionErrorCode.DATABASE_ERROR
+    );
   }
 }
 
-export async function getGoalsAction() {
+export async function getGoalsAction(): Promise<ActionResponse<Goal[]>> {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-      return { error: "Unauthorized", goals: [] };
+      return createError("Unauthorized", ActionErrorCode.UNAUTHORIZED);
     }
 
     const goals = await getGoalsForUser(session.user.id);
-    return { goals };
+    return createSuccess(goals);
   } catch (error) {
-    console.error("Error fetching goals:", error);
-    return { error: "Failed to fetch goals", goals: [] };
+    console.error("[getGoalsAction] Database error:", error);
+    return createError(
+      "Failed to fetch goals. Please try again.",
+      ActionErrorCode.DATABASE_ERROR
+    );
   }
 }
 
-export async function getGoalAction(id: string) {
+export async function getGoalAction(id: string): Promise<ActionResponse<Goal>> {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-      return { error: "Unauthorized", goal: null };
+      return createError("Unauthorized", ActionErrorCode.UNAUTHORIZED);
     }
 
     const goal = await getGoalById(id, session.user.id);
 
     if (!goal) {
-      return { error: "Goal not found", goal: null };
+      return createError("Goal not found", ActionErrorCode.NOT_FOUND);
     }
 
-    return { goal };
+    return createSuccess(goal);
   } catch (error) {
-    console.error("Error fetching goal:", error);
-    return { error: "Failed to fetch goal", goal: null };
+    console.error("[getGoalAction] Database error:", error);
+    return createError(
+      "Failed to fetch goal. Please try again.",
+      ActionErrorCode.DATABASE_ERROR
+    );
   }
 }

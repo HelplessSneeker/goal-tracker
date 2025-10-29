@@ -12,15 +12,15 @@ export interface UpdateRegionInput {
 }
 
 /**
- * Get all regions for a specific goal (with ownership verification)
- * @param goalId - The goal's ID
+ * Get all regions for a specific goal or all user's regions (with ownership verification)
+ * @param goalId - Optional goal ID. If provided, filters regions by goal. If undefined, returns all user's regions.
  * @param userId - The user's ID (to verify goal ownership)
- * @returns Array of regions for the goal
+ * @returns Array of regions for the goal or all user's regions
  */
-export async function getRegionsForGoal(goalId: string, userId: string) {
+export async function getRegionsForGoal(goalId: string | undefined, userId: string) {
   return await prisma.region.findMany({
     where: {
-      goalId,
+      ...(goalId ? { goalId } : {}),
       goal: {
         userId,
       },

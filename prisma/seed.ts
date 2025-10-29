@@ -2,6 +2,7 @@ import { PrismaClient } from "../generated/prisma";
 
 const prisma = new PrismaClient();
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Seed function is called manually, not automatically
 async function main() {
   console.log("🌱 Starting database seed...");
 
@@ -73,7 +74,7 @@ async function main() {
     },
   });
 
-  const region5 = await prisma.region.create({
+  await prisma.region.create({
     data: {
       goalId: goal3.id,
       title: "Learn Generics",

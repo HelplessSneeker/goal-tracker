@@ -39,13 +39,13 @@ export default function EditRegionPage({
       try {
         const result = await getRegionAction(regionId);
 
-        if ("error" in result || !result.region) {
-          throw new Error(result.error || "Failed to fetch region");
+        if ("error" in result) {
+          throw new Error(result.error);
         }
 
         setRegionData({
-          title: result.region.title,
-          description: result.region.description,
+          title: result.data.title,
+          description: result.data.description || "",
         });
       } catch (err) {
         setError(err instanceof Error ? err.message : t("failedToLoad"));

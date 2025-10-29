@@ -4,7 +4,7 @@ import VerifyRequestPage from "./page";
 describe("VerifyRequestPage", () => {
   it("should render the verify request message", async () => {
     const component = await VerifyRequestPage();
-    const { container } = render(component);
+    render(component);
 
     expect(screen.getByText("Check your email")).toBeInTheDocument();
     expect(

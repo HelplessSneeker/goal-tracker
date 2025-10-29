@@ -4,19 +4,22 @@ import {
   Task as PrismaTask,
 } from "@/generated/prisma/client";
 
-// API response types - Prisma Date objects are serialized to ISO strings in JSON
-export type Goal = Omit<PrismaGoal, "createdAt" | "updatedAt"> & {
-  createdAt?: string;
-  updatedAt?: string;
+// API response types - Accepts both Prisma Date objects (server-side) and ISO strings (client-side after serialization)
+export type Goal = Omit<PrismaGoal, "createdAt" | "updatedAt" | "description"> & {
+  description: string | null;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 };
 
-export type Region = Omit<PrismaRegion, "createdAt" | "updatedAt"> & {
-  createdAt?: string;
-  updatedAt?: string;
+export type Region = Omit<PrismaRegion, "createdAt" | "updatedAt" | "description"> & {
+  description: string | null;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 };
 
-export type Task = Omit<PrismaTask, "createdAt" | "updatedAt" | "deadline"> & {
-  deadline: string; // ISO date string
-  createdAt: string; // ISO date string
-  updatedAt?: string;
+export type Task = Omit<PrismaTask, "createdAt" | "updatedAt" | "deadline" | "description"> & {
+  description: string | null;
+  deadline: string | Date;
+  createdAt: string | Date;
+  updatedAt?: string | Date;
 };

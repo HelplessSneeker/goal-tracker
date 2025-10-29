@@ -34,6 +34,7 @@ jest.mock("next/link", () => {
   }: {
     children: React.ReactNode;
     href: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required for Link component props spreading in tests
     [key: string]: any;
   }) {
     return React.createElement("a", { href, ...props }, children);
@@ -206,36 +207,36 @@ jest.mock("next-intl/server", () => ({
   getRequestConfig: async () => ({ locale: "en", messages: translationsMap }),
 }));
 
-// Mock Prisma client
+// Mock Prisma client with properly typed mock functions
 jest.mock("@/lib/prisma", () => ({
   __esModule: true,
   default: {
     goal: {
-      findMany: jest.fn(),
-      findUnique: jest.fn(),
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      count: jest.fn(),
+      findMany: jest.fn() as jest.Mock,
+      findUnique: jest.fn() as jest.Mock,
+      findFirst: jest.fn() as jest.Mock,
+      create: jest.fn() as jest.Mock,
+      update: jest.fn() as jest.Mock,
+      delete: jest.fn() as jest.Mock,
+      count: jest.fn() as jest.Mock,
     },
     region: {
-      findMany: jest.fn(),
-      findUnique: jest.fn(),
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      count: jest.fn(),
+      findMany: jest.fn() as jest.Mock,
+      findUnique: jest.fn() as jest.Mock,
+      findFirst: jest.fn() as jest.Mock,
+      create: jest.fn() as jest.Mock,
+      update: jest.fn() as jest.Mock,
+      delete: jest.fn() as jest.Mock,
+      count: jest.fn() as jest.Mock,
     },
     task: {
-      findMany: jest.fn(),
-      findUnique: jest.fn(),
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      count: jest.fn(),
+      findMany: jest.fn() as jest.Mock,
+      findUnique: jest.fn() as jest.Mock,
+      findFirst: jest.fn() as jest.Mock,
+      create: jest.fn() as jest.Mock,
+      update: jest.fn() as jest.Mock,
+      delete: jest.fn() as jest.Mock,
+      count: jest.fn() as jest.Mock,
     },
   },
 }));

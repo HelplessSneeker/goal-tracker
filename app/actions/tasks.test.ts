@@ -1,6 +1,8 @@
 /**
  * @jest-environment node
  */
+/* eslint-disable @typescript-eslint/no-explicit-any -- Mock types in tests require any for flexibility */
+/* eslint-disable @typescript-eslint/no-unused-vars -- Some mocks may be unused in certain test scenarios */
 import { getServerSession } from "next-auth";
 import {
   createTask,

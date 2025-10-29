@@ -37,13 +37,13 @@ export default function EditGoalPage({
       try {
         const result = await getGoalAction(id);
 
-        if ("error" in result || !result.goal) {
-          throw new Error(result.error || "Failed to fetch goal");
+        if ("error" in result) {
+          throw new Error(result.error);
         }
 
         setGoalData({
-          title: result.goal.title,
-          description: result.goal.description,
+          title: result.data.title,
+          description: result.data.description || "",
         });
       } catch (err) {
         setError(err instanceof Error ? err.message : t("failedToLoad"));

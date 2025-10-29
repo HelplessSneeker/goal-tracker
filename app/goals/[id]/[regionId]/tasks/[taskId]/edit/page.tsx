@@ -39,11 +39,11 @@ export default function EditTaskPage({
       try {
         const result = await getTaskAction(taskId);
 
-        if ("error" in result || !result.task) {
-          throw new Error(result.error || "Failed to fetch task");
+        if ("error" in result) {
+          throw new Error(result.error);
         }
 
-        setTaskData(result.task);
+        setTaskData(result.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : t("failedToLoad"));
       } finally {
@@ -94,7 +94,15 @@ export default function EditTaskPage({
         mode="edit"
         regionId={regionId}
         goalId={goalId}
-        initialData={taskData}
+        initialData={{
+          id: taskData.id,
+          regionId: taskData.regionId,
+          title: taskData.title,
+          description: taskData.description || "",
+          deadline: typeof taskData.deadline === 'string' ? taskData.deadline : taskData.deadline.toISOString(),
+          status: taskData.status === "incomplete" ? "active" : taskData.status,
+          createdAt: typeof taskData.createdAt === 'string' ? taskData.createdAt : taskData.createdAt.toISOString(),
+        }}
         taskId={taskId}
       />
     </div>

@@ -10,151 +10,194 @@ import {
   getTaskById,
 } from "@/lib/services/tasks.service";
 import { revalidatePath } from "next/cache";
+import {
+  type ActionResponse,
+  ActionErrorCode,
+  createError,
+  createSuccess,
+  isActionError,
+} from "@/lib/action-types";
+import {
+  taskSchemas,
+  validateFormData,
+  extractFormData,
+} from "@/lib/validation";
+import type { Task } from "@/generated/prisma";
 
-export async function createTaskAction(formData: FormData) {
+export async function createTaskAction(
+  formData: FormData
+): Promise<ActionResponse<Task>> {
   try {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-      return { error: "Unauthorized" };
+      return createError("Unauthorized", ActionErrorCode.UNAUTHORIZED);
     }
 
     // Extract and validate data
-    const regionId = formData.get("regionId") as string;
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
-    const deadline = formData.get("deadline") as string;
+    const data = extractFormData(formData);
+    const validated = validateFormData(taskSchemas.create, data);
 
-    if (!regionId || regionId.trim() === "") {
-      return { error: "Region ID is required" };
-    }
-
-    if (!title || title.trim() === "") {
-      return { error: "Title is required" };
-    }
-
-    if (!deadline || deadline.trim() === "") {
-      return { error: "Deadline is required" };
+    if (isActionError(validated)) {
+      return validated;
     }
 
     // Create task via service
     const task = await createTask(session.user.id, {
-      regionId: regionId.trim(),
-      title: title.trim(),
-      description: description?.trim() || "",
-      deadline: new Date(deadline),
+      regionId: validated.regionId,
+      title: validated.title,
+      description: validated.description,
+      deadline: validated.deadline,
     });
 
     if (!task) {
-      return { error: "Region not found or unauthorized" };
+      return createError(
+        "Region not found or unauthorized",
+        ActionErrorCode.NOT_FOUND
+      );
     }
 
     // Revalidate relevant pages to show the new task
     revalidatePath("/goals");
 
-    return { success: true, task };
+    return createSuccess(task);
   } catch (error) {
-    console.error("Error creating task:", error);
-    return { error: "Failed to create task" };
+    console.error("[createTaskAction] Database error:", error);
+    return createError(
+      "Failed to create task. Please try again.",
+      ActionErrorCode.DATABASE_ERROR
+    );
   }
 }
 
-export async function updateTaskAction(id: string, formData: FormData) {
+export async function updateTaskAction(
+  id: string,
+  formData: FormData
+): Promise<ActionResponse<Task>> {
   try {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-      return { error: "Unauthorized" };
+      return createError("Unauthorized", ActionErrorCode.UNAUTHORIZED);
     }
 
-    // Extract and validate data
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
-    const deadline = formData.get("deadline") as string;
-    const status = formData.get("status") as "active" | "completed";
+    // Extract and validate data (including ID)
+    const data = { id, ...extractFormData(formData) };
+    const validated = validateFormData(taskSchemas.update, data);
 
-    if (!title || title.trim() === "") {
-      return { error: "Title is required" };
+    if (isActionError(validated)) {
+      return validated;
     }
 
     // Update task via service (includes ownership check)
-    const task = await updateTask(id, session.user.id, {
-      title: title.trim(),
-      description: description?.trim() || "",
-      ...(deadline ? { deadline: new Date(deadline) } : {}),
-      ...(status ? { status } : {}),
+    const task = await updateTask(validated.id, session.user.id, {
+      title: validated.title,
+      description: validated.description,
+      deadline: validated.deadline,
+      status: validated.status,
     });
 
     if (!task) {
-      return { error: "Task not found or unauthorized" };
+      return createError(
+        "Task not found or unauthorized",
+        ActionErrorCode.NOT_FOUND
+      );
     }
 
     // Revalidate relevant pages
     revalidatePath("/goals");
 
-    return { success: true, task };
+    return createSuccess(task);
   } catch (error) {
-    console.error("Error updating task:", error);
-    return { error: "Failed to update task" };
+    console.error("[updateTaskAction] Database error:", error);
+    return createError(
+      "Failed to update task. Please try again.",
+      ActionErrorCode.DATABASE_ERROR
+    );
   }
 }
 
-export async function deleteTaskAction(id: string) {
+export async function deleteTaskAction(
+  id: string
+): Promise<ActionResponse<{ deleted: true }>> {
   try {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-      return { error: "Unauthorized" };
+      return createError("Unauthorized", ActionErrorCode.UNAUTHORIZED);
+    }
+
+    // Validate ID
+    const validated = validateFormData(taskSchemas.delete, { id });
+
+    if (isActionError(validated)) {
+      return validated;
     }
 
     // Delete task via service (includes ownership check)
-    const success = await deleteTask(id, session.user.id);
+    const success = await deleteTask(validated.id, session.user.id);
 
     if (!success) {
-      return { error: "Task not found or unauthorized" };
+      return createError(
+        "Task not found or unauthorized",
+        ActionErrorCode.NOT_FOUND
+      );
     }
 
     // Revalidate the goals page
     revalidatePath("/goals");
 
-    return { success: true };
+    return createSuccess({ deleted: true });
   } catch (error) {
-    console.error("Error deleting task:", error);
-    return { error: "Failed to delete task" };
+    console.error("[deleteTaskAction] Database error:", error);
+    return createError(
+      "Failed to delete task. Please try again.",
+      ActionErrorCode.DATABASE_ERROR
+    );
   }
 }
 
-export async function getTasksAction(regionId?: string) {
+export async function getTasksAction(
+  regionId?: string
+): Promise<ActionResponse<Task[]>> {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-      return { error: "Unauthorized", tasks: [] };
+      return createError("Unauthorized", ActionErrorCode.UNAUTHORIZED);
     }
 
     const tasks = await getTasksForRegion(regionId, session.user.id);
-    return { tasks };
+    return createSuccess(tasks);
   } catch (error) {
-    console.error("Error fetching tasks:", error);
-    return { error: "Failed to fetch tasks", tasks: [] };
+    console.error("[getTasksAction] Database error:", error);
+    return createError(
+      "Failed to fetch tasks. Please try again.",
+      ActionErrorCode.DATABASE_ERROR
+    );
   }
 }
 
-export async function getTaskAction(id: string) {
+export async function getTaskAction(
+  id: string
+): Promise<ActionResponse<Task>> {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-      return { error: "Unauthorized", task: null };
+      return createError("Unauthorized", ActionErrorCode.UNAUTHORIZED);
     }
 
     const task = await getTaskById(id, session.user.id);
 
     if (!task) {
-      return { error: "Task not found", task: null };
+      return createError("Task not found", ActionErrorCode.NOT_FOUND);
     }
 
-    return { task };
+    return createSuccess(task);
   } catch (error) {
-    console.error("Error fetching task:", error);
-    return { error: "Failed to fetch task", task: null };
+    console.error("[getTaskAction] Database error:", error);
+    return createError(
+      "Failed to fetch task. Please try again.",
+      ActionErrorCode.DATABASE_ERROR
+    );
   }
 }

@@ -11,7 +11,7 @@ export interface UpdateTaskInput {
   title?: string;
   description?: string;
   deadline?: Date;
-  status?: "active" | "completed";
+  status?: "active" | "incomplete" | "completed";
 }
 
 /**

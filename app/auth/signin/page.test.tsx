@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- Mock types in tests require any for flexibility */
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
