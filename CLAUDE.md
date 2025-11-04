@@ -27,7 +27,7 @@ Next.js 15 goal-tracking application using App Router, React 19, TypeScript, Tai
 
 **Architecture:** Migrated from API routes to **Server Actions + Service Layer** for improved type safety and performance.
 
-See [TODOs.md](./TODOs.md) for roadmap and [TESTING.md](./TESTING.md) for testing guide.
+See [TODOs.md](./TODOs.md) for roadmap, [BEST_PRACTICES.md](./BEST_PRACTICES.md) for coding standards, and [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) for common issues. Use `/tdd` skill for TDD workflow and testing patterns.
 
 ## Development Commands
 

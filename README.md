@@ -236,8 +236,10 @@ goal-tracker/
 ## Documentation
 
 - **[CLAUDE.md](./CLAUDE.md)** - Comprehensive project documentation and architecture
-- **[TESTING.md](./TESTING.md)** - Testing guide and best practices
+- **[BEST_PRACTICES.md](./BEST_PRACTICES.md)** - Coding standards, patterns, and conventions
+- **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** - Common issues and solutions
 - **[TODOs.md](./TODOs.md)** - Implementation roadmap
+- **`/tdd` skill** - Test-Driven Development workflow and patterns (use in Claude Code)
 
 ## Database Schema
 
