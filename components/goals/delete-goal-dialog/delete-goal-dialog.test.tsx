@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { DeleteGoalDialog } from "./delete-goal-dialog";
 import { mockRouterPush, mockRouterRefresh } from "@/jest.setup";
 import * as goalsActions from "@/app/actions/goals";
+import { ActionErrorCode } from "@/lib/action-types";
 
 // Get the mocked action
 const mockDeleteGoalAction = goalsActions.deleteGoalAction as jest.MockedFunction<
@@ -74,7 +75,7 @@ describe("DeleteGoalDialog", () => {
   it("calls deleteGoalAction when confirmed", async () => {
     const user = userEvent.setup();
 
-    mockDeleteGoalAction.mockResolvedValueOnce({ success: true });
+    mockDeleteGoalAction.mockResolvedValueOnce({ success: true, data: { deleted: true } });
 
     render(<DeleteGoalDialog {...defaultProps} />);
 
@@ -92,7 +93,7 @@ describe("DeleteGoalDialog", () => {
   it("navigates to goals page after successful deletion", async () => {
     const user = userEvent.setup();
 
-    mockDeleteGoalAction.mockResolvedValueOnce({ success: true });
+    mockDeleteGoalAction.mockResolvedValueOnce({ success: true, data: { deleted: true } });
 
     render(<DeleteGoalDialog {...defaultProps} />);
 
@@ -110,7 +111,7 @@ describe("DeleteGoalDialog", () => {
   it("displays error message on failure", async () => {
     const user = userEvent.setup();
 
-    mockDeleteGoalAction.mockResolvedValueOnce({ error: "Failed to delete goal" });
+    mockDeleteGoalAction.mockResolvedValueOnce({ error: "Failed to delete goal", code: ActionErrorCode.DATABASE_ERROR });
 
     render(<DeleteGoalDialog {...defaultProps} />);
 
@@ -130,7 +131,7 @@ describe("DeleteGoalDialog", () => {
     mockDeleteGoalAction.mockImplementation(
       () =>
         new Promise((resolve) =>
-          setTimeout(() => resolve({ success: true }), 100),
+          setTimeout(() => resolve({ success: true, data: { deleted: true } }), 100),
         ),
     );
 
@@ -150,7 +151,7 @@ describe("DeleteGoalDialog", () => {
     mockDeleteGoalAction.mockImplementation(
       () =>
         new Promise((resolve) =>
-          setTimeout(() => resolve({ success: true }), 100),
+          setTimeout(() => resolve({ success: true, data: { deleted: true } }), 100),
         ),
     );
 

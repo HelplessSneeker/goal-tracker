@@ -7,6 +7,7 @@ describe("GoalCard", () => {
     id: "1",
     title: "Learn Next.js",
     description: "Master the Next.js framework",
+    userId: "user-1",
   };
 
   const mockRegions: Region[] = [

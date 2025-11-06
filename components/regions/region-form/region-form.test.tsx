@@ -38,7 +38,7 @@ describe("RegionForm", () => {
 
       mockCreateRegionAction.mockResolvedValueOnce({
         success: true,
-        region: {
+        data: {
           id: "region-1",
           goalId: "goal-123",
           title: "New Region",
@@ -66,7 +66,7 @@ describe("RegionForm", () => {
 
       mockCreateRegionAction.mockResolvedValueOnce({
         success: true,
-        region: {
+        data: {
           id: "region-1",
           goalId,
           title: "Region",
@@ -125,7 +125,7 @@ describe("RegionForm", () => {
 
       mockUpdateRegionAction.mockResolvedValueOnce({
         success: true,
-        region: {
+        data: {
           id: regionId,
           goalId,
           title: "Updated Region",
@@ -166,7 +166,7 @@ describe("RegionForm", () => {
 
       mockUpdateRegionAction.mockResolvedValueOnce({
         success: true,
-        region: {
+        data: {
           id: regionId,
           goalId,
           title: "Updated",

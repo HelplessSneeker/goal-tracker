@@ -12,6 +12,13 @@ import prisma from "@/lib/prisma";
 
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 
+// Type assertions for mock methods
+const mockGoalFindMany = mockPrisma.goal.findMany as unknown as jest.Mock;
+const mockGoalFindFirst = mockPrisma.goal.findFirst as unknown as jest.Mock;
+const mockGoalCreate = mockPrisma.goal.create as unknown as jest.Mock;
+const mockGoalUpdate = mockPrisma.goal.update as unknown as jest.Mock;
+const mockGoalDelete = mockPrisma.goal.delete as unknown as jest.Mock;
+
 describe("GoalsService", () => {
   const mockUserId = "clxyz123456789";
   const mockOtherUserId = "clxyz987654321";
@@ -41,20 +48,20 @@ describe("GoalsService", () => {
         },
       ];
 
-      mockPrisma.goal.findMany.mockResolvedValue(mockGoals);
+      mockGoalFindMany.mockResolvedValue(mockGoals);
 
       const result = await getGoalsForUser(mockUserId);
 
       expect(result).toHaveLength(2);
       expect(result).toEqual(mockGoals);
-      expect(mockPrisma.goal.findMany).toHaveBeenCalledWith({
+      expect(mockGoalFindMany).toHaveBeenCalledWith({
         where: { userId: mockUserId },
         orderBy: { createdAt: "desc" },
       });
     });
 
     it("should return empty array when user has no goals", async () => {
-      mockPrisma.goal.findMany.mockResolvedValue([]);
+      mockGoalFindMany.mockResolvedValue([]);
 
       const result = await getGoalsForUser(mockUserId);
 
@@ -74,12 +81,12 @@ describe("GoalsService", () => {
         },
       ];
 
-      mockPrisma.goal.findMany.mockResolvedValue(mockGoals);
+      mockGoalFindMany.mockResolvedValue(mockGoals);
 
       const result = await getGoalsForUser(mockUserId);
 
       expect(result.every((goal) => goal.userId === mockUserId)).toBe(true);
-      expect(mockPrisma.goal.findMany).toHaveBeenCalledWith({
+      expect(mockGoalFindMany).toHaveBeenCalledWith({
         where: { userId: mockUserId },
         orderBy: { createdAt: "desc" },
       });
@@ -97,12 +104,12 @@ describe("GoalsService", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.goal.findFirst.mockResolvedValue(mockGoal);
+      mockGoalFindFirst.mockResolvedValue(mockGoal);
 
       const result = await getGoalById("goal-1", mockUserId);
 
       expect(result).toEqual(mockGoal);
-      expect(mockPrisma.goal.findFirst).toHaveBeenCalledWith({
+      expect(mockGoalFindFirst).toHaveBeenCalledWith({
         where: {
           id: "goal-1",
           userId: mockUserId,
@@ -111,7 +118,7 @@ describe("GoalsService", () => {
     });
 
     it("should return null when goal does not exist", async () => {
-      mockPrisma.goal.findFirst.mockResolvedValue(null);
+      mockGoalFindFirst.mockResolvedValue(null);
 
       const result = await getGoalById("nonexistent", mockUserId);
 
@@ -119,12 +126,12 @@ describe("GoalsService", () => {
     });
 
     it("should return null when goal exists but user does not own it", async () => {
-      mockPrisma.goal.findFirst.mockResolvedValue(null);
+      mockGoalFindFirst.mockResolvedValue(null);
 
       const result = await getGoalById("goal-1", mockOtherUserId);
 
       expect(result).toBeNull();
-      expect(mockPrisma.goal.findFirst).toHaveBeenCalledWith({
+      expect(mockGoalFindFirst).toHaveBeenCalledWith({
         where: {
           id: "goal-1",
           userId: mockOtherUserId,
@@ -148,12 +155,12 @@ describe("GoalsService", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.goal.create.mockResolvedValue(createdGoal);
+      mockGoalCreate.mockResolvedValue(createdGoal);
 
       const result = await createGoal(mockUserId, goalData);
 
       expect(result).toEqual(createdGoal);
-      expect(mockPrisma.goal.create).toHaveBeenCalledWith({
+      expect(mockGoalCreate).toHaveBeenCalledWith({
         data: {
           title: goalData.title,
           description: goalData.description,
@@ -176,7 +183,7 @@ describe("GoalsService", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.goal.create.mockResolvedValue(createdGoal);
+      mockGoalCreate.mockResolvedValue(createdGoal);
 
       const result = await createGoal(mockUserId, goalData);
 
@@ -199,7 +206,7 @@ describe("GoalsService", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.goal.create.mockResolvedValue(createdGoal);
+      mockGoalCreate.mockResolvedValue(createdGoal);
 
       const result = await createGoal(mockUserId, goalData);
 
@@ -229,44 +236,44 @@ describe("GoalsService", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.goal.findFirst.mockResolvedValue(existingGoal);
-      mockPrisma.goal.update.mockResolvedValue(updatedGoal);
+      mockGoalFindFirst.mockResolvedValue(existingGoal);
+      mockGoalUpdate.mockResolvedValue(updatedGoal);
 
       const result = await updateGoal("goal-1", mockUserId, updates);
 
       expect(result).toEqual(updatedGoal);
-      expect(mockPrisma.goal.findFirst).toHaveBeenCalledWith({
+      expect(mockGoalFindFirst).toHaveBeenCalledWith({
         where: {
           id: "goal-1",
           userId: mockUserId,
         },
       });
-      expect(mockPrisma.goal.update).toHaveBeenCalledWith({
+      expect(mockGoalUpdate).toHaveBeenCalledWith({
         where: { id: "goal-1" },
         data: updates,
       });
     });
 
     it("should return null when goal does not exist", async () => {
-      mockPrisma.goal.findFirst.mockResolvedValue(null);
+      mockGoalFindFirst.mockResolvedValue(null);
 
       const result = await updateGoal("nonexistent", mockUserId, {
         title: "Updated",
       });
 
       expect(result).toBeNull();
-      expect(mockPrisma.goal.update).not.toHaveBeenCalled();
+      expect(mockGoalUpdate).not.toHaveBeenCalled();
     });
 
     it("should return null when user does not own the goal", async () => {
-      mockPrisma.goal.findFirst.mockResolvedValue(null);
+      mockGoalFindFirst.mockResolvedValue(null);
 
       const result = await updateGoal("goal-1", mockOtherUserId, {
         title: "Updated",
       });
 
       expect(result).toBeNull();
-      expect(mockPrisma.goal.update).not.toHaveBeenCalled();
+      expect(mockGoalUpdate).not.toHaveBeenCalled();
     });
 
     it("should allow partial updates", async () => {
@@ -285,8 +292,8 @@ describe("GoalsService", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.goal.findFirst.mockResolvedValue(existingGoal);
-      mockPrisma.goal.update.mockResolvedValue(updatedGoal);
+      mockGoalFindFirst.mockResolvedValue(existingGoal);
+      mockGoalUpdate.mockResolvedValue(updatedGoal);
 
       const result = await updateGoal("goal-1", mockUserId, {
         title: "New Title",
@@ -308,39 +315,39 @@ describe("GoalsService", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.goal.findFirst.mockResolvedValue(existingGoal);
-      mockPrisma.goal.delete.mockResolvedValue(existingGoal);
+      mockGoalFindFirst.mockResolvedValue(existingGoal);
+      mockGoalDelete.mockResolvedValue(existingGoal);
 
       const result = await deleteGoal("goal-1", mockUserId);
 
       expect(result).toBe(true);
-      expect(mockPrisma.goal.findFirst).toHaveBeenCalledWith({
+      expect(mockGoalFindFirst).toHaveBeenCalledWith({
         where: {
           id: "goal-1",
           userId: mockUserId,
         },
       });
-      expect(mockPrisma.goal.delete).toHaveBeenCalledWith({
+      expect(mockGoalDelete).toHaveBeenCalledWith({
         where: { id: "goal-1" },
       });
     });
 
     it("should return false when goal does not exist", async () => {
-      mockPrisma.goal.findFirst.mockResolvedValue(null);
+      mockGoalFindFirst.mockResolvedValue(null);
 
       const result = await deleteGoal("nonexistent", mockUserId);
 
       expect(result).toBe(false);
-      expect(mockPrisma.goal.delete).not.toHaveBeenCalled();
+      expect(mockGoalDelete).not.toHaveBeenCalled();
     });
 
     it("should return false when user does not own the goal", async () => {
-      mockPrisma.goal.findFirst.mockResolvedValue(null);
+      mockGoalFindFirst.mockResolvedValue(null);
 
       const result = await deleteGoal("goal-1", mockOtherUserId);
 
       expect(result).toBe(false);
-      expect(mockPrisma.goal.delete).not.toHaveBeenCalled();
+      expect(mockGoalDelete).not.toHaveBeenCalled();
     });
   });
 });

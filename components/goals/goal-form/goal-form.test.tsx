@@ -7,6 +7,7 @@ import {
   mockRouterBack,
 } from "@/jest.setup";
 import * as goalsActions from "@/app/actions/goals";
+import { ActionErrorCode } from "@/lib/action-types";
 
 // Get the mocked actions
 const mockCreateGoalAction = goalsActions.createGoalAction as jest.MockedFunction<
@@ -53,7 +54,7 @@ describe("GoalForm", () => {
 
       mockCreateGoalAction.mockResolvedValueOnce({
         success: true,
-        goal: {
+        data: {
           id: "123",
           title: "New Goal",
           description: "New Description",
@@ -79,7 +80,7 @@ describe("GoalForm", () => {
 
       mockCreateGoalAction.mockResolvedValueOnce({
         success: true,
-        goal: {
+        data: {
           id: "123",
           title: "New Goal",
           description: "Desc",
@@ -106,6 +107,7 @@ describe("GoalForm", () => {
 
       mockCreateGoalAction.mockResolvedValueOnce({
         error: "Failed to create goal",
+        code: ActionErrorCode.DATABASE_ERROR,
       });
 
       render(<GoalForm mode="create" />);
@@ -129,7 +131,7 @@ describe("GoalForm", () => {
               () =>
                 resolve({
                   success: true,
-                  goal: {
+                  data: {
                     id: "123",
                     title: "Goal",
                     description: "Desc",
@@ -169,7 +171,7 @@ describe("GoalForm", () => {
 
       mockCreateGoalAction.mockResolvedValueOnce({
         success: true,
-        goal: {
+        data: {
           id: "123",
           title: "Goal",
           description: "Desc",
@@ -237,7 +239,7 @@ describe("GoalForm", () => {
 
       mockUpdateGoalAction.mockResolvedValueOnce({
         success: true,
-        goal: {
+        data: {
           id: "123",
           title: "Updated Goal",
           description: "Updated Description",
@@ -271,7 +273,7 @@ describe("GoalForm", () => {
 
       mockUpdateGoalAction.mockResolvedValueOnce({
         success: true,
-        goal: {
+        data: {
           id: "123",
           title: "Updated",
           description: "Desc",
@@ -296,6 +298,7 @@ describe("GoalForm", () => {
 
       mockUpdateGoalAction.mockResolvedValueOnce({
         error: "Failed to update goal",
+        code: ActionErrorCode.DATABASE_ERROR,
       });
 
       render(<GoalForm mode="edit" initialData={initialData} goalId="123" />);
@@ -317,7 +320,7 @@ describe("GoalForm", () => {
               () =>
                 resolve({
                   success: true,
-                  goal: {
+                  data: {
                     id: "123",
                     title: "Updated",
                     description: "Desc",

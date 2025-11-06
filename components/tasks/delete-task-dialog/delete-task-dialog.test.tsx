@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { DeleteTaskDialog } from "./delete-task-dialog";
 import { mockRouterPush, mockRouterRefresh } from "@/jest.setup";
 import { deleteTaskAction } from "@/app/actions/tasks";
+import { ActionErrorCode } from "@/lib/action-types";
 
 jest.mock("@/app/actions/tasks");
 
@@ -67,7 +68,7 @@ describe("DeleteTaskDialog", () => {
   it("calls deleteTaskAction when confirmed", async () => {
     const user = userEvent.setup();
 
-    mockDeleteTaskAction.mockResolvedValueOnce({ success: true });
+    mockDeleteTaskAction.mockResolvedValueOnce({ success: true, data: { deleted: true } });
 
     render(<DeleteTaskDialog {...defaultProps} />);
 
@@ -85,7 +86,7 @@ describe("DeleteTaskDialog", () => {
   it("navigates to region detail page after successful deletion", async () => {
     const user = userEvent.setup();
 
-    mockDeleteTaskAction.mockResolvedValueOnce({ success: true });
+    mockDeleteTaskAction.mockResolvedValueOnce({ success: true, data: { deleted: true } });
 
     render(<DeleteTaskDialog {...defaultProps} />);
 
@@ -105,7 +106,7 @@ describe("DeleteTaskDialog", () => {
   it("displays error message on action failure", async () => {
     const user = userEvent.setup();
 
-    mockDeleteTaskAction.mockResolvedValueOnce({ error: "Failed to delete task" });
+    mockDeleteTaskAction.mockResolvedValueOnce({ error: "Failed to delete task", code: ActionErrorCode.DATABASE_ERROR });
 
     render(<DeleteTaskDialog {...defaultProps} />);
 
@@ -126,7 +127,7 @@ describe("DeleteTaskDialog", () => {
     mockDeleteTaskAction.mockImplementation(
       () =>
         new Promise((resolve) =>
-          setTimeout(() => resolve({ success: true }), 100),
+          setTimeout(() => resolve({ success: true, data: { deleted: true } }), 100),
         ),
     );
 

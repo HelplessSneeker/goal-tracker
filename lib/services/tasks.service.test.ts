@@ -12,6 +12,14 @@ import prisma from "@/lib/prisma";
 
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 
+// Type assertions for mock methods
+const mockTaskFindMany = mockPrisma.task.findMany as unknown as jest.Mock;
+const mockTaskFindFirst = mockPrisma.task.findFirst as unknown as jest.Mock;
+const mockTaskCreate = mockPrisma.task.create as unknown as jest.Mock;
+const mockTaskUpdate = mockPrisma.task.update as unknown as jest.Mock;
+const mockTaskDelete = mockPrisma.task.delete as unknown as jest.Mock;
+const mockRegionFindFirst = mockPrisma.region.findFirst as unknown as jest.Mock;
+
 describe("TasksService", () => {
   const mockUserId = "clxyz123456789";
   const mockOtherUserId = "clxyz987654321";
@@ -49,13 +57,13 @@ describe("TasksService", () => {
         },
       ];
 
-      mockPrisma.task.findMany.mockResolvedValue(mockTasks);
+      mockTaskFindMany.mockResolvedValue(mockTasks);
 
       const result = await getTasksForRegion(mockRegionId, mockUserId);
 
       expect(result).toHaveLength(2);
       expect(result).toEqual(mockTasks);
-      expect(mockPrisma.task.findMany).toHaveBeenCalledWith({
+      expect(mockTaskFindMany).toHaveBeenCalledWith({
         where: {
           regionId: mockRegionId,
           region: {
@@ -67,7 +75,7 @@ describe("TasksService", () => {
     });
 
     it("should return empty array when region has no tasks", async () => {
-      mockPrisma.task.findMany.mockResolvedValue([]);
+      mockTaskFindMany.mockResolvedValue([]);
 
       const result = await getTasksForRegion(mockRegionId, mockUserId);
 
@@ -76,11 +84,11 @@ describe("TasksService", () => {
     });
 
     it("should verify goal ownership through region when fetching tasks", async () => {
-      mockPrisma.task.findMany.mockResolvedValue([]);
+      mockTaskFindMany.mockResolvedValue([]);
 
       await getTasksForRegion(mockRegionId, mockUserId);
 
-      expect(mockPrisma.task.findMany).toHaveBeenCalledWith({
+      expect(mockTaskFindMany).toHaveBeenCalledWith({
         where: {
           regionId: mockRegionId,
           region: {
@@ -106,12 +114,12 @@ describe("TasksService", () => {
         },
       ];
 
-      mockPrisma.task.findMany.mockResolvedValue(mockTasks);
+      mockTaskFindMany.mockResolvedValue(mockTasks);
 
       const result = await getTasksForRegion(undefined, mockUserId);
 
       expect(result).toEqual(mockTasks);
-      expect(mockPrisma.task.findMany).toHaveBeenCalledWith({
+      expect(mockTaskFindMany).toHaveBeenCalledWith({
         where: {
           region: {
             goal: { userId: mockUserId },
@@ -136,12 +144,12 @@ describe("TasksService", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.task.findFirst.mockResolvedValue(mockTask);
+      mockTaskFindFirst.mockResolvedValue(mockTask);
 
       const result = await getTaskById("task-1", mockUserId);
 
       expect(result).toEqual(mockTask);
-      expect(mockPrisma.task.findFirst).toHaveBeenCalledWith({
+      expect(mockTaskFindFirst).toHaveBeenCalledWith({
         where: {
           id: "task-1",
           region: {
@@ -152,7 +160,7 @@ describe("TasksService", () => {
     });
 
     it("should return null when task does not exist", async () => {
-      mockPrisma.task.findFirst.mockResolvedValue(null);
+      mockTaskFindFirst.mockResolvedValue(null);
 
       const result = await getTaskById("nonexistent", mockUserId);
 
@@ -160,12 +168,12 @@ describe("TasksService", () => {
     });
 
     it("should return null when user does not own the goal", async () => {
-      mockPrisma.task.findFirst.mockResolvedValue(null);
+      mockTaskFindFirst.mockResolvedValue(null);
 
       const result = await getTaskById("task-1", mockOtherUserId);
 
       expect(result).toBeNull();
-      expect(mockPrisma.task.findFirst).toHaveBeenCalledWith({
+      expect(mockTaskFindFirst).toHaveBeenCalledWith({
         where: {
           id: "task-1",
           region: {
@@ -195,7 +203,7 @@ describe("TasksService", () => {
       };
 
       // Mock region ownership check
-      mockPrisma.region.findFirst.mockResolvedValue({
+      mockRegionFindFirst.mockResolvedValue({
         id: mockRegionId,
         title: "Region",
         description: "Desc",
@@ -204,18 +212,18 @@ describe("TasksService", () => {
         updatedAt: new Date(),
       });
 
-      mockPrisma.task.create.mockResolvedValue(createdTask);
+      mockTaskCreate.mockResolvedValue(createdTask);
 
       const result = await createTask(mockUserId, taskData);
 
       expect(result).toEqual(createdTask);
-      expect(mockPrisma.region.findFirst).toHaveBeenCalledWith({
+      expect(mockRegionFindFirst).toHaveBeenCalledWith({
         where: {
           id: mockRegionId,
           goal: { userId: mockUserId },
         },
       });
-      expect(mockPrisma.task.create).toHaveBeenCalledWith({
+      expect(mockTaskCreate).toHaveBeenCalledWith({
         data: {
           ...taskData,
           status: "active",
@@ -231,12 +239,12 @@ describe("TasksService", () => {
         deadline: new Date("2025-12-31"),
       };
 
-      mockPrisma.region.findFirst.mockResolvedValue(null);
+      mockRegionFindFirst.mockResolvedValue(null);
 
       const result = await createTask(mockOtherUserId, taskData);
 
       expect(result).toBeNull();
-      expect(mockPrisma.task.create).not.toHaveBeenCalled();
+      expect(mockTaskCreate).not.toHaveBeenCalled();
     });
   });
 
@@ -267,13 +275,13 @@ describe("TasksService", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.task.findFirst.mockResolvedValue(existingTask);
-      mockPrisma.task.update.mockResolvedValue(updatedTask);
+      mockTaskFindFirst.mockResolvedValue(existingTask);
+      mockTaskUpdate.mockResolvedValue(updatedTask);
 
       const result = await updateTask("task-1", mockUserId, updates);
 
       expect(result).toEqual(updatedTask);
-      expect(mockPrisma.task.findFirst).toHaveBeenCalledWith({
+      expect(mockTaskFindFirst).toHaveBeenCalledWith({
         where: {
           id: "task-1",
           region: {
@@ -281,32 +289,32 @@ describe("TasksService", () => {
           },
         },
       });
-      expect(mockPrisma.task.update).toHaveBeenCalledWith({
+      expect(mockTaskUpdate).toHaveBeenCalledWith({
         where: { id: "task-1" },
         data: updates,
       });
     });
 
     it("should return null when task does not exist", async () => {
-      mockPrisma.task.findFirst.mockResolvedValue(null);
+      mockTaskFindFirst.mockResolvedValue(null);
 
       const result = await updateTask("nonexistent", mockUserId, {
         title: "Updated",
       });
 
       expect(result).toBeNull();
-      expect(mockPrisma.task.update).not.toHaveBeenCalled();
+      expect(mockTaskUpdate).not.toHaveBeenCalled();
     });
 
     it("should return null when user does not own the goal", async () => {
-      mockPrisma.task.findFirst.mockResolvedValue(null);
+      mockTaskFindFirst.mockResolvedValue(null);
 
       const result = await updateTask("task-1", mockOtherUserId, {
         title: "Updated",
       });
 
       expect(result).toBeNull();
-      expect(mockPrisma.task.update).not.toHaveBeenCalled();
+      expect(mockTaskUpdate).not.toHaveBeenCalled();
     });
 
     it("should allow partial updates", async () => {
@@ -328,8 +336,8 @@ describe("TasksService", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.task.findFirst.mockResolvedValue(existingTask);
-      mockPrisma.task.update.mockResolvedValue(updatedTask);
+      mockTaskFindFirst.mockResolvedValue(existingTask);
+      mockTaskUpdate.mockResolvedValue(updatedTask);
 
       const result = await updateTask("task-1", mockUserId, {
         title: "New Title",
@@ -354,13 +362,13 @@ describe("TasksService", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.task.findFirst.mockResolvedValue(existingTask);
-      mockPrisma.task.delete.mockResolvedValue(existingTask);
+      mockTaskFindFirst.mockResolvedValue(existingTask);
+      mockTaskDelete.mockResolvedValue(existingTask);
 
       const result = await deleteTask("task-1", mockUserId);
 
       expect(result).toBe(true);
-      expect(mockPrisma.task.findFirst).toHaveBeenCalledWith({
+      expect(mockTaskFindFirst).toHaveBeenCalledWith({
         where: {
           id: "task-1",
           region: {
@@ -368,27 +376,27 @@ describe("TasksService", () => {
           },
         },
       });
-      expect(mockPrisma.task.delete).toHaveBeenCalledWith({
+      expect(mockTaskDelete).toHaveBeenCalledWith({
         where: { id: "task-1" },
       });
     });
 
     it("should return false when task does not exist", async () => {
-      mockPrisma.task.findFirst.mockResolvedValue(null);
+      mockTaskFindFirst.mockResolvedValue(null);
 
       const result = await deleteTask("nonexistent", mockUserId);
 
       expect(result).toBe(false);
-      expect(mockPrisma.task.delete).not.toHaveBeenCalled();
+      expect(mockTaskDelete).not.toHaveBeenCalled();
     });
 
     it("should return false when user does not own the goal", async () => {
-      mockPrisma.task.findFirst.mockResolvedValue(null);
+      mockTaskFindFirst.mockResolvedValue(null);
 
       const result = await deleteTask("task-1", mockOtherUserId);
 
       expect(result).toBe(false);
-      expect(mockPrisma.task.delete).not.toHaveBeenCalled();
+      expect(mockTaskDelete).not.toHaveBeenCalled();
     });
   });
 });

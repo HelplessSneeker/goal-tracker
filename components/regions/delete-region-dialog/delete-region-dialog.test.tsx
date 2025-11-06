@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { DeleteRegionDialog } from "./delete-region-dialog";
 import { mockRouterPush, mockRouterRefresh } from "@/jest.setup";
 import { deleteRegionAction } from "@/app/actions/regions";
+import { ActionErrorCode } from "@/lib/action-types";
 
 jest.mock("@/app/actions/regions");
 
@@ -69,7 +70,7 @@ describe("DeleteRegionDialog", () => {
   it("calls deleteRegionAction when confirmed", async () => {
     const user = userEvent.setup();
 
-    mockDeleteRegionAction.mockResolvedValueOnce({ success: true });
+    mockDeleteRegionAction.mockResolvedValueOnce({ success: true, data: { deleted: true } });
 
     render(<DeleteRegionDialog {...defaultProps} />);
 
@@ -87,7 +88,7 @@ describe("DeleteRegionDialog", () => {
   it("navigates to goal detail page after successful deletion", async () => {
     const user = userEvent.setup();
 
-    mockDeleteRegionAction.mockResolvedValueOnce({ success: true });
+    mockDeleteRegionAction.mockResolvedValueOnce({ success: true, data: { deleted: true } });
 
     render(<DeleteRegionDialog {...defaultProps} />);
 
@@ -105,7 +106,7 @@ describe("DeleteRegionDialog", () => {
   it("displays error message on action failure", async () => {
     const user = userEvent.setup();
 
-    mockDeleteRegionAction.mockResolvedValueOnce({ error: "Failed to delete region" });
+    mockDeleteRegionAction.mockResolvedValueOnce({ error: "Failed to delete region", code: ActionErrorCode.DATABASE_ERROR });
 
     render(<DeleteRegionDialog {...defaultProps} />);
 

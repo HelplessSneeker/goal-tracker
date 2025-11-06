@@ -7,6 +7,7 @@ import {
   mockRouterBack,
 } from "@/jest.setup";
 import { createTaskAction, updateTaskAction } from "@/app/actions/tasks";
+import { ActionErrorCode } from "@/lib/action-types";
 
 jest.mock("@/app/actions/tasks");
 
@@ -43,14 +44,13 @@ describe("TaskForm", () => {
 
       mockCreateTaskAction.mockResolvedValueOnce({
         success: true,
-        task: {
+        data: {
           id: "123",
           regionId: "region-1",
           title: "New Task",
           description: "Test Description",
           deadline: new Date("2025-12-01"),
           status: "active",
-          userId: "user-1",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -97,14 +97,13 @@ describe("TaskForm", () => {
 
       mockCreateTaskAction.mockResolvedValueOnce({
         success: true,
-        task: {
+        data: {
           id: "1",
           title: "Test",
           regionId: "region-1",
           description: "",
           deadline: new Date(),
           status: "active",
-          userId: "user-1",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -127,14 +126,13 @@ describe("TaskForm", () => {
 
       mockCreateTaskAction.mockResolvedValueOnce({
         success: true,
-        task: {
+        data: {
           id: "1",
           regionId: "region-1",
           title: "Task",
           description: "Desc",
           deadline: new Date(),
           status: "active",
-          userId: "user-1",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -157,6 +155,7 @@ describe("TaskForm", () => {
 
       mockCreateTaskAction.mockResolvedValueOnce({
         error: "Failed to create task",
+        code: ActionErrorCode.DATABASE_ERROR,
       });
 
       render(<TaskForm mode="create" regionId="region-1" />);
@@ -181,14 +180,13 @@ describe("TaskForm", () => {
               () =>
                 resolve({
                   success: true,
-                  task: {
+                  data: {
                     id: "1",
                     regionId: "region-1",
                     title: "Task",
                     description: "Desc",
                     deadline: new Date(),
                     status: "active",
-                    userId: "user-1",
                     createdAt: new Date(),
                     updatedAt: new Date(),
                   },
@@ -282,11 +280,14 @@ describe("TaskForm", () => {
 
       mockUpdateTaskAction.mockResolvedValueOnce({
         success: true,
-        task: {
-          ...initialData,
+        data: {
+          id: initialData.id,
+          regionId: initialData.regionId,
           title: "Updated Task",
+          description: initialData.description,
           deadline: new Date(initialData.deadline),
-          userId: "user-1",
+          status: initialData.status,
+          createdAt: new Date(initialData.createdAt),
           updatedAt: new Date(),
         },
       });
@@ -319,10 +320,14 @@ describe("TaskForm", () => {
 
       mockUpdateTaskAction.mockResolvedValueOnce({
         success: true,
-        task: {
-          ...initialData,
+        data: {
+          id: initialData.id,
+          regionId: initialData.regionId,
+          title: initialData.title,
+          description: initialData.description,
           deadline: new Date(initialData.deadline),
-          userId: "user-1",
+          status: initialData.status,
+          createdAt: new Date(initialData.createdAt),
           updatedAt: new Date(),
         },
       });
@@ -348,10 +353,14 @@ describe("TaskForm", () => {
 
       mockUpdateTaskAction.mockResolvedValueOnce({
         success: true,
-        task: {
-          ...initialData,
+        data: {
+          id: initialData.id,
+          regionId: initialData.regionId,
+          title: initialData.title,
+          description: initialData.description,
           deadline: new Date(initialData.deadline),
-          userId: "user-1",
+          status: initialData.status,
+          createdAt: new Date(initialData.createdAt),
           updatedAt: new Date(),
         },
       });

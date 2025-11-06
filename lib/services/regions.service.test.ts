@@ -12,6 +12,14 @@ import prisma from "@/lib/prisma";
 
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 
+// Type assertions for mock methods
+const mockRegionFindMany = mockPrisma.region.findMany as unknown as jest.Mock;
+const mockRegionFindFirst = mockPrisma.region.findFirst as unknown as jest.Mock;
+const mockRegionCreate = mockPrisma.region.create as unknown as jest.Mock;
+const mockRegionUpdate = mockPrisma.region.update as unknown as jest.Mock;
+const mockRegionDelete = mockPrisma.region.delete as unknown as jest.Mock;
+const mockGoalFindFirst = mockPrisma.goal.findFirst as unknown as jest.Mock;
+
 describe("RegionsService", () => {
   const mockUserId = "clxyz123456789";
   const mockOtherUserId = "clxyz987654321";
@@ -42,13 +50,13 @@ describe("RegionsService", () => {
         },
       ];
 
-      mockPrisma.region.findMany.mockResolvedValue(mockRegions);
+      mockRegionFindMany.mockResolvedValue(mockRegions);
 
       const result = await getRegionsForGoal(mockGoalId, mockUserId);
 
       expect(result).toHaveLength(2);
       expect(result).toEqual(mockRegions);
-      expect(mockPrisma.region.findMany).toHaveBeenCalledWith({
+      expect(mockRegionFindMany).toHaveBeenCalledWith({
         where: {
           goalId: mockGoalId,
           goal: {
@@ -60,7 +68,7 @@ describe("RegionsService", () => {
     });
 
     it("should return empty array when goal has no regions", async () => {
-      mockPrisma.region.findMany.mockResolvedValue([]);
+      mockRegionFindMany.mockResolvedValue([]);
 
       const result = await getRegionsForGoal(mockGoalId, mockUserId);
 
@@ -69,11 +77,11 @@ describe("RegionsService", () => {
     });
 
     it("should verify goal ownership when fetching regions", async () => {
-      mockPrisma.region.findMany.mockResolvedValue([]);
+      mockRegionFindMany.mockResolvedValue([]);
 
       await getRegionsForGoal(mockGoalId, mockUserId);
 
-      expect(mockPrisma.region.findMany).toHaveBeenCalledWith({
+      expect(mockRegionFindMany).toHaveBeenCalledWith({
         where: {
           goalId: mockGoalId,
           goal: {
@@ -96,12 +104,12 @@ describe("RegionsService", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.region.findFirst.mockResolvedValue(mockRegion);
+      mockRegionFindFirst.mockResolvedValue(mockRegion);
 
       const result = await getRegionById("region-1", mockUserId);
 
       expect(result).toEqual(mockRegion);
-      expect(mockPrisma.region.findFirst).toHaveBeenCalledWith({
+      expect(mockRegionFindFirst).toHaveBeenCalledWith({
         where: {
           id: "region-1",
           goal: {
@@ -112,7 +120,7 @@ describe("RegionsService", () => {
     });
 
     it("should return null when region does not exist", async () => {
-      mockPrisma.region.findFirst.mockResolvedValue(null);
+      mockRegionFindFirst.mockResolvedValue(null);
 
       const result = await getRegionById("nonexistent", mockUserId);
 
@@ -120,12 +128,12 @@ describe("RegionsService", () => {
     });
 
     it("should return null when user does not own the goal", async () => {
-      mockPrisma.region.findFirst.mockResolvedValue(null);
+      mockRegionFindFirst.mockResolvedValue(null);
 
       const result = await getRegionById("region-1", mockOtherUserId);
 
       expect(result).toBeNull();
-      expect(mockPrisma.region.findFirst).toHaveBeenCalledWith({
+      expect(mockRegionFindFirst).toHaveBeenCalledWith({
         where: {
           id: "region-1",
           goal: {
@@ -152,7 +160,7 @@ describe("RegionsService", () => {
       };
 
       // Mock goal ownership check
-      mockPrisma.goal.findFirst.mockResolvedValue({
+      mockGoalFindFirst.mockResolvedValue({
         id: mockGoalId,
         title: "Goal",
         description: "Desc",
@@ -161,18 +169,18 @@ describe("RegionsService", () => {
         updatedAt: new Date(),
       });
 
-      mockPrisma.region.create.mockResolvedValue(createdRegion);
+      mockRegionCreate.mockResolvedValue(createdRegion);
 
       const result = await createRegion(mockUserId, regionData);
 
       expect(result).toEqual(createdRegion);
-      expect(mockPrisma.goal.findFirst).toHaveBeenCalledWith({
+      expect(mockGoalFindFirst).toHaveBeenCalledWith({
         where: {
           id: mockGoalId,
           userId: mockUserId,
         },
       });
-      expect(mockPrisma.region.create).toHaveBeenCalledWith({
+      expect(mockRegionCreate).toHaveBeenCalledWith({
         data: regionData,
       });
     });
@@ -184,12 +192,12 @@ describe("RegionsService", () => {
         description: "New Description",
       };
 
-      mockPrisma.goal.findFirst.mockResolvedValue(null);
+      mockGoalFindFirst.mockResolvedValue(null);
 
       const result = await createRegion(mockOtherUserId, regionData);
 
       expect(result).toBeNull();
-      expect(mockPrisma.region.create).not.toHaveBeenCalled();
+      expect(mockRegionCreate).not.toHaveBeenCalled();
     });
 
     it("should handle special characters in title and description", async () => {
@@ -206,7 +214,7 @@ describe("RegionsService", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.goal.findFirst.mockResolvedValue({
+      mockGoalFindFirst.mockResolvedValue({
         id: mockGoalId,
         title: "Goal",
         description: "Desc",
@@ -215,7 +223,7 @@ describe("RegionsService", () => {
         updatedAt: new Date(),
       });
 
-      mockPrisma.region.create.mockResolvedValue(createdRegion);
+      mockRegionCreate.mockResolvedValue(createdRegion);
 
       const result = await createRegion(mockUserId, regionData);
 
@@ -246,13 +254,13 @@ describe("RegionsService", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.region.findFirst.mockResolvedValue(existingRegion);
-      mockPrisma.region.update.mockResolvedValue(updatedRegion);
+      mockRegionFindFirst.mockResolvedValue(existingRegion);
+      mockRegionUpdate.mockResolvedValue(updatedRegion);
 
       const result = await updateRegion("region-1", mockUserId, updates);
 
       expect(result).toEqual(updatedRegion);
-      expect(mockPrisma.region.findFirst).toHaveBeenCalledWith({
+      expect(mockRegionFindFirst).toHaveBeenCalledWith({
         where: {
           id: "region-1",
           goal: {
@@ -260,32 +268,32 @@ describe("RegionsService", () => {
           },
         },
       });
-      expect(mockPrisma.region.update).toHaveBeenCalledWith({
+      expect(mockRegionUpdate).toHaveBeenCalledWith({
         where: { id: "region-1" },
         data: updates,
       });
     });
 
     it("should return null when region does not exist", async () => {
-      mockPrisma.region.findFirst.mockResolvedValue(null);
+      mockRegionFindFirst.mockResolvedValue(null);
 
       const result = await updateRegion("nonexistent", mockUserId, {
         title: "Updated",
       });
 
       expect(result).toBeNull();
-      expect(mockPrisma.region.update).not.toHaveBeenCalled();
+      expect(mockRegionUpdate).not.toHaveBeenCalled();
     });
 
     it("should return null when user does not own the goal", async () => {
-      mockPrisma.region.findFirst.mockResolvedValue(null);
+      mockRegionFindFirst.mockResolvedValue(null);
 
       const result = await updateRegion("region-1", mockOtherUserId, {
         title: "Updated",
       });
 
       expect(result).toBeNull();
-      expect(mockPrisma.region.update).not.toHaveBeenCalled();
+      expect(mockRegionUpdate).not.toHaveBeenCalled();
     });
 
     it("should allow partial updates", async () => {
@@ -304,8 +312,8 @@ describe("RegionsService", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.region.findFirst.mockResolvedValue(existingRegion);
-      mockPrisma.region.update.mockResolvedValue(updatedRegion);
+      mockRegionFindFirst.mockResolvedValue(existingRegion);
+      mockRegionUpdate.mockResolvedValue(updatedRegion);
 
       const result = await updateRegion("region-1", mockUserId, {
         title: "New Title",
@@ -327,13 +335,13 @@ describe("RegionsService", () => {
         updatedAt: new Date(),
       };
 
-      mockPrisma.region.findFirst.mockResolvedValue(existingRegion);
-      mockPrisma.region.delete.mockResolvedValue(existingRegion);
+      mockRegionFindFirst.mockResolvedValue(existingRegion);
+      mockRegionDelete.mockResolvedValue(existingRegion);
 
       const result = await deleteRegion("region-1", mockUserId);
 
       expect(result).toBe(true);
-      expect(mockPrisma.region.findFirst).toHaveBeenCalledWith({
+      expect(mockRegionFindFirst).toHaveBeenCalledWith({
         where: {
           id: "region-1",
           goal: {
@@ -341,27 +349,27 @@ describe("RegionsService", () => {
           },
         },
       });
-      expect(mockPrisma.region.delete).toHaveBeenCalledWith({
+      expect(mockRegionDelete).toHaveBeenCalledWith({
         where: { id: "region-1" },
       });
     });
 
     it("should return false when region does not exist", async () => {
-      mockPrisma.region.findFirst.mockResolvedValue(null);
+      mockRegionFindFirst.mockResolvedValue(null);
 
       const result = await deleteRegion("nonexistent", mockUserId);
 
       expect(result).toBe(false);
-      expect(mockPrisma.region.delete).not.toHaveBeenCalled();
+      expect(mockRegionDelete).not.toHaveBeenCalled();
     });
 
     it("should return false when user does not own the goal", async () => {
-      mockPrisma.region.findFirst.mockResolvedValue(null);
+      mockRegionFindFirst.mockResolvedValue(null);
 
       const result = await deleteRegion("region-1", mockOtherUserId);
 
       expect(result).toBe(false);
-      expect(mockPrisma.region.delete).not.toHaveBeenCalled();
+      expect(mockRegionDelete).not.toHaveBeenCalled();
     });
   });
 });

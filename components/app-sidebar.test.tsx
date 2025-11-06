@@ -5,6 +5,7 @@ import { AppSidebar } from "./app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { getGoalsAction } from "@/app/actions/goals";
 import { getRegionsAction } from "@/app/actions/regions";
+import { ActionErrorCode } from "@/lib/action-types";
 
 // Note: next/navigation is globally mocked in jest.setup.ts
 // We need to access the mock through the module
@@ -179,8 +180,8 @@ describe("AppSidebar", () => {
 
     it("handles failed goal fetch gracefully", async () => {
       mockGetGoalsAction.mockResolvedValue({
-        success: false,
         error: "Failed to fetch goals",
+        code: ActionErrorCode.DATABASE_ERROR,
       });
 
       const consoleSpy = jest.spyOn(console, "error").mockImplementation();
@@ -200,8 +201,8 @@ describe("AppSidebar", () => {
     it("handles failed region fetch gracefully", async () => {
       const user = userEvent.setup();
       mockGetRegionsAction.mockResolvedValue({
-        success: false,
         error: "Failed to fetch regions",
+        code: ActionErrorCode.DATABASE_ERROR,
       });
 
       const consoleSpy = jest.spyOn(console, "error").mockImplementation();

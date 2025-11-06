@@ -8,6 +8,7 @@ describe("GoalDetailHeader", () => {
     id: "123",
     title: "Test Goal Title",
     description: "Test goal description",
+    userId: "user-1",
   };
 
   it("renders goal title and description", () => {
