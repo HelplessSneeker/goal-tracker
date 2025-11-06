@@ -132,5 +132,11 @@
     "notFound": "Not found",
     "invalidInput": "Invalid input",
     "serverError": "Server error"
+  },
+  "user": {
+    "signOut": "Sign Out",
+    "settings": "Settings",
+    "account": "Account",
+    "settingsComingSoon": "Settings page coming soon..."
   }
 }

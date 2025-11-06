@@ -132,5 +132,11 @@
     "notFound": "Nicht gefunden",
     "invalidInput": "Ungültige Eingabe",
     "serverError": "Serverfehler"
+  },
+  "user": {
+    "signOut": "Abmelden",
+    "settings": "Einstellungen",
+    "account": "Konto",
+    "settingsComingSoon": "Einstellungen-Seite kommt bald..."
   }
 }

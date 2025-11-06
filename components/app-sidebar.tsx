@@ -8,6 +8,7 @@ import { ChevronRight, Target, ChevronsDownUp, TrendingUp } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -27,6 +28,7 @@ import {
 import { useEffect, useState } from "react";
 import { getGoalsAction } from "@/app/actions/goals";
 import { getRegionsAction } from "@/app/actions/regions";
+import { UserMenu } from "@/components/user-menu";
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -234,6 +236,9 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <UserMenu />
+      </SidebarFooter>
     </Sidebar>
   );
 }
