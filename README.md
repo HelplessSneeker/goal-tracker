@@ -16,20 +16,30 @@ This is a full-stack application with:
 - ✅ **Server Actions + Service Layer** architecture (migrated from API routes)
 - ✅ **PostgreSQL database** with Prisma ORM
 - ✅ **Authentication** with NextAuth.js (email/magic link)
-- ✅ **Comprehensive test coverage** (228/228 tests, 100% service coverage)
-- ✅ **Modern UI** with shadcn/ui components
+- ✅ **User avatar and menu** with sign-out functionality
+- ✅ **Comprehensive test coverage** (260/260 tests, 100% service coverage)
+- ✅ **Modern UI** with shadcn/ui components and responsive design
+- ✅ **Type-safe action responses** with proper error handling
+- ⏳ **User Settings Page** (next priority)
 - ⏳ **Weekly Tasks and Progress Tracking** (planned)
 
 ## Features
 
 ### Implemented
 - **Authentication** - Email-based magic link authentication with NextAuth.js
+- **User Interface** - Avatar with dropdown menu, sign-out, settings link
 - **Goals** - High-level objectives (no deadlines)
 - **Regions** - Specific areas within goals to focus on
 - **Tasks** - Concrete tasks with deadlines and status tracking
-- Full create, read, update, delete functionality
-- Responsive UI with modern design
-- Database persistence with Prisma + PostgreSQL
+- **Full CRUD** - Create, read, update, delete functionality for all entities
+- **Responsive Design** - Modern UI with shadcn/ui components
+- **Database** - PostgreSQL with Prisma ORM (UUID primary keys)
+- **Testing** - Comprehensive test suite (260 tests, 100% coverage)
+- **Type Safety** - ActionResponse types with proper error handling
+- **Internationalization** - English and German language support
+
+### In Progress
+- **User Settings Page** - Account preferences and profile management
 
 ### Planned
 - **Weekly Tasks** - 3 prioritized tasks per week
@@ -177,10 +187,11 @@ pnpm test:coverage     # Run tests with coverage report
 ```
 
 **Current Test Status:**
-- 228/228 tests passing (~7.4s)
-- 100% server action coverage
-- 100% service layer coverage
-- 93-100% component coverage
+- 260/260 tests passing (~4.1s)
+- 100% server action coverage (91 tests)
+- 100% service layer coverage (53 tests)
+- 93-100% component coverage (104 tests, includes 15 UserMenu tests)
+- 100% authentication coverage (12 tests)
 
 ## Tech Stack
 

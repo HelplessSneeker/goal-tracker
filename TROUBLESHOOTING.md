@@ -222,6 +222,32 @@ process.env.NEXTAUTH_URL = 'http://localhost:3000'
 process.env.NEXTAUTH_SECRET = 'test-secret'
 ```
 
+### ActionResponse Mock Format
+```typescript
+import { ActionErrorCode } from '@/lib/action-types'
+
+// ✅ Success: { success: true, data: {...} }
+mockAction.mockResolvedValue({
+  success: true,
+  data: { id: "123", title: "Test" }
+})
+
+// ✅ Error: { error: string, code: ActionErrorCode }
+mockAction.mockResolvedValue({
+  error: "Failed",
+  code: ActionErrorCode.DATABASE_ERROR
+})
+```
+
+### Prisma Mock Typing
+```typescript
+const mockPrisma = prisma as jest.Mocked<typeof prisma>
+
+// ✅ Explicit type assertions required
+const mockFindMany = mockPrisma.goal.findMany as unknown as jest.Mock
+mockFindMany.mockResolvedValue([])
+```
+
 ---
 
 ## TypeScript
