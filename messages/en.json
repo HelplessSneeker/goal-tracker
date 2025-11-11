@@ -137,6 +137,22 @@
     "signOut": "Sign Out",
     "settings": "Settings",
     "account": "Account",
-    "settingsComingSoon": "Settings page coming soon..."
+    "settingsComingSoon": "Settings page coming soon...",
+    "profile": "Profile",
+    "profileDescription": "Your account information",
+    "name": "Name",
+    "email": "Email",
+    "noNameSet": "No name set",
+    "accountPreferences": "Account Preferences",
+    "preferencesDescription": "Manage your account settings",
+    "language": "Language",
+    "english": "English",
+    "german": "German",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "comingSoon": "(Coming soon)",
+    "preferencesAvailableSoon": "Preference settings will be available soon"
   }
 }

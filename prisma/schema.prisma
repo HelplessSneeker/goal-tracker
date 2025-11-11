@@ -75,7 +75,8 @@ model User {
   sessions Session[]
 
   // application references
-  goals Goal[]
+  goals       Goal[]
+  preferences UserPreferences?
 }
 
 model Account {
@@ -111,4 +112,20 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model UserPreferences {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Preferences
+  language String @default("en")
+  theme    String @default("system")
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }

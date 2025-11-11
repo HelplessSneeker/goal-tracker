@@ -137,6 +137,22 @@
     "signOut": "Abmelden",
     "settings": "Einstellungen",
     "account": "Konto",
-    "settingsComingSoon": "Einstellungen-Seite kommt bald..."
+    "settingsComingSoon": "Einstellungen-Seite kommt bald...",
+    "profile": "Profil",
+    "profileDescription": "Ihre Kontoinformationen",
+    "name": "Name",
+    "email": "E-Mail",
+    "noNameSet": "Kein Name festgelegt",
+    "accountPreferences": "Kontoeinstellungen",
+    "preferencesDescription": "Verwalten Sie Ihre Kontoeinstellungen",
+    "language": "Sprache",
+    "english": "Englisch",
+    "german": "Deutsch",
+    "theme": "Theme",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System",
+    "comingSoon": "(Demnächst verfügbar)",
+    "preferencesAvailableSoon": "Einstellungsoptionen werden bald verfügbar sein"
   }
 }

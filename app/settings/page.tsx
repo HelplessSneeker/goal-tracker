@@ -3,36 +3,44 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  UserProfileSection,
+  UserPreferencesSection,
+} from "@/components/user-settings";
+import { getUserPreferences } from "@/lib/services/user-preferences.service";
 
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions);
   const t = await getTranslations("user");
 
-  if (!session) {
+  if (!session?.user?.id) {
     redirect("/auth/signin");
   }
 
-  return (
-    <div className="container mx-auto p-6 animate-fade-in">
-      <h1 className="text-3xl font-bold mb-6">{t("settings")}</h1>
+  // Fetch real preferences (auto-creates if not exist)
+  const preferences = await getUserPreferences(session.user.id);
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("account")}</CardTitle>
-          <CardDescription>{session.user?.email}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            {t("settingsComingSoon")}
-          </p>
-        </CardContent>
-      </Card>
+  return (
+    <div className="container mx-auto p-6 max-w-4xl animate-fade-in">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">{t("settings")}</h1>
+      </div>
+
+      <div className="space-y-6">
+        <UserProfileSection
+          user={{
+            name: session.user.name,
+            email: session.user.email,
+            image: session.user.image,
+          }}
+        />
+
+        <UserPreferencesSection
+          initialPreferences={{
+            language: preferences?.language || "en",
+            theme: preferences?.theme || "system",
+          }}
+        />
+      </div>
     </div>
   );
 }

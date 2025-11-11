@@ -23,9 +23,9 @@ Next.js 15 goal-tracking application using App Router, React 19, TypeScript, Tai
 - ✅ Authentication (NextAuth.js with email/magic link, JWT sessions)
 - ✅ User Interface (User avatar sidebar with dropdown menu)
 - ✅ Internationalization (next-intl with English & German, European date format)
-- ✅ Testing (Jest + React Testing Library - 260/260 tests passing, 100% service coverage)
-- ⏳ User Settings Page (Next priority)
-- ⏳ Database Seeding Improvements (Before weekly tasks)
+- ✅ Testing (Jest + React Testing Library - 297/297 tests passing, 100% service coverage)
+- ✅ User Settings Page (Complete - profile display & interactive preferences with DB persistence)
+- ⏳ Database Seeding Improvements (Before weekly tasks) - Next priority
 - ⏳ Weekly Tasks, Progress Entries (TODO - use TDD)
 
 **Architecture:** Migrated from API routes to **Server Actions + Service Layer** for improved type safety and performance.
@@ -54,10 +54,10 @@ pnpm prisma studio      # Database GUI
 
 **⚠️ IMPORTANT: Follow Test-Driven Development for all new features.**
 
-**Current Status:** 260/260 tests passing (~4.1s)
-- ✅ 91 action tests (100% coverage)
-- ✅ 53 service tests (100% coverage)
-- ✅ 104 component tests (93-100% coverage, includes 15 UserMenu tests)
+**Current Status:** 297/297 tests passing (~11s)
+- ✅ 102 action tests (100% coverage, includes 11 user preferences tests)
+- ✅ 60 service tests (100% coverage, includes 7 user preferences tests)
+- ✅ 123 component tests (93-100% coverage, includes 15 UserMenu + 21 UserSettings tests)
 - ✅ 12 authentication tests (100% coverage)
 
 **TDD Workflow:**
@@ -217,10 +217,32 @@ mockAction.mockResolvedValue({
 - `Goal`: id, title, description, userId, createdAt, updatedAt
 - `Region`: id, goalId, title, description, createdAt, updatedAt (userId via Goal)
 - `Task`: id, regionId, title, description, deadline, status, createdAt, updatedAt (userId via Region→Goal)
+- `UserPreferences`: id, userId, language, theme, createdAt, updatedAt (auto-created on first access)
 
 **TODO:**
 - `WeeklyTask`: id, taskId, title, description, priority (1-3), weekStartDate, status
 - `ProgressEntry`: id, weeklyTaskId, date, notes, completionPercentage (0-100)
+
+### User Preferences Feature
+
+**Status:** ✅ Complete with database persistence
+
+**Service Layer:**
+- `getUserPreferences(userId)` - Auto-creates defaults if not exist
+- `updateUserPreferences(userId, data)` - Updates with ownership verification
+
+**Server Actions:**
+- `getUserPreferencesAction()` - Authenticated read
+- `updateUserPreferencesAction(formData)` - Validated update
+
+**UI Features:**
+- Language selector (English/German)
+- Theme selector (Light/Dark/System)
+- Optimistic UI updates
+- Loading states
+- Error handling (console.log for now, toast component pending)
+
+**Test Coverage:** 100% service, 93.75% actions
 
 ## Internationalization (i18n)
 
@@ -281,32 +303,61 @@ Configured in `tsconfig.json`:
 
 ---
 
-## Recent Completions (2025-11-06)
+## Recent Completions
 
-### TypeScript Error Fixes ✅
+### User Settings Page - Complete ✅ (2025-11-11)
+
+**Phase 1 (Morning):** UI Structure
+- Implemented UserProfileSection component (avatar, name, email display)
+- Implemented UserPreferencesSection component (read-only selectors)
+- Added Select component from shadcn/ui
+- Complete i18n support (17 new keys in EN + DE)
+- Full test coverage (20 new tests: 11 profile + 9 preferences)
+- 280/280 tests passing
+
+**Phase 2 (Afternoon):** Backend & Interactivity
+- Added UserPreferences model to Prisma schema
+- Implemented service layer with TDD (7 tests, 100% coverage)
+- Implemented server actions with TDD (11 tests, 93.75% coverage)
+- Made UI fully interactive with optimistic updates
+- Updated settings page to fetch real preferences
+- 297/297 tests passing
+
+**Key Features Delivered:**
+- User preferences persist across sessions
+- Language & theme selection fully functional
+- Optimistic UI updates with error recovery
+- Auto-creates default preferences on first visit
+- 100% test coverage for business logic
+
+**Documentation:** See `dev/active/user-settings-implementation/` for full implementation details
+
+### TypeScript Error Fixes ✅ (2025-11-06)
 - Standardized ActionResponse formats across all test files
 - Fixed Prisma mock typing with explicit type assertions
 - Reduced TypeScript errors from 77 to 9 (only auth-related remain)
 - All 260 tests passing with improved type safety
 
-### User Avatar Sidebar ✅
+### User Avatar Sidebar ✅ (2025-11-06)
 - Implemented UserMenu component with avatar and dropdown
 - Integrated with NextAuth for authentication
 - Added i18n support (English + German)
 - Full test coverage (15 new tests)
 - Responsive behavior in sidebar footer
 
-**Documentation:** See `dev/completed/ARCHIVE_INDEX.md` for detailed documentation
+**Documentation:** See `dev/completed/ARCHIVE_INDEX.md` for archived documentation
 
 ---
 
 ## Immediate Next Steps
 
-1. **User Settings Page** (Highest Priority)
-   - Create `/settings` page with authentication
-   - User profile display (email, name)
-   - Account preferences
-   - Settings form with TDD approach
+1. **User Settings Page - Phase 2** (Highest Priority - READY TO START)
+   - Add UserPreferences Prisma model (language, theme)
+   - Implement service layer with TDD (getUserPreferences, updateUserPreferences)
+   - Implement server actions with TDD (validation + error handling)
+   - Make preferences UI interactive (optimistic updates, toasts)
+   - End-to-end testing and manual verification
+   - **See:** `dev/active/user-settings-implementation/user-settings-implementation-plan.md`
 
 2. **Database Seeding Improvements** (Before Weekly Tasks)
    - Add more realistic sample data

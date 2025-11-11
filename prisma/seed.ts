@@ -2,6 +2,31 @@ import { PrismaClient } from "../generated/prisma";
 
 const prisma = new PrismaClient();
 
+/**
+ * Create default preferences for users who don't have them
+ */
+async function createDefaultPreferences() {
+  console.log("👤 Creating default preferences for users...");
+
+  const users = await prisma.user.findMany({
+    where: {
+      preferences: null,
+    },
+  });
+
+  for (const user of users) {
+    await prisma.userPreferences.create({
+      data: {
+        userId: user.id,
+        language: "en",
+        theme: "system",
+      },
+    });
+  }
+
+  console.log(`✅ Created default preferences for ${users.length} users`);
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Seed function is called manually, not automatically
 async function main() {
   console.log("🌱 Starting database seed...");
@@ -139,10 +164,14 @@ async function main() {
     },
   });
 
+  // Create default preferences for existing users
+  await createDefaultPreferences();
+
   console.log("✨ Database seeded successfully!");
   console.log(`Created ${await prisma.goal.count()} goals`);
   console.log(`Created ${await prisma.region.count()} regions`);
   console.log(`Created ${await prisma.task.count()} tasks`);
+  console.log(`Total users with preferences: ${await prisma.userPreferences.count()}`);
 }
 
 // main()

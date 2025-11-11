@@ -166,6 +166,28 @@ export const taskSchemas = {
   }),
 };
 
+/**
+ * User Preferences validation schemas
+ */
+export const languageSchema = z.enum(["en", "de"], {
+  errorMap: () => ({ message: "Language must be either 'en' or 'de'" }),
+});
+
+export const themeSchema = z.enum(["light", "dark", "system"], {
+  errorMap: () => ({
+    message: "Theme must be 'light', 'dark', or 'system'",
+  }),
+});
+
+export const updateUserPreferencesSchema = z.object({
+  language: languageSchema.optional(),
+  theme: themeSchema.optional(),
+});
+
+export type UpdateUserPreferencesInput = z.infer<
+  typeof updateUserPreferencesSchema
+>;
+
 // =============================================================================
 // Validation Helpers
 // =============================================================================
