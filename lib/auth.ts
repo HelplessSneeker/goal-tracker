@@ -42,11 +42,29 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       // Add user ID to token on sign in
       if (user) {
         token.sub = user.id;
+        token.name = user.name;
+        token.email = user.email;
+        token.picture = user.image;
       }
+
+      // On token refresh or update, fetch fresh user data from database
+      if (trigger === "update" || (!user && token.sub)) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.sub as string },
+          select: { name: true, email: true, image: true },
+        });
+
+        if (dbUser) {
+          token.name = dbUser.name;
+          token.email = dbUser.email;
+          token.picture = dbUser.image;
+        }
+      }
+
       return token;
     },
   },

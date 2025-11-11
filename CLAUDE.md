@@ -223,10 +223,11 @@ mockAction.mockResolvedValue({
 - `WeeklyTask`: id, taskId, title, description, priority (1-3), weekStartDate, status
 - `ProgressEntry`: id, weeklyTaskId, date, notes, completionPercentage (0-100)
 
-### User Preferences Feature
+### User Settings Features
 
-**Status:** ✅ Complete with database persistence
+**Status:** ✅ Phase 1-3 Complete | ⏳ Phase 4 (Language Switching) Pending
 
+#### User Preferences (Phase 1 & 2) ✅
 **Service Layer:**
 - `getUserPreferences(userId)` - Auto-creates defaults if not exist
 - `updateUserPreferences(userId, data)` - Updates with ownership verification
@@ -236,13 +237,37 @@ mockAction.mockResolvedValue({
 - `updateUserPreferencesAction(formData)` - Validated update
 
 **UI Features:**
-- Language selector (English/German)
-- Theme selector (Light/Dark/System)
+- Language selector (English/German) - saves to DB
+- Theme selector (Light/Dark/System) - saves to DB
 - Optimistic UI updates
 - Loading states
-- Error handling (console.log for now, toast component pending)
+- Error handling
 
 **Test Coverage:** 100% service, 93.75% actions
+
+#### Name Editing (Phase 3) ✅
+**Service Layer:**
+- `getUserById(userId)` - Get user data
+- `updateUserName(userId, name)` - Update with null support
+
+**Server Actions:**
+- `updateUserNameAction(formData)` - Auth + validation
+
+**UI Features:**
+- Edit/Save/Cancel buttons
+- Input field with validation (max 100 chars)
+- Success message with auto-refresh
+- Error handling
+- XSS sanitization
+- Can clear name (sets to null)
+
+**Test Coverage:** 100% service, 100% actions, 100% component
+
+**Key Feature:** Automatically reloads page after save to refresh NextAuth session
+
+#### Language Switching (Phase 4) ⏳ TODO
+**Current Issue:** Language preference saves but UI doesn't switch languages
+**Solution Needed:** Implement i18n middleware with cookie-based locale detection
 
 ## Internationalization (i18n)
 
@@ -347,17 +372,53 @@ Configured in `tsconfig.json`:
 
 **Documentation:** See `dev/completed/ARCHIVE_INDEX.md` for archived documentation
 
+### User Settings Page - Phase 3: Name Editing ✅ (2025-11-11) - Production Ready
+
+**Implementation:**
+- Created user service with `getUserById()` and `updateUserName()` functions
+- Created server action `updateUserNameAction()` with full validation
+- Updated UserProfileSection component with edit mode UI
+- Added auto-refresh after save to update NextAuth session
+- **Critical Fix:** Modified NextAuth JWT callback to fetch fresh user data from database
+- Full i18n support (4 new keys in EN + DE)
+
+**Test Results:** 321/321 tests passing (added 24 new tests)
+- 8 service tests (100% coverage)
+- 9 action tests (100% coverage)
+- 7 component tests for edit functionality
+
+**Manual Testing:** ✅ Complete - All scenarios verified working
+
+**Key Features Delivered:**
+- Users can edit their name in settings page
+- Can clear name (sets to null, shows "No name set")
+- Input validation (max 100 characters)
+- XSS sanitization
+- Auto-refresh after save with optimistic UI updates
+- Success/error messages with proper i18n
+- **Name persists correctly** after page reload (JWT callback fix)
+
+**Critical Bug Fix:**
+- Issue: Name saved to DB but didn't appear after reload
+- Root Cause: NextAuth JWT tokens cached stale user data
+- Solution: Modified JWT callback to fetch fresh data from database on every access
+- Result: Name now persists correctly across sessions
+
+**Documentation:** See `dev/active/user-settings-implementation/PHASE3-COMPLETION-SUMMARY.md`
+
 ---
 
 ## Immediate Next Steps
 
-1. **User Settings Page - Phase 2** (Highest Priority - READY TO START)
-   - Add UserPreferences Prisma model (language, theme)
-   - Implement service layer with TDD (getUserPreferences, updateUserPreferences)
-   - Implement server actions with TDD (validation + error handling)
-   - Make preferences UI interactive (optimistic updates, toasts)
-   - End-to-end testing and manual verification
-   - **See:** `dev/active/user-settings-implementation/user-settings-implementation-plan.md`
+1. **Language Switching Implementation** (Highest Priority - User Explicitly Requested)
+   - Problem: Language preference saves but UI doesn't switch
+   - Solution: Implement i18n middleware with cookie-based locale detection
+   - Create `lib/navigation.ts` with custom hooks
+   - Update middleware to detect NEXT_LOCALE cookie
+   - Install js-cookie dependency
+   - Update UserPreferencesSection to set cookie and refresh
+   - **Estimated Time:** 2-3 hours
+   - **See:** `dev/active/user-settings-implementation/SESSION-HANDOFF-PHASE2.md`
 
 2. **Database Seeding Improvements** (Before Weekly Tasks)
    - Add more realistic sample data

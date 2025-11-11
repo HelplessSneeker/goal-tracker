@@ -168,6 +168,15 @@ jest.mock("@/lib/prisma", () => ({
       delete: jest.fn() as jest.Mock,
       count: jest.fn() as jest.Mock,
     },
+    user: {
+      findMany: jest.fn() as jest.Mock,
+      findUnique: jest.fn() as jest.Mock,
+      findFirst: jest.fn() as jest.Mock,
+      create: jest.fn() as jest.Mock,
+      update: jest.fn() as jest.Mock,
+      delete: jest.fn() as jest.Mock,
+      count: jest.fn() as jest.Mock,
+    },
   },
 }));
 
@@ -205,6 +214,10 @@ jest.mock("@/app/actions/tasks", () => ({
 jest.mock("@/app/actions/user-preferences", () => ({
   getUserPreferencesAction: jest.fn(),
   updateUserPreferencesAction: jest.fn(),
+}));
+
+jest.mock("@/app/actions/user", () => ({
+  updateUserNameAction: jest.fn(),
 }));
 
 // Setup global mocks

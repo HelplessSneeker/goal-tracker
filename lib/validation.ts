@@ -188,6 +188,38 @@ export type UpdateUserPreferencesInput = z.infer<
   typeof updateUserPreferencesSchema
 >;
 
+/**
+ * User validation schemas
+ */
+export const userSchemas = {
+  updateName: z.object({
+    name: z
+      .string()
+      .nullable()
+      .optional()
+      .transform((val) => {
+        // Handle null, undefined, or empty string
+        if (!val || val.trim() === "") return null;
+        return val;
+      })
+      .pipe(
+        z
+          .string()
+          .nullable()
+          .refine((val) => !val || val.length <= 100, {
+            message: "Name must be 100 characters or less",
+          })
+      )
+      .transform((val) => {
+        // Sanitize non-null values
+        if (!val) return null;
+        return sanitizeString(val);
+      }),
+  }),
+};
+
+export type UpdateUserNameInput = z.infer<typeof userSchemas.updateName>;
+
 // =============================================================================
 // Validation Helpers
 // =============================================================================
