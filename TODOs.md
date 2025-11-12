@@ -8,7 +8,7 @@ This document tracks the implementation progress and remaining work for the goal
 
 ## Current Status
 
-**Branch:** `user-settings` (ready to merge to main)
+**Branch:** `main'
 
 **Architecture:** Server Actions + Service Layer (migrated from API routes)
 
