@@ -1,7 +1,7 @@
 import { withAuth } from "next-auth/middleware";
 
 // NextAuth middleware for route protection
-// Note: next-intl is configured with localePrefix: "never" so no middleware needed for i18n
+// Locale detection happens in lib/i18n.ts by reading the NEXT_LOCALE cookie directly
 export default withAuth({
   callbacks: {
     authorized: ({ token, req }) => {

@@ -18,6 +18,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { updateUserPreferencesAction } from "@/app/actions/user-preferences";
+import { useChangeLocale } from "@/lib/navigation";
+import type { Locale } from "@/lib/i18n";
 
 interface UserPreferencesSectionProps {
   initialPreferences: {
@@ -32,6 +34,7 @@ export function UserPreferencesSection({
   const t = useTranslations("user");
   const [preferences, setPreferences] = useState(initialPreferences);
   const [isPending, startTransition] = useTransition();
+  const changeLocale = useChangeLocale();
 
   const handleUpdate = (key: "language" | "theme", value: string) => {
     // Optimistic update
@@ -50,6 +53,11 @@ export function UserPreferencesSection({
         console.error("Failed to update preferences:", result.error);
       } else {
         console.log("Preferences updated successfully");
+
+        // If language was changed, update the locale cookie and reload
+        if (key === "language") {
+          changeLocale(value as Locale);
+        }
       }
     });
   };

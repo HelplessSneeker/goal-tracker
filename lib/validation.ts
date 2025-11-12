@@ -35,7 +35,7 @@ export function sanitizeString(value: string): string {
  * Sanitize optional string (can be null or undefined)
  */
 export function sanitizeOptionalString(
-  value: string | null | undefined
+  value: string | null | undefined,
 ): string | undefined {
   if (!value) return undefined;
   const sanitized = sanitizeString(value);
@@ -55,7 +55,12 @@ export const goalSchemas = {
       .string()
       .nullable()
       .transform((val) => val || "")
-      .pipe(z.string().min(1, "Title is required").max(255, "Title must be 255 characters or less"))
+      .pipe(
+        z
+          .string()
+          .min(1, "Title is required")
+          .max(255, "Title must be 255 characters or less"),
+      )
       .transform(sanitizeString),
     description: z
       .string()
@@ -69,7 +74,12 @@ export const goalSchemas = {
       .string()
       .nullable()
       .transform((val) => val || "")
-      .pipe(z.string().min(1, "Title is required").max(255, "Title must be 255 characters or less"))
+      .pipe(
+        z
+          .string()
+          .min(1, "Title is required")
+          .max(255, "Title must be 255 characters or less"),
+      )
       .transform(sanitizeString),
     description: z
       .string()
@@ -92,7 +102,12 @@ export const regionSchemas = {
       .string()
       .nullable()
       .transform((val) => val || "")
-      .pipe(z.string().min(1, "Title is required").max(255, "Title must be 255 characters or less"))
+      .pipe(
+        z
+          .string()
+          .min(1, "Title is required")
+          .max(255, "Title must be 255 characters or less"),
+      )
       .transform(sanitizeString),
     description: z
       .string()
@@ -106,7 +121,12 @@ export const regionSchemas = {
       .string()
       .nullable()
       .transform((val) => val || "")
-      .pipe(z.string().min(1, "Title is required").max(255, "Title must be 255 characters or less"))
+      .pipe(
+        z
+          .string()
+          .min(1, "Title is required")
+          .max(255, "Title must be 255 characters or less"),
+      )
       .transform(sanitizeString),
     description: z
       .string()
@@ -129,7 +149,12 @@ export const taskSchemas = {
       .string()
       .nullable()
       .transform((val) => val || "")
-      .pipe(z.string().min(1, "Title is required").max(255, "Title must be 255 characters or less"))
+      .pipe(
+        z
+          .string()
+          .min(1, "Title is required")
+          .max(255, "Title must be 255 characters or less"),
+      )
       .transform(sanitizeString),
     description: z
       .string()
@@ -149,7 +174,12 @@ export const taskSchemas = {
       .string()
       .nullable()
       .transform((val) => val || "")
-      .pipe(z.string().min(1, "Title is required").max(255, "Title must be 255 characters or less"))
+      .pipe(
+        z
+          .string()
+          .min(1, "Title is required")
+          .max(255, "Title must be 255 characters or less"),
+      )
       .transform(sanitizeString),
     description: z
       .string()
@@ -170,13 +200,11 @@ export const taskSchemas = {
  * User Preferences validation schemas
  */
 export const languageSchema = z.enum(["en", "de"], {
-  errorMap: () => ({ message: "Language must be either 'en' or 'de'" }),
+  message: "Language must be either 'en' or 'de'",
 });
 
 export const themeSchema = z.enum(["light", "dark", "system"], {
-  errorMap: () => ({
-    message: "Theme must be 'light', 'dark', or 'system'",
-  }),
+  message: "Theme must be 'light', 'dark', or 'system'",
 });
 
 export const updateUserPreferencesSchema = z.object({
@@ -208,7 +236,7 @@ export const userSchemas = {
           .nullable()
           .refine((val) => !val || val.length <= 100, {
             message: "Name must be 100 characters or less",
-          })
+          }),
       )
       .transform((val) => {
         // Sanitize non-null values
@@ -230,7 +258,7 @@ export type UpdateUserNameInput = z.infer<typeof userSchemas.updateName>;
  */
 export function validateFormData<T extends z.ZodType>(
   schema: T,
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
 ): z.infer<T> | ActionError {
   try {
     return schema.parse(data);
@@ -244,14 +272,11 @@ export function validateFormData<T extends z.ZodType>(
       return createError(
         "Validation failed. Please check your input.",
         ActionErrorCode.VALIDATION_ERROR,
-        validationErrors
+        validationErrors,
       );
     }
 
-    return createError(
-      "Invalid input data",
-      ActionErrorCode.VALIDATION_ERROR
-    );
+    return createError("Invalid input data", ActionErrorCode.VALIDATION_ERROR);
   }
 }
 
@@ -260,7 +285,7 @@ export function validateFormData<T extends z.ZodType>(
  * Handles null values and type conversion
  */
 export function extractFormData(
-  formData: FormData
+  formData: FormData,
 ): Record<string, string | null> {
   const data: Record<string, string | null> = {};
 

@@ -28,9 +28,9 @@ export default async function SettingsPage() {
       <div className="space-y-6">
         <UserProfileSection
           user={{
-            name: session.user.name,
-            email: session.user.email,
-            image: session.user.image,
+            name: session.user.name ?? null,
+            email: session.user.email ?? null,
+            image: session.user.image ?? null,
           }}
         />
 

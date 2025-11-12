@@ -69,21 +69,32 @@ if (typeof window !== "undefined") {
 
 // Flatten nested JSON to dot notation (e.g., "user.signOut" from {user: {signOut: "Sign Out"}})
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic function for flattening any nested object
-function flattenTranslations(obj: Record<string, any>, prefix = ''): Record<string, string> {
-  return Object.keys(obj).reduce((acc, key) => {
-    const fullKey = prefix ? `${prefix}.${key}` : key;
-    if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-      Object.assign(acc, flattenTranslations(obj[key], fullKey));
-    } else {
-      acc[fullKey] = String(obj[key]);
-    }
-    return acc;
-  }, {} as Record<string, string>);
+function flattenTranslations(
+  obj: Record<string, any>,
+  prefix = "",
+): Record<string, string> {
+  return Object.keys(obj).reduce(
+    (acc, key) => {
+      const fullKey = prefix ? `${prefix}.${key}` : key;
+      if (
+        typeof obj[key] === "object" &&
+        obj[key] !== null &&
+        !Array.isArray(obj[key])
+      ) {
+        Object.assign(acc, flattenTranslations(obj[key], fullKey));
+      } else {
+        acc[fullKey] = String(obj[key]);
+      }
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
 }
 
 // Translation map dynamically loaded from messages/en.json
 // This ensures tests always use the same translations as the app
-const translationsMap: Record<string, string> = flattenTranslations(translations);
+const translationsMap: Record<string, string> =
+  flattenTranslations(translations);
 
 // Translation function with param support
 const translate = (key: string, params?: Record<string, string>): string => {
@@ -186,6 +197,17 @@ jest.mock("next-auth", () => ({
   getServerSession: mockGetServerSession,
 }));
 
+// Mock locale server action
+jest.mock("@/app/actions/locale", () => ({
+  setLocaleCookie: jest.fn().mockResolvedValue({ success: true }),
+}));
+
+// Mock navigation hooks for locale switching
+export const mockChangeLocale = jest.fn();
+jest.mock("@/lib/navigation", () => ({
+  useChangeLocale: () => mockChangeLocale,
+}));
+
 // Mock Server Actions for component tests
 jest.mock("@/app/actions/goals", () => ({
   createGoalAction: jest.fn(),
@@ -227,6 +249,7 @@ beforeEach(() => {
   mockRouterRefresh.mockClear();
   mockRouterBack.mockClear();
   mockGetServerSession.mockClear();
+  mockChangeLocale.mockClear();
 
   // Setup fetch mock
   global.fetch = jest.fn();
