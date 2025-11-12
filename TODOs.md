@@ -8,23 +8,24 @@ This document tracks the implementation progress and remaining work for the goal
 
 ## Current Status
 
-**Branch:** `user-settings`
+**Branch:** `user-settings` (ready to merge to main)
 
 **Architecture:** Server Actions + Service Layer (migrated from API routes)
 
-**Test Status:** ✅ 321/321 tests passing (~4.8s, 100% service coverage)
+**Test Status:** ✅ 321/321 tests passing (~7.9s, 100% service coverage)
 
 **Completed:**
 - Goals, Regions, Tasks (CRUD with Server Actions + Service Layer)
 - PostgreSQL + Prisma ORM with UUID primary keys
 - NextAuth.js authentication (email/magic link, JWT sessions)
 - User avatar sidebar with dropdown menu
-- User Settings Page (profile editing, language switching, theme preferences)
+- User Settings Page (complete - profile editing, language switching, theme selection saved)
 - Dynamic language switching with cookie-based locale detection
+- Name editing with JWT callback fix for persistence
 - TypeScript error fixes and type safety improvements
 - Comprehensive test coverage (actions, services, components)
 
-**Next:** Database Seeding Improvements → Weekly Tasks
+**Next:** Database Seeding → Theme Implementation → Weekly Tasks
 
 ---
 
@@ -84,7 +85,8 @@ The system follows a 4-level hierarchy:
 ---
 
 ### Phase 4.6: Database Seeding Improvements 🌱
-**Status:** Required before weekly tasks implementation
+**Status:** Next Priority - Required before theme implementation
+**Rationale:** Need comprehensive test data to view all pages when testing theme styles
 
 #### Current Issues
 - Limited sample data (minimal testing scenarios)
@@ -105,6 +107,29 @@ The system follows a 4-level hierarchy:
 - [ ] Use faker library for realistic data generation
 - [ ] Add seed data categories (minimal, development, testing, demo)
 - [ ] Document seeding options in README
+
+---
+
+### Phase 4.7: Theme Implementation 🎨
+**Status:** After seeding - User requested priority
+**Rationale:** Theme preference already saved to DB, need to apply it
+
+#### Requirements
+- [ ] Install next-themes package
+- [ ] Create theme provider component
+- [ ] Wrap app with theme provider in layout
+- [ ] Read user preference from DB on initial load
+- [ ] Apply light/dark mode styles to all components
+- [ ] Test theme switching across all pages (using seeded data)
+- [ ] Verify theme persists across sessions
+- [ ] Update Tailwind config for dark mode support
+
+#### Implementation Notes
+- Theme preference already stored in UserPreferences model
+- Use next-themes for client-side theme management
+- Connect to DB preference via layout/initial load
+- Tailwind dark mode class strategy
+- Test with comprehensive seeded data
 
 ---
 
@@ -313,9 +338,9 @@ The system follows a 4-level hierarchy:
   - Includes 15 UserMenu + 31 UserSettings tests (profile + preferences)
 - ✅ **Authentication tests:** 12 tests (100% coverage) - All passing
 
-**Total:** 321/321 tests passing (~4.8s)
+**Total:** 321/321 tests passing (~7.9s)
 
-**Summary:** Application is production-ready with comprehensive test coverage, type-safe action responses, dynamic language switching, and proper error handling throughout.
+**Summary:** Application is production-ready with comprehensive test coverage, type-safe action responses, dynamic language switching, user settings complete, and proper error handling throughout.
 
 See [TESTING.md](./TESTING.md) for comprehensive testing guide.
 
@@ -328,8 +353,17 @@ See [TESTING.md](./TESTING.md) for comprehensive testing guide.
    - Create realistic and varied sample data
    - Include edge cases and empty states
    - Use faker library for data generation
-   - **Why before weekly tasks:** Need robust test data for development
+   - **Why first:** Need comprehensive data to view all pages when testing themes
    - **Estimated time:** 1-2 hours
+
+2. **Phase 4.7: Theme Implementation** 🎨 **← THEN THIS**
+   - Install next-themes package
+   - Create theme provider and wrap app
+   - Apply light/dark mode styles to all components
+   - Connect to saved user preference from DB
+   - Test theme switching across all pages with seeded data
+   - **Why next:** User requested, preference already saved, high visibility feature
+   - **Estimated time:** 2-3 hours
 
 3. **Phase 5: Weekly Tasks Implementation** 🚀
    - Add Prisma schema model

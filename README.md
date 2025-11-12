@@ -17,10 +17,13 @@ This is a full-stack application with:
 - ✅ **PostgreSQL database** with Prisma ORM
 - ✅ **Authentication** with NextAuth.js (email/magic link)
 - ✅ **User avatar and menu** with sign-out functionality
-- ✅ **Comprehensive test coverage** (260/260 tests, 100% service coverage)
+- ✅ **User Settings Page** - profile editing, language switching, theme preferences
+- ✅ **Dynamic i18n** - English/German with cookie-based switching
+- ✅ **Comprehensive test coverage** (321/321 tests, 100% service coverage)
 - ✅ **Modern UI** with shadcn/ui components and responsive design
 - ✅ **Type-safe action responses** with proper error handling
-- ⏳ **User Settings Page** (next priority)
+- ⏳ **Database Seeding** (next priority - before theme implementation)
+- ⏳ **Theme Implementation** (Light/Dark mode)
 - ⏳ **Weekly Tasks and Progress Tracking** (planned)
 
 ## Features
@@ -28,18 +31,20 @@ This is a full-stack application with:
 ### Implemented
 - **Authentication** - Email-based magic link authentication with NextAuth.js
 - **User Interface** - Avatar with dropdown menu, sign-out, settings link
+- **User Settings** - Profile editing, name updates, language & theme preferences
+- **Internationalization** - English/German with dynamic switching (cookie-based)
 - **Goals** - High-level objectives (no deadlines)
 - **Regions** - Specific areas within goals to focus on
 - **Tasks** - Concrete tasks with deadlines and status tracking
 - **Full CRUD** - Create, read, update, delete functionality for all entities
 - **Responsive Design** - Modern UI with shadcn/ui components
 - **Database** - PostgreSQL with Prisma ORM (UUID primary keys)
-- **Testing** - Comprehensive test suite (260 tests, 100% coverage)
+- **Testing** - Comprehensive test suite (321 tests, 100% coverage)
 - **Type Safety** - ActionResponse types with proper error handling
-- **Internationalization** - English and German language support
 
 ### In Progress
-- **User Settings Page** - Account preferences and profile management
+- **Database Seeding** - Comprehensive test data for development
+- **Theme Implementation** - Light/Dark mode based on user preference
 
 ### Planned
 - **Weekly Tasks** - 3 prioritized tasks per week
@@ -187,10 +192,10 @@ pnpm test:coverage     # Run tests with coverage report
 ```
 
 **Current Test Status:**
-- 260/260 tests passing (~4.1s)
-- 100% server action coverage (91 tests)
-- 100% service layer coverage (53 tests)
-- 93-100% component coverage (104 tests, includes 15 UserMenu tests)
+- 321/321 tests passing (~7.9s)
+- 100% server action coverage (102 tests)
+- 100% service layer coverage (60 tests)
+- 93-100% component coverage (147 tests, includes 15 UserMenu + 31 UserSettings tests)
 - 100% authentication coverage (12 tests)
 
 ## Tech Stack
@@ -269,6 +274,7 @@ Goal (UUID) ──> Region (UUID) ──> Task (UUID)
 **Current Models:**
 - `User`, `Account`, `Session`, `VerificationToken` (NextAuth adapter models)
 - `Goal`, `Region`, `Task` (with userId foreign keys)
+- `UserPreferences` (language, theme settings with auto-creation)
 
 All entities use UUID primary keys for better scalability and security.
 

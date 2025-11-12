@@ -24,8 +24,9 @@ Next.js 15 goal-tracking application using App Router, React 19, TypeScript, Tai
 - ✅ User Interface (User avatar sidebar with dropdown menu)
 - ✅ Internationalization (next-intl with English & German, dynamic language switching via cookies)
 - ✅ Testing (Jest + React Testing Library - 321/321 tests passing, 100% service coverage)
-- ✅ User Settings Page (Complete - profile editing, language switching, theme preferences)
-- ⏳ Database Seeding Improvements (Before weekly tasks) - Next priority
+- ✅ User Settings Page (Complete - profile editing, language switching, theme selection saved to DB)
+- ⏳ Database Seeding Improvements (Next priority - needed before theme testing)
+- ⏳ Theme Implementation (Light/Dark mode - after seeding)
 - ⏳ Weekly Tasks, Progress Entries (TODO - use TDD)
 
 **Architecture:** Migrated from API routes to **Server Actions + Service Layer** for improved type safety and performance.
@@ -54,8 +55,8 @@ pnpm prisma studio      # Database GUI
 
 **⚠️ IMPORTANT: Follow Test-Driven Development for all new features.**
 
-**Current Status:** 321/321 tests passing (~4.8s)
-- ✅ 102 action tests (100% coverage, includes 11 user preferences tests)
+**Current Status:** 321/321 tests passing (~7.9s)
+- ✅ 102 action tests (100% coverage, includes 11 user preferences + 9 user action tests)
 - ✅ 60 service tests (100% coverage, includes 7 user preferences + 8 user service tests)
 - ✅ 147 component tests (93-100% coverage, includes 15 UserMenu + 31 UserSettings tests)
 - ✅ 12 authentication tests (100% coverage)
@@ -133,6 +134,8 @@ See [TESTING.md](./TESTING.md) for detailed patterns and examples.
 - `goals.ts` - Create, read, update, delete goals
 - `regions.ts` - Create, read, update, delete regions
 - `tasks.ts` - Create, read, update, delete tasks
+- `user-preferences.ts` - Get and update user preferences
+- `user.ts` - Get user data and update user name
 
 Actions handle:
 - FormData validation from client components
@@ -145,6 +148,8 @@ Actions handle:
 - `goals.service.ts` - Business logic + Prisma queries for goals
 - `regions.service.ts` - Business logic + Prisma queries for regions
 - `tasks.service.ts` - Business logic + Prisma queries for tasks
+- `user-preferences.service.ts` - User preferences with auto-creation defaults
+- `user.service.ts` - User data retrieval and name updates
 
 Services handle:
 - Direct Prisma database operations
@@ -237,13 +242,13 @@ mockAction.mockResolvedValue({
 - `updateUserPreferencesAction(formData)` - Validated update
 
 **UI Features:**
-- Language selector (English/German) - saves to DB
-- Theme selector (Light/Dark/System) - saves to DB
+- Language selector (English/German) - saves to DB, switches UI on reload
+- Theme selector (Light/Dark/System) - saves to DB (not yet applied to UI)
 - Optimistic UI updates
 - Loading states
 - Error handling
 
-**Test Coverage:** 100% service, 93.75% actions
+**Test Coverage:** 100% service, 100% actions
 
 #### Name Editing (Phase 3) ✅
 **Service Layer:**
@@ -433,7 +438,7 @@ Configured in `tsconfig.json`:
 - Added js-cookie dependency for client-side cookie management
 - Updated jest.setup.ts with js-cookie and navigation mocks
 
-**Test Results:** 321/321 tests passing (~4.8s) - All existing tests still passing
+**Test Results:** 321/321 tests passing (~7.9s) - All existing tests still passing
 - No new tests required (hook is mocked in test environment)
 - Production build successful with no TypeScript errors
 
@@ -463,14 +468,24 @@ Configured in `tsconfig.json`:
 
 ## Immediate Next Steps
 
-1. **Database Seeding Improvements** (Next Priority - Before Weekly Tasks)
+1. **Database Seeding Improvements** (Next Priority - Before Theme Testing)
    - Add more realistic sample data
    - Create multiple users for testing
    - Add variety in goals, regions, tasks
-   - Test data for different scenarios
+   - Test data for different scenarios (overdue tasks, empty states, etc.)
+   - **Why first:** Need comprehensive data to view all pages when testing themes
+   - **Estimated time:** 1-2 hours
+
+2. **Theme Implementation** (Light/Dark Mode)
+   - Implement theme provider (next-themes)
+   - Apply light/dark mode styles to all components
+   - Connect to saved user preference from DB
+   - Test theme switching across all pages with seeded data
+   - **Estimated time:** 2-3 hours
 
 3. **Weekly Tasks Implementation**
    - Add Prisma schema model
    - Implement service layer + actions (TDD)
    - UI components for weekly task management
    - Enforce 3 tasks per week rule
+   - **Estimated time:** 4-6 hours
