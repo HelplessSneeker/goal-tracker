@@ -25,8 +25,8 @@ Next.js 15 goal-tracking application using App Router, React 19, TypeScript, Tai
 - ✅ Internationalization (next-intl with English & German, dynamic language switching via cookies)
 - ✅ Testing (Jest + React Testing Library - 321/321 tests passing, 100% service coverage)
 - ✅ User Settings Page (Complete - profile editing, language switching, theme selection saved to DB)
-- ⏳ Database Seeding Improvements (Next priority - needed before theme testing)
-- ⏳ Theme Implementation (Light/Dark mode - after seeding)
+- ✅ Database Seeding (4 test users with comprehensive data: Alice, Bob, Charlie, Diana)
+- ⏳ Theme Implementation (Light/Dark mode - next priority)
 - ⏳ Weekly Tasks, Progress Entries (TODO - use TDD)
 
 **Architecture:** Migrated from API routes to **Server Actions + Service Layer** for improved type safety and performance.
@@ -215,6 +215,25 @@ mockAction.mockResolvedValue({
 });
 ```
 
+### Database Seeding
+
+**Status:** ✅ Comprehensive test data (2025-11-13)
+
+The database seeder (`prisma/seed.ts`) creates realistic test data for development and testing.
+
+**Test Users (4):**
+- **Alice** (alice@example.com) - Power user: 7 goals, English, Light theme
+- **Bob** (bob@example.com) - German user: 3 goals, German, Dark theme  
+- **Charlie** (charlie@example.com) - New user: 1 goal, no name, English, System theme
+- **Diana** (diana@example.com) - Empty state: 0 goals, English, System theme
+
+**Run Seeding:**
+```bash
+pnpm prisma db seed
+```
+
+**Features:** Varied task statuses (active/completed/overdue), realistic deadlines, German content for i18n testing, edge cases (long titles, null descriptions), empty states.
+
 ### Database Models (Prisma)
 
 **Current:**
@@ -352,9 +371,21 @@ Configured in `tsconfig.json`:
 
 ## Recent Completions
 
-### User Settings Page - Complete ✅ (2025-11-11)
+### Database Seeding Improvements ✅ (2025-11-13)
 
-**Phase 1 (Morning):** UI Structure
+Complete rewrite of `prisma/seed.ts` with 4 test users and comprehensive sample data:
+
+**Test Users:**
+- Alice (power user): 7 goals, 14 regions, 33 tasks
+- Bob (German): 3 goals, 5 regions, 8 tasks  
+- Charlie (new user): 1 goal, 1 region, 1 task
+- Diana (empty state): 0 goals
+
+**Features:** Realistic dates, varied task statuses, German i18n content, edge cases, empty states for thorough UI testing.
+
+### User Settings Page - Complete ✅ (2025-11-11 to 2025-11-12)
+
+**Phase 1:** UI Structure
 - Implemented UserProfileSection component (avatar, name, email display)
 - Implemented UserPreferencesSection component (read-only selectors)
 - Added Select component from shadcn/ui
@@ -362,7 +393,7 @@ Configured in `tsconfig.json`:
 - Full test coverage (20 new tests: 11 profile + 9 preferences)
 - 280/280 tests passing
 
-**Phase 2 (Afternoon):** Backend & Interactivity
+**Phase 2:** Backend & Interactivity
 - Added UserPreferences model to Prisma schema
 - Implemented service layer with TDD (7 tests, 100% coverage)
 - Implemented server actions with TDD (11 tests, 93.75% coverage)
@@ -377,7 +408,8 @@ Configured in `tsconfig.json`:
 - Auto-creates default preferences on first visit
 - 100% test coverage for business logic
 
-**Documentation:** See `dev/active/user-settings-implementation/` for full implementation details
+**Phase 3:** Name editing with JWT callback fix
+**Phase 4:** Language switching with cookie-based locale detection
 
 ### TypeScript Error Fixes ✅ (2025-11-06)
 - Standardized ActionResponse formats across all test files
@@ -392,100 +424,29 @@ Configured in `tsconfig.json`:
 - Full test coverage (15 new tests)
 - Responsive behavior in sidebar footer
 
-**Documentation:** See `dev/completed/ARCHIVE_INDEX.md` for archived documentation
-
-### User Settings Page - Phase 3: Name Editing ✅ (2025-11-11) - Production Ready
-
-**Implementation:**
-- Created user service with `getUserById()` and `updateUserName()` functions
-- Created server action `updateUserNameAction()` with full validation
-- Updated UserProfileSection component with edit mode UI
-- Added auto-refresh after save to update NextAuth session
-- **Critical Fix:** Modified NextAuth JWT callback to fetch fresh user data from database
-- Full i18n support (4 new keys in EN + DE)
-
-**Test Results:** 321/321 tests passing (added 24 new tests)
-- 8 service tests (100% coverage)
-- 9 action tests (100% coverage)
-- 7 component tests for edit functionality
-
-**Manual Testing:** ✅ Complete - All scenarios verified working
-
-**Key Features Delivered:**
-- Users can edit their name in settings page
-- Can clear name (sets to null, shows "No name set")
-- Input validation (max 100 characters)
-- XSS sanitization
-- Auto-refresh after save with optimistic UI updates
-- Success/error messages with proper i18n
-- **Name persists correctly** after page reload (JWT callback fix)
-
-**Critical Bug Fix:**
-- Issue: Name saved to DB but didn't appear after reload
-- Root Cause: NextAuth JWT tokens cached stale user data
-- Solution: Modified JWT callback to fetch fresh data from database on every access
-- Result: Name now persists correctly across sessions
-
-**Documentation:** See `dev/active/user-settings-implementation/PHASE3-COMPLETION-SUMMARY.md`
-
-### User Settings Page - Phase 4: Language Switching ✅ (2025-11-12) - Production Ready
-
-**Implementation:**
-- Created `lib/navigation.ts` with `useChangeLocale()` hook for client-side locale switching
-- Updated `middleware.ts` to read `NEXT_LOCALE` cookie and pass locale to i18n via headers
-- Updated `lib/i18n.ts` to accept locale from middleware header
-- Wired up UserPreferencesSection to call `useChangeLocale()` after saving language preference
-- Added js-cookie dependency for client-side cookie management
-- Updated jest.setup.ts with js-cookie and navigation mocks
-
-**Test Results:** 321/321 tests passing (~7.9s) - All existing tests still passing
-- No new tests required (hook is mocked in test environment)
-- Production build successful with no TypeScript errors
-
-**Key Features Delivered:**
-- Language selection now switches UI immediately after page reload
-- Locale preference persists via `NEXT_LOCALE` cookie
-- Cookie-based locale detection in middleware
-- Full integration with next-intl framework
-- Type-safe locale handling throughout
-- Seamless user experience with page reload
-
-**Technical Implementation:**
-- Cookie name: `NEXT_LOCALE` (expires in 1 year)
-- Flow: User selects language → Saves to DB → Sets cookie → Page reloads → Middleware reads cookie → Passes to i18n → UI switches
-- Middleware integration: Combined NextAuth authentication with locale detection
-- Fallback: Defaults to "en" if cookie not present or invalid
-
-**Files Modified:**
-- `lib/navigation.ts` (new) - Locale switching hook
-- `middleware.ts` - Cookie detection and header injection
-- `lib/i18n.ts` - Header-based locale resolution
-- `components/user-settings/user-preferences-section/user-preferences-section.tsx` - Hook integration
-- `jest.setup.ts` - Mock setup for testing
-- `package.json` - Added js-cookie dependencies
+**Archive:** See `dev/completed/ARCHIVE_INDEX.md` for detailed phase documentation
 
 ---
 
 ## Immediate Next Steps
 
-1. **Database Seeding Improvements** (Next Priority - Before Theme Testing)
-   - Add more realistic sample data
-   - Create multiple users for testing
-   - Add variety in goals, regions, tasks
-   - Test data for different scenarios (overdue tasks, empty states, etc.)
-   - **Why first:** Need comprehensive data to view all pages when testing themes
-   - **Estimated time:** 1-2 hours
-
-2. **Theme Implementation** (Light/Dark Mode)
-   - Implement theme provider (next-themes)
+1. **Theme Implementation** (Light/Dark Mode) ← **START HERE**
+   - Install next-themes package
+   - Create theme provider and wrap app
    - Apply light/dark mode styles to all components
    - Connect to saved user preference from DB
-   - Test theme switching across all pages with seeded data
+   - Test with seeded data (Alice=light, Bob=dark, Charlie/Diana=system)
    - **Estimated time:** 2-3 hours
 
-3. **Weekly Tasks Implementation**
+2. **Weekly Tasks Implementation**
    - Add Prisma schema model
    - Implement service layer + actions (TDD)
    - UI components for weekly task management
    - Enforce 3 tasks per week rule
    - **Estimated time:** 4-6 hours
+
+3. **Progress Entries Implementation**
+   - Add Prisma schema model for daily journaling
+   - Service layer + actions (TDD)
+   - Daily progress UI with completion percentage
+   - **Estimated time:** 3-4 hours

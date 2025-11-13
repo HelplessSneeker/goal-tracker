@@ -68,7 +68,8 @@
     "weeklyTasksComingSoon": "Funktion für wöchentliche Aufgaben kommt bald...",
     "status": {
       "active": "aktiv",
-      "completed": "abgeschlossen"
+      "completed": "abgeschlossen",
+      "incomplete": "überfällig"
     }
   },
   "delete": {

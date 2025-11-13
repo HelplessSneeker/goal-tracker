@@ -2,7 +2,7 @@
 
 This document tracks the implementation progress and remaining work for the goal tracking system.
 
-**Last Updated:** 2025-11-12
+**Last Updated:** 2025-11-13
 
 ---
 
@@ -24,8 +24,9 @@ This document tracks the implementation progress and remaining work for the goal
 - Name editing with JWT callback fix for persistence
 - TypeScript error fixes and type safety improvements
 - Comprehensive test coverage (actions, services, components)
+- Database seeding with 4 test users and comprehensive data
 
-**Next:** Database Seeding → Theme Implementation → Weekly Tasks
+**Next:** Theme Implementation → Weekly Tasks → Progress Entries
 
 ---
 
@@ -38,7 +39,7 @@ The system follows a 4-level hierarchy:
 
 ## Completed Work ✅
 
-**Phases 1-4.5 Complete** (Goals, Regions, Tasks, Database, Authentication, UI, User Settings)
+**Phases 1-4.6 Complete** (Goals, Regions, Tasks, Database, Authentication, UI, User Settings, Seeding)
 
 - ✅ **CRUD Operations:** Goals, Regions, Tasks with full UI
 - ✅ **Architecture:** Server Actions + Service Layer (migrated from API routes)
@@ -66,6 +67,12 @@ The system follows a 4-level hierarchy:
   - Header-based locale passing to next-intl
   - Seamless language switching with page reload
   - Locale persists across sessions via cookie
+- ✅ **Database Seeding:** Comprehensive test data (2025-11-13)
+  - 4 test users: Alice (power user), Bob (German), Charlie (new), Diana (empty)
+  - Realistic sample data with varied scenarios
+  - Task statuses: active, completed, overdue
+  - German content for i18n testing
+  - Edge cases and empty states
 - ✅ **Testing:** 321/321 tests passing (actions, services, components, auth)
 - ✅ **Components:** Forms, cards, dialogs for all entities
 - ✅ **User Ownership:** Service layer verifies user ownership on all operations
@@ -84,34 +91,29 @@ The system follows a 4-level hierarchy:
 
 ---
 
-### Phase 4.6: Database Seeding Improvements 🌱
-**Status:** Next Priority - Required before theme implementation
-**Rationale:** Need comprehensive test data to view all pages when testing theme styles
+### Phase 4.6: Database Seeding Improvements 🌱 ✅ COMPLETED (2025-11-13)
 
-#### Current Issues
-- Limited sample data (minimal testing scenarios)
-- Single user only
-- No variety in data for testing edge cases
+Complete rewrite of `prisma/seed.ts` with comprehensive test data:
 
-#### Improvements Needed
-- [ ] Create multiple test users (3-5 users)
-- [ ] Add realistic goal/region/task data for each user
-- [ ] Include various task statuses (pending, in_progress, completed)
-- [ ] Add tasks with different deadline ranges (overdue, upcoming, far future)
-- [ ] Include empty states (users with no goals, goals with no regions)
-- [ ] Add data for testing ownership/authorization
-- [ ] Include edge cases (very long titles, special characters)
+- [x] 4 test users created (Alice, Bob, Charlie, Diana)
+- [x] Realistic goal/region/task data with helper functions
+- [x] Various task statuses (active, completed, overdue/incomplete)
+- [x] Different deadline ranges (past, present, future)
+- [x] Empty states (Diana has no goals, some goals have no regions)
+- [x] Edge cases (long titles, null descriptions, varied dates)
+- [x] German content for i18n testing
+- [x] Comprehensive statistics output after seeding
 
-#### Implementation
-- [ ] Refactor `prisma/seed.ts` with helper functions
-- [ ] Use faker library for realistic data generation
-- [ ] Add seed data categories (minimal, development, testing, demo)
-- [ ] Document seeding options in README
+**Test Users:**
+- Alice: Power user (7 goals, 14 regions, 33 tasks) - English, Light theme
+- Bob: German user (3 goals, 5 regions, 8 tasks) - German, Dark theme
+- Charlie: New user (1 goal, 1 region, 1 task, no name) - English, System theme
+- Diana: Empty state (0 goals) - English, System theme
 
 ---
 
 ### Phase 4.7: Theme Implementation 🎨
-**Status:** After seeding - User requested priority
+**Status:** Next Priority - Seeding complete
 **Rationale:** Theme preference already saved to DB, need to apply it
 
 #### Requirements
@@ -120,16 +122,14 @@ The system follows a 4-level hierarchy:
 - [ ] Wrap app with theme provider in layout
 - [ ] Read user preference from DB on initial load
 - [ ] Apply light/dark mode styles to all components
-- [ ] Test theme switching across all pages (using seeded data)
+- [ ] Test theme switching across all pages with seeded data
 - [ ] Verify theme persists across sessions
 - [ ] Update Tailwind config for dark mode support
 
-#### Implementation Notes
-- Theme preference already stored in UserPreferences model
-- Use next-themes for client-side theme management
-- Connect to DB preference via layout/initial load
-- Tailwind dark mode class strategy
-- Test with comprehensive seeded data
+#### Test with Seeded Users
+- Alice: Light theme preference
+- Bob: Dark theme preference
+- Charlie/Diana: System theme preference
 
 ---
 
@@ -348,15 +348,7 @@ See [TESTING.md](./TESTING.md) for comprehensive testing guide.
 
 ## Immediate Next Steps (Priority Order)
 
-1. **Phase 4.6: Database Seeding Improvements** 🌱 **← START HERE**
-   - Add multiple test users (3-5)
-   - Create realistic and varied sample data
-   - Include edge cases and empty states
-   - Use faker library for data generation
-   - **Why first:** Need comprehensive data to view all pages when testing themes
-   - **Estimated time:** 1-2 hours
-
-2. **Phase 4.7: Theme Implementation** 🎨 **← THEN THIS**
+1. **Phase 4.7: Theme Implementation** 🎨 **← START HERE**
    - Install next-themes package
    - Create theme provider and wrap app
    - Apply light/dark mode styles to all components

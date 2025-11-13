@@ -22,8 +22,8 @@ This is a full-stack application with:
 - ✅ **Comprehensive test coverage** (321/321 tests, 100% service coverage)
 - ✅ **Modern UI** with shadcn/ui components and responsive design
 - ✅ **Type-safe action responses** with proper error handling
-- ⏳ **Database Seeding** (next priority - before theme implementation)
-- ⏳ **Theme Implementation** (Light/Dark mode)
+- ✅ **Database Seeding** with 4 test users and comprehensive sample data
+- ⏳ **Theme Implementation** (Light/Dark mode - next priority)
 - ⏳ **Weekly Tasks and Progress Tracking** (planned)
 
 ## Features
@@ -43,7 +43,6 @@ This is a full-stack application with:
 - **Type Safety** - ActionResponse types with proper error handling
 
 ### In Progress
-- **Database Seeding** - Comprehensive test data for development
 - **Theme Implementation** - Light/Dark mode based on user preference
 
 ### Planned
@@ -118,9 +117,20 @@ pnpm prisma db push
 # Generate Prisma Client
 pnpm prisma generate
 
-# Seed database with sample data (optional)
+# Seed database with comprehensive test data (optional but recommended)
 pnpm prisma db seed
 ```
+
+**What gets seeded:**
+- 4 test users with different profiles:
+  - **Alice** (alice@example.com) - Power user with 7 goals, English, Light theme
+  - **Bob** (bob@example.com) - German user with 3 goals, German, Dark theme
+  - **Charlie** (charlie@example.com) - New user with 1 goal, no name, English, System theme
+  - **Diana** (diana@example.com) - Empty state user with 0 goals, English, System theme
+- Comprehensive sample data including goals, regions, tasks with varied statuses
+- Realistic deadlines (overdue, current, future)
+- German content for i18n testing
+- Edge cases and empty states for thorough UI testing
 
 ### 5. Set Up Email (Development)
 
@@ -179,7 +189,7 @@ pnpm lint         # Run ESLint
 ```bash
 pnpm prisma generate     # Generate Prisma Client
 pnpm prisma db push      # Push schema changes to database
-pnpm prisma db seed      # Seed database with sample data
+pnpm prisma db seed      # Seed with 4 test users and comprehensive data
 pnpm prisma studio       # Open Prisma Studio (database GUI)
 ```
 
