@@ -12,6 +12,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
+import { getUserPreferences } from "@/lib/services/user-preferences.service";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,13 +37,22 @@ export default async function RootLayout({
   const session = await getServerSession(authOptions);
   const messages = await getMessages();
 
+  // Fetch user's theme preference if authenticated
+  let theme = "system"; // Default theme
+  if (session?.user?.id) {
+    const preferences = await getUserPreferences(session.user.id);
+    if (preferences?.theme) {
+      theme = preferences.theme;
+    }
+  }
+
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
-          <Providers>
+          <Providers theme={theme}>
             {session ? (
               <SidebarProvider>
                 <AppSidebar />

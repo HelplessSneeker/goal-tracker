@@ -208,6 +208,19 @@ jest.mock("@/lib/navigation", () => ({
   useChangeLocale: () => mockChangeLocale,
 }));
 
+// Mock next-themes
+export const mockSetTheme = jest.fn();
+jest.mock("next-themes", () => ({
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
+  useTheme: () => ({
+    theme: "light",
+    setTheme: mockSetTheme,
+    systemTheme: "light",
+    resolvedTheme: "light",
+    themes: ["light", "dark", "system"],
+  }),
+}));
+
 // Mock Server Actions for component tests
 jest.mock("@/app/actions/goals", () => ({
   createGoalAction: jest.fn(),
@@ -250,6 +263,7 @@ beforeEach(() => {
   mockRouterBack.mockClear();
   mockGetServerSession.mockClear();
   mockChangeLocale.mockClear();
+  mockSetTheme.mockClear();
 
   // Setup fetch mock
   global.fetch = jest.fn();

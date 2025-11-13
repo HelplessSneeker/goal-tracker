@@ -23,8 +23,8 @@ This is a full-stack application with:
 - ✅ **Modern UI** with shadcn/ui components and responsive design
 - ✅ **Type-safe action responses** with proper error handling
 - ✅ **Database Seeding** with 4 test users and comprehensive sample data
-- ⏳ **Theme Implementation** (Light/Dark mode - next priority)
-- ⏳ **Weekly Tasks and Progress Tracking** (planned)
+- ✅ **Theme Implementation** (Light/Dark/System mode with instant switching)
+- ⏳ **Weekly Tasks and Progress Tracking** (next priority)
 
 ## Features
 
@@ -33,6 +33,7 @@ This is a full-stack application with:
 - **User Interface** - Avatar with dropdown menu, sign-out, settings link
 - **User Settings** - Profile editing, name updates, language & theme preferences
 - **Internationalization** - English/German with dynamic switching (cookie-based)
+- **Theming** - Light/Dark/System mode with instant switching and persistence
 - **Goals** - High-level objectives (no deadlines)
 - **Regions** - Specific areas within goals to focus on
 - **Tasks** - Concrete tasks with deadlines and status tracking
@@ -42,11 +43,8 @@ This is a full-stack application with:
 - **Testing** - Comprehensive test suite (321 tests, 100% coverage)
 - **Type Safety** - ActionResponse types with proper error handling
 
-### In Progress
-- **Theme Implementation** - Light/Dark mode based on user preference
-
 ### Planned
-- **Weekly Tasks** - 3 prioritized tasks per week
+- **Weekly Tasks** - Up to 3 prioritized tasks per week
 - **Progress Entries** - Daily progress tracking with completion percentages
 - **Weekly Review** - Review and recreate weekly tasks
 - **Archive System** - Historical progress tracking
@@ -216,6 +214,7 @@ pnpm test:coverage     # Run tests with coverage report
 - **TypeScript** - Type safety
 - **Tailwind CSS v4** - Styling
 - **shadcn/ui** - Component library
+- **next-themes** - Theme management (Light/Dark/System)
 - **Lucide React** - Icons
 
 ### Backend

@@ -29,6 +29,7 @@ export interface ActionError {
   error: string;
   code: ActionErrorCode;
   validationErrors?: ValidationError[];
+  success?: boolean;
 }
 
 /**
@@ -48,9 +49,7 @@ export type ActionResponse<T> = ActionSuccess<T> | ActionError;
  * Type guard to check if response is an error
  * Can be used with ActionResponse or validation results
  */
-export function isActionError(
-  response: unknown
-): response is ActionError {
+export function isActionError(response: unknown): response is ActionError {
   return (
     typeof response === "object" &&
     response !== null &&
@@ -63,7 +62,7 @@ export function isActionError(
  * Type guard to check if response is successful
  */
 export function isActionSuccess<T>(
-  response: ActionResponse<T>
+  response: ActionResponse<T>,
 ): response is ActionSuccess<T> {
   return "success" in response && response.success === true;
 }
@@ -74,7 +73,7 @@ export function isActionSuccess<T>(
 export function createError(
   message: string,
   code: ActionErrorCode,
-  validationErrors?: ValidationError[]
+  validationErrors?: ValidationError[],
 ): ActionError {
   return {
     error: message,

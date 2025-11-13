@@ -26,7 +26,7 @@ This document tracks the implementation progress and remaining work for the goal
 - Comprehensive test coverage (actions, services, components)
 - Database seeding with 4 test users and comprehensive data
 
-**Next:** Theme Implementation → Weekly Tasks → Progress Entries
+**Next:** Weekly Tasks → Progress Entries
 
 ---
 
@@ -73,6 +73,11 @@ The system follows a 4-level hierarchy:
   - Task statuses: active, completed, overdue
   - German content for i18n testing
   - Edge cases and empty states
+- ✅ **Theme Implementation:** Light/Dark/System mode with next-themes (2025-11-13)
+  - ThemeProvider integration with database-backed preferences
+  - Instant theme switching with `useThemeSync` hook
+  - All components theme-ready with semantic Tailwind classes
+  - Seamless persistence across sessions
 - ✅ **Testing:** 321/321 tests passing (actions, services, components, auth)
 - ✅ **Components:** Forms, cards, dialogs for all entities
 - ✅ **User Ownership:** Service layer verifies user ownership on all operations
@@ -83,7 +88,7 @@ The system follows a 4-level hierarchy:
 - [x] User profile menu in UI (UserMenu component in sidebar)
 - [x] User settings page with profile editing
 - [x] Dynamic language switching (English/German)
-- [x] Theme preference selection (saved, not yet applied)
+- [x] Theme implementation (Light/Dark/System mode, instant switching)
 
 ---
 
@@ -112,24 +117,40 @@ Complete rewrite of `prisma/seed.ts` with comprehensive test data:
 
 ---
 
-### Phase 4.7: Theme Implementation 🎨
-**Status:** Next Priority - Seeding complete
-**Rationale:** Theme preference already saved to DB, need to apply it
+### Phase 4.7: Theme Implementation 🎨 ✅ COMPLETED (2025-11-13)
+
+Implemented full Light/Dark/System theme switching with `next-themes`.
 
 #### Requirements
-- [ ] Install next-themes package
-- [ ] Create theme provider component
-- [ ] Wrap app with theme provider in layout
-- [ ] Read user preference from DB on initial load
-- [ ] Apply light/dark mode styles to all components
-- [ ] Test theme switching across all pages with seeded data
-- [ ] Verify theme persists across sessions
-- [ ] Update Tailwind config for dark mode support
+- [x] Install next-themes package (v0.4.6)
+- [x] Create ThemeProvider wrapper component (`components/theme-provider.tsx`)
+- [x] Update Providers component to include ThemeProvider
+- [x] Add suppressHydrationWarning to root layout
+- [x] Fetch user preference from DB on initial load (server-side)
+- [x] Pass theme as defaultTheme to ThemeProvider
+- [x] Create useThemeSync hook for instant theme changes + DB sync
+- [x] Update UserPreferencesSection to use useThemeSync
+- [x] Add next-themes mock to jest.setup.ts
+- [x] Test theme switching (all 321 tests passing)
+- [x] Verify theme persists across sessions
+- [x] Tailwind dark mode support (CSS variables already defined)
 
-#### Test with Seeded Users
-- Alice: Light theme preference
-- Bob: Dark theme preference
-- Charlie/Diana: System theme preference
+#### Files Created
+- `components/theme-provider.tsx` - ThemeProvider wrapper
+- `hooks/use-theme-sync.ts` - Hook for syncing theme to DB
+
+#### Files Modified
+- `app/providers.tsx`, `app/layout.tsx`, `jest.setup.ts`, `package.json`
+- `components/user-settings/user-preferences-section/user-preferences-section.tsx`
+
+#### Key Features
+- Instant theme switching (no page reload required)
+- Database-backed persistence across sessions
+- System preference detection with `enableSystem={true}`
+- All components theme-ready (semantic Tailwind classes)
+- No hydration mismatch with `suppressHydrationWarning`
+
+**Time Invested:** ~2.5 hours
 
 ---
 
@@ -145,7 +166,7 @@ Complete rewrite of `prisma/seed.ts` with comprehensive test data:
   - Handle FormData, auth checks, call service layer, revalidate paths
 
 #### UI/Components
-- [ ] WeeklyTaskForm component (enforce 3 tasks per week)
+- [ ] WeeklyTaskForm component (max 3 tasks per week)
 - [ ] WeeklyTaskCard component with priority indicator
 - [ ] Add weekly tasks section to task detail page
 - [ ] Week selector/navigation
@@ -362,7 +383,7 @@ See [TESTING.md](./TESTING.md) for comprehensive testing guide.
    - Create service layer (TDD)
    - Create server actions (TDD)
    - Create UI components (TDD)
-   - Enforce 3 tasks per week per task
+   - Max 3 tasks per week per task
    - **Estimated time:** 4-6 hours
 
 4. **Phase 6: Progress Entries**

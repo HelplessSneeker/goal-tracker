@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { updateUserPreferencesAction } from "@/app/actions/user-preferences";
 import { useChangeLocale } from "@/lib/navigation";
+import { useThemeSync } from "@/hooks/use-theme-sync";
 import type { Locale } from "@/lib/i18n";
 
 interface UserPreferencesSectionProps {
@@ -35,12 +36,20 @@ export function UserPreferencesSection({
   const [preferences, setPreferences] = useState(initialPreferences);
   const [isPending, startTransition] = useTransition();
   const changeLocale = useChangeLocale();
+  const { setThemeSync } = useThemeSync();
 
   const handleUpdate = (key: "language" | "theme", value: string) => {
     // Optimistic update
     const previousPreferences = preferences;
     setPreferences((prev) => ({ ...prev, [key]: value }));
 
+    // Handle theme changes with immediate UI update
+    if (key === "theme") {
+      setThemeSync(value);
+      return;
+    }
+
+    // Handle language changes (existing logic)
     startTransition(async () => {
       const formData = new FormData();
       formData.append(key, value);

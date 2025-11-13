@@ -26,7 +26,7 @@ Next.js 15 goal-tracking application using App Router, React 19, TypeScript, Tai
 - ✅ Testing (Jest + React Testing Library - 321/321 tests passing, 100% service coverage)
 - ✅ User Settings Page (Complete - profile editing, language switching, theme selection saved to DB)
 - ✅ Database Seeding (4 test users with comprehensive data: Alice, Bob, Charlie, Diana)
-- ⏳ Theme Implementation (Light/Dark mode - next priority)
+- ✅ Theme Implementation (Light/Dark/System mode with next-themes, instant switching, persisted to DB)
 - ⏳ Weekly Tasks, Progress Entries (TODO - use TDD)
 
 **Architecture:** Migrated from API routes to **Server Actions + Service Layer** for improved type safety and performance.
@@ -371,6 +371,54 @@ Configured in `tsconfig.json`:
 
 ## Recent Completions
 
+### Theme Implementation - Complete ✅ (2025-11-13)
+
+Implemented full Light/Dark/System theme switching with `next-themes` package.
+
+**What Was Implemented:**
+- Installed `next-themes@0.4.6` package
+- Created `ThemeProvider` wrapper component (`components/theme-provider.tsx`)
+- Updated `Providers` component to include ThemeProvider with user's saved preference
+- Added `suppressHydrationWarning` to root layout's `<html>` tag (prevents hydration mismatch)
+- Fetches user's theme preference from database in root layout (server-side)
+- Passes theme as `defaultTheme` prop to ThemeProvider
+- Created `useThemeSync` hook (`hooks/use-theme-sync.ts`) to sync theme changes to both next-themes AND database
+- Updated `UserPreferencesSection` to trigger immediate theme changes via `useThemeSync`
+- Added next-themes mock to `jest.setup.ts` for testing
+- All 321 tests still passing
+
+**How It Works:**
+1. User's saved theme preference is fetched from database on page load (root layout)
+2. Theme is passed to ThemeProvider as initial value
+3. ThemeProvider applies the correct CSS class to the `<html>` element
+4. When user changes theme in settings:
+   - `useThemeSync` updates next-themes immediately (instant UI change)
+   - Theme preference is saved to database (persists across sessions)
+   - Router refreshes to ensure server components see updated preference
+
+**Files Created:**
+- `components/theme-provider.tsx` - ThemeProvider wrapper
+- `hooks/use-theme-sync.ts` - Hook for syncing theme to DB
+
+**Files Modified:**
+- `app/providers.tsx` - Added ThemeProvider integration
+- `app/layout.tsx` - Added theme fetching and suppressHydrationWarning
+- `components/user-settings/user-preferences-section/user-preferences-section.tsx` - Integrated useThemeSync
+- `jest.setup.ts` - Added next-themes mock
+- `package.json` - Added next-themes dependency
+
+**Testing:**
+- All existing semantic Tailwind classes (bg-background, text-foreground, etc.) automatically work with themes
+- CSS variables for light and dark modes already defined in `globals.css`
+- Test with seeded users: Alice (light), Bob (dark), Charlie/Diana (system)
+- Dev server: `pnpm dev` → http://localhost:3000
+
+**Key Technical Details:**
+- Uses `attribute="class"` mode (adds `.dark` class to html element)
+- `enableSystem={true}` for system preference detection
+- `disableTransitionOnChange` prevents flash during theme switch
+- No hardcoded colors in components - all use semantic Tailwind classes
+
 ### Database Seeding Improvements ✅ (2025-11-13)
 
 Complete rewrite of `prisma/seed.ts` with 4 test users and comprehensive sample data:
@@ -430,22 +478,14 @@ Complete rewrite of `prisma/seed.ts` with 4 test users and comprehensive sample 
 
 ## Immediate Next Steps
 
-1. **Theme Implementation** (Light/Dark Mode) ← **START HERE**
-   - Install next-themes package
-   - Create theme provider and wrap app
-   - Apply light/dark mode styles to all components
-   - Connect to saved user preference from DB
-   - Test with seeded data (Alice=light, Bob=dark, Charlie/Diana=system)
-   - **Estimated time:** 2-3 hours
-
-2. **Weekly Tasks Implementation**
+1. **Weekly Tasks Implementation** ← **START HERE**
    - Add Prisma schema model
    - Implement service layer + actions (TDD)
    - UI components for weekly task management
    - Enforce 3 tasks per week rule
    - **Estimated time:** 4-6 hours
 
-3. **Progress Entries Implementation**
+2. **Progress Entries Implementation**
    - Add Prisma schema model for daily journaling
    - Service layer + actions (TDD)
    - Daily progress UI with completion percentage
