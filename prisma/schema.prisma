@@ -60,6 +60,32 @@ model Task {
 
   region   Region @relation(fields: [regionId], references: [id])
   regionId String
+
+  weeklyTasks WeeklyTask[]
+}
+
+enum WeeklyTaskStatus {
+  pending
+  in_progress
+  completed
+}
+
+model WeeklyTask {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title         String           @db.VarChar(255)
+  description   String?
+  priority      Int              @default(1)
+  weekStartDate DateTime
+  status        WeeklyTaskStatus @default(pending)
+
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId String
+
+  @@index([taskId])
+  @@index([weekStartDate])
 }
 
 // Nextauth tables for user management

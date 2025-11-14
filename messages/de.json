@@ -72,6 +72,38 @@
       "incomplete": "überfällig"
     }
   },
+  "weeklyTasks": {
+    "title": "Wöchentliche Aufgaben",
+    "newWeeklyTask": "Neue wöchentliche Aufgabe",
+    "createNew": "Neue wöchentliche Aufgabe erstellen",
+    "editWeeklyTask": "Wöchentliche Aufgabe bearbeiten",
+    "createDescription": "Fügen Sie eine wöchentliche Aufgabe für diese Woche hinzu",
+    "editDescription": "Aktualisieren Sie Ihre wöchentlichen Aufgabeninformationen",
+    "titlePlaceholder": "z.B. Tutorial-Abschnitt 1-3 abschließen",
+    "descriptionPlaceholder": "Beschreiben Sie diese wöchentliche Aufgabe...",
+    "createButton": "Wöchentliche Aufgabe erstellen",
+    "saveButton": "Änderungen speichern",
+    "failedToLoad": "Wöchentliche Aufgabe konnte nicht geladen werden",
+    "noWeeklyTasks": "Noch keine wöchentlichen Aufgaben für diese Woche.",
+    "createFirst": "Erstellen Sie Ihre erste wöchentliche Aufgabe, um zu beginnen.",
+    "priority": "Priorität",
+    "weekStartDate": "Wochenbeginn",
+    "thisWeek": "Diese Woche",
+    "previousWeek": "Vorherige Woche",
+    "nextWeek": "Nächste Woche",
+    "week": "Woche",
+    "warningLimit": "Hinweis: Sie haben bereits 3 oder mehr Aufgaben für diese Woche. Erwägen Sie, sich auf die Fertigstellung bestehender Aufgaben zu konzentrieren, bevor Sie weitere hinzufügen.",
+    "status": {
+      "pending": "Ausstehend",
+      "in_progress": "In Bearbeitung",
+      "completed": "Abgeschlossen"
+    },
+    "priorityLevel": {
+      "1": "Hohe Priorität",
+      "2": "Mittlere Priorität",
+      "3": "Niedrige Priorität"
+    }
+  },
   "delete": {
     "goal": {
       "title": "Ziel löschen",
@@ -108,6 +140,13 @@
       "confirmPlaceholder": "Aufgabentitel zur Bestätigung eingeben",
       "errorMismatch": "Aufgabenname stimmt nicht überein",
       "deleteButton": "Aufgabe löschen"
+    },
+    "weeklyTask": {
+      "title": "Wöchentliche Aufgabe löschen",
+      "warning": "Diese Aktion kann nicht rückgängig gemacht werden. Dies wird die wöchentliche Aufgabe dauerhaft löschen",
+      "confirmPrompt": "Bitte geben Sie {title} zur Bestätigung ein:",
+      "confirmPlaceholder": "Titel der wöchentlichen Aufgabe zur Bestätigung eingeben",
+      "deleteButton": "Wöchentliche Aufgabe löschen"
     }
   },
   "auth": {

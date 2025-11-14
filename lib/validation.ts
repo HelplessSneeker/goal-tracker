@@ -197,6 +197,69 @@ export const taskSchemas = {
 };
 
 /**
+ * Weekly Task validation schemas
+ */
+export const weeklyTaskSchemas = {
+  create: z.object({
+    taskId: z.string().uuid("Invalid task ID"),
+    title: z
+      .string()
+      .nullable()
+      .transform((val) => val || "")
+      .pipe(
+        z
+          .string()
+          .min(1, "Title is required")
+          .max(255, "Title must be 255 characters or less"),
+      )
+      .transform(sanitizeString),
+    description: z
+      .string()
+      .nullable()
+      .optional()
+      .transform((val) => sanitizeOptionalString(val ?? undefined)),
+    priority: z.coerce
+      .number()
+      .int("Priority must be an integer")
+      .min(1, "Priority must be between 1 and 3")
+      .max(3, "Priority must be between 1 and 3")
+      .default(1),
+    weekStartDate: z.coerce.date({ message: "Invalid week start date" }),
+  }),
+  update: z.object({
+    id: z.string().uuid("Invalid weekly task ID"),
+    title: z
+      .string()
+      .nullable()
+      .transform((val) => val || "")
+      .pipe(
+        z
+          .string()
+          .min(1, "Title is required")
+          .max(255, "Title must be 255 characters or less"),
+      )
+      .transform(sanitizeString),
+    description: z
+      .string()
+      .nullable()
+      .optional()
+      .transform((val) => sanitizeOptionalString(val ?? undefined)),
+    priority: z.coerce
+      .number()
+      .int("Priority must be an integer")
+      .min(1, "Priority must be between 1 and 3")
+      .max(3, "Priority must be between 1 and 3"),
+    weekStartDate: z.coerce.date({ message: "Invalid week start date" }),
+    status: z.enum(["pending", "in_progress", "completed"], {
+      message: "Status must be pending, in_progress, or completed",
+    }),
+  }),
+  delete: z.object({
+    id: z.string().uuid("Invalid weekly task ID"),
+  }),
+};
+
+/**
  * User Preferences validation schemas
  */
 export const languageSchema = z.enum(["en", "de"], {

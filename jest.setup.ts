@@ -170,6 +170,15 @@ jest.mock("@/lib/prisma", () => ({
       delete: jest.fn() as jest.Mock,
       count: jest.fn() as jest.Mock,
     },
+    weeklyTask: {
+      findMany: jest.fn() as jest.Mock,
+      findUnique: jest.fn() as jest.Mock,
+      findFirst: jest.fn() as jest.Mock,
+      create: jest.fn() as jest.Mock,
+      update: jest.fn() as jest.Mock,
+      delete: jest.fn() as jest.Mock,
+      count: jest.fn() as jest.Mock,
+    },
     userPreferences: {
       findMany: jest.fn() as jest.Mock,
       findUnique: jest.fn() as jest.Mock,
