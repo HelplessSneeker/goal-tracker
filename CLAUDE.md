@@ -23,7 +23,7 @@ Next.js 15 goal-tracking application using App Router, React 19, TypeScript, Tai
 - ✅ Authentication (NextAuth.js with email/magic link, JWT sessions)
 - ✅ User Interface (User avatar sidebar with dropdown menu)
 - ✅ Internationalization (next-intl with English & German, dynamic language switching via cookies)
-- ✅ Testing (Jest + React Testing Library - 424/424 tests passing, 100% service coverage)
+- ✅ Testing (Jest + React Testing Library - 425/425 tests passing, 100% service coverage)
 - ✅ User Settings Page (Complete - profile editing, language switching, theme selection saved to DB)
 - ✅ Database Seeding (4 test users with comprehensive data: Alice, Bob, Charlie, Diana)
 - ✅ Theme Implementation (Light/Dark/System mode with next-themes, instant switching, persisted to DB)
@@ -56,9 +56,9 @@ pnpm prisma studio      # Database GUI
 
 **⚠️ IMPORTANT: Follow Test-Driven Development for all new features.**
 
-**Current Status:** 424/424 tests passing (~6s)
+**Current Status:** 425/425 tests passing (~5.6s)
 - ✅ 129 action tests (85%+ coverage, includes 11 user preferences + 9 user + 27 weekly tasks action tests)
-- ✅ 75 service tests (100% coverage, includes 7 user preferences + 8 user + 15 weekly tasks service tests)
+- ✅ 76 service tests (100% coverage, includes 7 user preferences + 8 user + 18 weekly tasks service tests)
 - ✅ 208 component tests (93-100% coverage, includes 15 UserMenu + 31 UserSettings + 61 weekly tasks UI tests)
 - ✅ 12 authentication tests (100% coverage)
 
@@ -370,127 +370,40 @@ Configured in `tsconfig.json`:
 
 ## Recent Completions
 
-### Weekly Tasks Implementation - Complete ✅ (2025-11-17)
+### Weekly Tasks Implementation - Complete ✅ (2025-11-18)
 
-Fully implemented weekly tasks feature using TDD methodology across all layers.
+Fully implemented weekly tasks feature using TDD methodology across all layers with full UI integration.
 
 **What Was Implemented:**
+- **Database:** WeeklyTask model with priority (1-3), status, weekStartDate
+- **Service Layer:** 5 functions, 100% coverage, 18 tests
+  - getWeeklyTasksForTask (with optional week filter)
+  - getWeeklyTaskById (with ownership verification through Task → Region → Goal chain)
+  - createWeeklyTask, updateWeeklyTask, deleteWeeklyTask
+- **Server Actions:** 5 actions, 85%+ coverage, 27 tests
+  - Full CRUD with NextAuth session verification, Zod validation, cache revalidation
+- **Components:** 5 components, 96-100% coverage, 61 tests
+  - WeeklyTaskCard - priority badges, status display, edit/delete actions
+  - WeeklyTaskForm - create/edit modes with validation (99.62% coverage)
+  - WeekSelector - week navigation (Previous/This/Next), 100% coverage
+  - DeleteWeeklyTaskDialog - confirmation with title match, 98% coverage
+  - WeeklyTasksSection - main container with 3-task limit enforcement (96.03% coverage)
+- **Pages:** 2 pages with full test coverage, 11 tests
+  - Create page: `/weekly-tasks/new`
+  - Edit page: `/weekly-tasks/[weeklyTaskId]/edit`
+- **UI Integration:** Task detail pages with full weekly tasks display and management
+- **i18n:** 24+ translation keys (EN + DE)
+- **Ordering:** Priority-based (1, 2, 3) instead of creation date
 
-**Database Layer:**
-- Added `WeeklyTask` model to Prisma schema with:
-  - UUID primary key
-  - Foreign key to Task (with cascade delete)
-  - Fields: title, description, priority (1-3), weekStartDate, status
-  - Enum: WeeklyTaskStatus (pending, in_progress, completed)
-  - Indexes on taskId and weekStartDate for query performance
-- Ran `pnpm prisma generate && pnpm prisma db push`
+**Bug Fixes:**
+- Fixed 404 on creation page (URL path issue)
+- Fixed action name typos (getTaskAction, getWeeklyTaskAction)
+- Fixed TypeScript errors (14 errors resolved, ActionErrorCode usage, WeeklyTask imports)
+- Fixed delete dialog integration in WeeklyTasksSection
 
-**Service Layer (100% coverage):**
-- `lib/services/weekly-tasks.service.ts` - 5 functions implemented with TDD:
-  - `getWeeklyTasksForTask(taskId, userId, weekStartDate?)` - List with optional week filter
-  - `getWeeklyTaskById(id, userId)` - Single task retrieval with ownership check
-  - `createWeeklyTask(data)` - Create with task ownership verification
-  - `updateWeeklyTask(id, userId, data)` - Update with ownership check
-  - `deleteWeeklyTask(id, userId)` - Delete with ownership verification
-- Ownership verification through relationship chain: WeeklyTask → Task → Region → Goal → User
-- All 15 service tests passing
+**Test Results:** 425/425 passing, ~5.6s
 
-**Server Actions (85%+ coverage):**
-- `app/actions/weekly-tasks.ts` - 5 actions implemented with TDD:
-  - `createWeeklyTaskAction(formData)` - Validates priority (1-3), status, weekStartDate
-  - `updateWeeklyTaskAction(formData)` - Updates with validation
-  - `deleteWeeklyTaskAction(formData)` - Simple ID-based deletion
-  - `getWeeklyTasksAction(taskId, weekStartDate?)` - Fetch with optional week filter
-  - `getWeeklyTaskAction(id)` - Single task retrieval
-- All actions use NextAuth session verification
-- FormData validation with Zod schemas
-- Cache revalidation on mutations (`revalidatePath`)
-- All 27 action tests passing
-
-**Validation Schemas:**
-- `lib/validation.ts` - Added weeklyTaskSchemas:
-  - `createWeeklyTaskSchema` - Validates title, description, priority, weekStartDate, status, taskId
-  - `updateWeeklyTaskSchema` - Validates id + update fields
-  - `deleteWeeklyTaskSchema` - Simple id validation
-  - Priority validation enforces 1-3 range
-  - Date coercion for weekStartDate
-
-**Type Definitions:**
-- `lib/types.ts` - Added WeeklyTask type:
-  - Supports both Prisma Date objects and ISO string dates
-  - Compatible with JSON serialization for server components
-
-**Components (98-100% coverage):**
-- `WeeklyTaskCard` component:
-  - Displays weekly task with priority badge (color-coded 1-3: red/yellow/blue)
-  - Shows status with i18n translation (pending/in_progress/completed)
-  - Edit/Delete action buttons
-  - Full i18n support
-  - 9 component tests passing
-
-- `DeleteWeeklyTaskDialog` component:
-  - Confirmation dialog requiring exact title match
-  - Loading states during deletion
-  - Error handling with error messages
-  - Router refresh after successful deletion
-  - 10 component tests passing
-
-- `WeekSelector` component:
-  - Week navigation (Previous/This Week/Next)
-  - Displays week range with proper date formatting
-  - Normalizes any date to Sunday (week start)
-  - Utility function: `getWeekStart(date)` - Returns Sunday at midnight UTC
-  - 11 component tests passing (after fixing date calculations)
-
-**Internationalization:**
-- Added 24 new i18n keys to `messages/en.json` and `messages/de.json`:
-  - `weeklyTasks.*` - Form labels, buttons, status labels
-  - `weeklyTasks.status.*` - Status translations (pending, in_progress, completed)
-  - `weeklyTasks.priorityLevel.*` - Priority labels (High/Medium/Low)
-  - `delete.weeklyTask.*` - Delete dialog translations
-
-**Bug Fix - Test Date Calculations:**
-- Fixed 6 failing tests in `week-selector.test.tsx`
-- Issue: Tests assumed Nov 10, 2025 was Sunday (actually Monday)
-- Solution: Changed mock dates to Nov 9, 2025 (actual Sunday)
-- Updated all date expectations in tests to match correct week boundaries
-
-**Test Results:**
-- Started with: 387/393 tests passing (6 failures in WeekSelector)
-- After fixes: **393/393 tests passing** ✅
-- Test execution time: ~10s
-- Coverage: 85%+ actions, 100% services, 98%+ components
-
-**Files Created:**
-- `lib/services/weekly-tasks.service.ts` + `.test.ts`
-- `app/actions/weekly-tasks.ts` + `.test.ts`
-- `components/weekly-tasks/weekly-task-card/` (component + tests)
-- `components/weekly-tasks/delete-weekly-task-dialog/` (component + tests)
-- `components/weekly-tasks/week-selector/` (component + tests)
-- `components/weekly-tasks/index.ts` (exports)
-
-**Files Modified:**
-- `prisma/schema.prisma` - Added WeeklyTask model
-- `lib/validation.ts` - Added weeklyTaskSchemas
-- `lib/types.ts` - Added WeeklyTask type
-- `messages/en.json` - Added 24 weekly task keys
-- `messages/de.json` - Added 24 weekly task keys (German translations)
-
-**Key Features:**
-- Week-based organization (tasks grouped by Sunday week start)
-- Priority system (1-3: High/Medium/Low with visual indicators)
-- Status tracking (pending/in_progress/completed)
-- Ownership verification through 3-level relationship chain
-- Full CRUD operations with proper error handling
-- Optimistic UI updates in components
-- Comprehensive i18n support
-
-**Architecture Pattern:**
-Following established pattern: Client Component → Server Action → Service Layer → Prisma → Database
-
-**Next Steps:**
-- UI integration for weekly tasks in task detail pages (display + forms)
-- Progress Entries implementation (next feature in hierarchy)
+See `dev/active/weekly-tasks/` for detailed implementation notes.
 
 ### Theme Implementation - Complete ✅ (2025-11-13)
 
@@ -599,14 +512,13 @@ Complete rewrite of `prisma/seed.ts` with 4 test users and comprehensive sample 
 
 ## Immediate Next Steps
 
-1. **Weekly Tasks UI Integration** ← **START HERE**
-   - Create WeeklyTaskForm component (create/edit modes)
-   - Integrate WeekSelector, WeeklyTaskCard, DeleteWeeklyTaskDialog into task detail pages
-   - Add "Add Weekly Task" button and form dialog
-   - Display weekly tasks list filtered by selected week
-   - Add empty states for weeks with no tasks
-   - Optional: Add warning when 3+ tasks exist for a week
-   - **Estimated time:** 2-3 hours
+1. **Progress Page Overhaul** ← **START HERE**
+   - Display current week's weekly tasks with parent task info
+   - Show task hierarchy (Goal → Region → Task → Weekly Task)
+   - Filter by week with WeekSelector
+   - Include priority indicators and status
+   - Add completion statistics
+   - **Estimated time:** 3-4 hours
 
 2. **Progress Entries Implementation**
    - Add ProgressEntry Prisma model for daily journaling

@@ -239,6 +239,17 @@ mockAction.mockResolvedValue({
 })
 ```
 
+### WeeklyTask Type Import Location
+```typescript
+// ✅ Import from types, NOT from Prisma client
+import type { WeeklyTask } from '@/lib/types'
+
+// ❌ Don't import from Prisma (causes serialization issues)
+import type { WeeklyTask } from '@prisma/client'
+```
+
+**Why:** The `@/lib/types` version supports both Date objects (server) and ISO string dates (after serialization), while the Prisma version only supports Date objects.
+
 ### Prisma Mock Typing
 ```typescript
 const mockPrisma = prisma as jest.Mocked<typeof prisma>
@@ -478,6 +489,8 @@ pnpm tsc --noEmit     # Type check
 | `TextEncoder is not defined` | next/cache in tests | Add `jest.mock("next/cache")` |
 | `Cannot read 'getTime' of undefined` | SSR date initialization | Use nullable state + useEffect |
 | `Foreign key constraint` | User doesn't exist | Check user exists before creating related records |
+| `ActionErrorCode not found` | Wrong import in tests | Import from `@/lib/action-types` |
+| `WeeklyTask type mismatch` | Wrong import location | Import from `@/lib/types` not `@prisma/client` |
 
 ---
 

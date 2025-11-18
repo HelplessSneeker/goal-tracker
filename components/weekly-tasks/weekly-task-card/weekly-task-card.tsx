@@ -13,7 +13,7 @@ interface WeeklyTaskCardProps {
   goalId: string;
   regionId: string;
   taskId: string;
-  onDelete?: (weeklyTask: WeeklyTask) => void;
+  onDeleted?: (weeklyTask: WeeklyTask) => void;
 }
 
 export function WeeklyTaskCard({
@@ -21,7 +21,7 @@ export function WeeklyTaskCard({
   goalId,
   regionId,
   taskId,
-  onDelete,
+  onDeleted,
 }: WeeklyTaskCardProps) {
   const router = useRouter();
   const t = useTranslations();
@@ -33,8 +33,8 @@ export function WeeklyTaskCard({
   };
 
   const handleDelete = () => {
-    if (onDelete) {
-      onDelete(weeklyTask);
+    if (onDeleted) {
+      onDeleted(weeklyTask);
     }
   };
 

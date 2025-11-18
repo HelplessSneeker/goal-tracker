@@ -1,4 +1,4 @@
-import { getTaskByIdAction } from "@/app/actions/tasks";
+import { getTaskAction } from "@/app/actions/tasks";
 import { WeeklyTaskForm } from "@/components/weekly-tasks";
 import { getTranslations } from "next-intl/server";
 
@@ -14,14 +14,12 @@ export default async function NewWeeklyTaskPage({
   params,
 }: NewWeeklyTaskPageProps) {
   const t = await getTranslations("weeklyTasks");
-  const result = await getTaskByIdAction(params.taskId);
+  const result = await getTaskAction(params.taskId);
 
   if ("error" in result) {
     return (
       <div className="container mx-auto max-w-2xl py-8">
-        <div className="text-center text-destructive">
-          {result.error}
-        </div>
+        <div className="text-center text-destructive">{result.error}</div>
       </div>
     );
   }

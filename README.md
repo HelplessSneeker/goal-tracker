@@ -19,12 +19,13 @@ This is a full-stack application with:
 - ✅ **User avatar and menu** with sign-out functionality
 - ✅ **User Settings Page** - profile editing, language switching, theme preferences
 - ✅ **Dynamic i18n** - English/German with cookie-based switching
-- ✅ **Comprehensive test coverage** (321/321 tests, 100% service coverage)
+- ✅ **Comprehensive test coverage** (425/425 tests, 100% service coverage)
 - ✅ **Modern UI** with shadcn/ui components and responsive design
 - ✅ **Type-safe action responses** with proper error handling
 - ✅ **Database Seeding** with 4 test users and comprehensive sample data
 - ✅ **Theme Implementation** (Light/Dark/System mode with instant switching)
-- ⏳ **Weekly Tasks and Progress Tracking** (next priority)
+- ✅ **Weekly Tasks** - Complete CRUD with priority system and full UI integration
+- ⏳ **Progress Tracking** (next priority)
 
 ## Features
 
@@ -37,6 +38,7 @@ This is a full-stack application with:
 - **Goals** - High-level objectives (no deadlines)
 - **Regions** - Specific areas within goals to focus on
 - **Tasks** - Concrete tasks with deadlines and status tracking
+- **Weekly Tasks** - Up to 3 prioritized tasks per week with status tracking
 - **Full CRUD** - Create, read, update, delete functionality for all entities
 - **Responsive Design** - Modern UI with shadcn/ui components
 - **Database** - PostgreSQL with Prisma ORM (UUID primary keys)
@@ -44,7 +46,7 @@ This is a full-stack application with:
 - **Type Safety** - ActionResponse types with proper error handling
 
 ### Planned
-- **Weekly Tasks** - Up to 3 prioritized tasks per week
+- **Progress Page Overhaul** - Dashboard for current week's tasks
 - **Progress Entries** - Daily progress tracking with completion percentages
 - **Weekly Review** - Review and recreate weekly tasks
 - **Archive System** - Historical progress tracking
@@ -200,10 +202,10 @@ pnpm test:coverage     # Run tests with coverage report
 ```
 
 **Current Test Status:**
-- 321/321 tests passing (~7.9s)
-- 100% server action coverage (102 tests)
-- 100% service layer coverage (60 tests)
-- 93-100% component coverage (147 tests, includes 15 UserMenu + 31 UserSettings tests)
+- 425/425 tests passing (~5.6s)
+- 85%+ server action coverage (129 tests, includes 27 weekly tasks)
+- 100% service layer coverage (76 tests, includes 18 weekly tasks)
+- 93-100% component coverage (208 tests, includes 61 weekly tasks)
 - 100% authentication coverage (12 tests)
 
 ## Tech Stack
@@ -282,7 +284,7 @@ Goal (UUID) ──> Region (UUID) ──> Task (UUID)
 
 **Current Models:**
 - `User`, `Account`, `Session`, `VerificationToken` (NextAuth adapter models)
-- `Goal`, `Region`, `Task` (with userId foreign keys)
+- `Goal`, `Region`, `Task`, `WeeklyTask` (with userId foreign keys)
 - `UserPreferences` (language, theme settings with auto-creation)
 
 All entities use UUID primary keys for better scalability and security.

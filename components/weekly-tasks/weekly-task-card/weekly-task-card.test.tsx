@@ -126,15 +126,15 @@ describe("WeeklyTaskCard", () => {
       );
     });
 
-    it("should call onDelete when Delete button is clicked", async () => {
-      const mockOnDelete = jest.fn();
+    it("should call onDeleted when Delete button is clicked", async () => {
+      const mockOnDeleted = jest.fn();
       const user = userEvent.setup();
-      render(<WeeklyTaskCard {...defaultProps} onDelete={mockOnDelete} />);
+      render(<WeeklyTaskCard {...defaultProps} onDeleted={mockOnDeleted} />);
 
       const deleteButton = screen.getByRole("button", { name: /delete/i });
       await user.click(deleteButton);
 
-      expect(mockOnDelete).toHaveBeenCalledWith(mockWeeklyTask);
+      expect(mockOnDeleted).toHaveBeenCalledWith(mockWeeklyTask);
     });
   });
 

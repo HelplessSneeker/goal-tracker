@@ -26,7 +26,7 @@ export interface UpdateWeeklyTaskInput {
 export async function getWeeklyTasksForTask(
   taskId: string,
   userId: string,
-  weekStartDate?: Date
+  weekStartDate?: Date,
 ) {
   return await prisma.weeklyTask.findMany({
     where: {
@@ -40,7 +40,7 @@ export async function getWeeklyTasksForTask(
         },
       },
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { priority: "asc" },
   });
 }
 
@@ -73,7 +73,7 @@ export async function getWeeklyTaskById(id: string, userId: string) {
  */
 export async function createWeeklyTask(
   userId: string,
-  data: CreateWeeklyTaskInput
+  data: CreateWeeklyTaskInput,
 ) {
   // First verify the user owns the task's goal
   const task = await prisma.task.findFirst({
@@ -106,7 +106,7 @@ export async function createWeeklyTask(
 export async function updateWeeklyTask(
   id: string,
   userId: string,
-  data: UpdateWeeklyTaskInput
+  data: UpdateWeeklyTaskInput,
 ) {
   // First verify the weekly task exists and user owns the goal
   const existingWeeklyTask = await prisma.weeklyTask.findFirst({

@@ -6,6 +6,7 @@ import {
   createWeeklyTaskAction,
   updateWeeklyTaskAction,
 } from "@/app/actions/weekly-tasks";
+import { ActionErrorCode } from "@/lib/action-types";
 import type { WeeklyTask } from "@/lib/types";
 
 jest.mock("@/app/actions/weekly-tasks");
@@ -114,7 +115,7 @@ describe("WeeklyTaskForm", () => {
       const user = userEvent.setup();
       mockCreateWeeklyTaskAction.mockResolvedValue({
         success: true,
-        data: mockWeeklyTask,
+        data: mockWeeklyTask as any,
       });
 
       render(
@@ -150,7 +151,7 @@ describe("WeeklyTaskForm", () => {
       const user = userEvent.setup();
       mockCreateWeeklyTaskAction.mockResolvedValue({
         success: true,
-        data: mockWeeklyTask,
+        data: mockWeeklyTask as any,
       });
 
       render(
@@ -178,7 +179,7 @@ describe("WeeklyTaskForm", () => {
       const user = userEvent.setup();
       mockCreateWeeklyTaskAction.mockResolvedValue({
         error: "Failed to create weekly task",
-        code: "DATABASE_ERROR",
+        code: ActionErrorCode.DATABASE_ERROR,
       });
 
       render(
@@ -226,7 +227,7 @@ describe("WeeklyTaskForm", () => {
       const user = userEvent.setup();
       mockUpdateWeeklyTaskAction.mockResolvedValue({
         success: true,
-        data: { ...mockWeeklyTask, title: "Updated task" },
+        data: { ...mockWeeklyTask, title: "Updated task" } as any,
       });
 
       render(
@@ -261,7 +262,7 @@ describe("WeeklyTaskForm", () => {
         () =>
           new Promise((resolve) =>
             setTimeout(
-              () => resolve({ success: true, data: mockWeeklyTask }),
+              () => resolve({ success: true, data: mockWeeklyTask as any }),
               100,
             ),
           ),

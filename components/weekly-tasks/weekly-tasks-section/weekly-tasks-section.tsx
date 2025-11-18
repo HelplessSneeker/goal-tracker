@@ -8,8 +8,9 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { WeekSelector, getWeekStart } from "../week-selector/week-selector";
 import { WeeklyTaskCard } from "../weekly-task-card/weekly-task-card";
+import { DeleteWeeklyTaskDialog } from "../delete-weekly-task-dialog/delete-weekly-task-dialog";
 import { getWeeklyTasksAction } from "@/app/actions/weekly-tasks";
-import type { WeeklyTask } from "@prisma/client";
+import type { WeeklyTask } from "@/lib/types";
 
 interface WeeklyTasksSectionProps {
   task: {
@@ -27,6 +28,8 @@ export function WeeklyTasksSection({ task }: WeeklyTasksSectionProps) {
   const [weeklyTasks, setWeeklyTasks] = useState<WeeklyTask[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<WeeklyTask | null>(null);
 
   // Initialize selectedWeek on client side only
   useEffect(() => {
@@ -40,7 +43,10 @@ export function WeeklyTasksSection({ task }: WeeklyTasksSectionProps) {
     setError(null);
 
     try {
-      const result = await getWeeklyTasksAction(task.id, weekStart);
+      const result = await getWeeklyTasksAction(
+        task.id,
+        weekStart.toISOString(),
+      );
 
       if ("error" in result) {
         setError(result.error);
@@ -66,15 +72,25 @@ export function WeeklyTasksSection({ task }: WeeklyTasksSectionProps) {
     setSelectedWeek(newWeek);
   };
 
-  const handleTaskDeleted = () => {
-    // Refetch tasks after successful deletion
-    if (selectedWeek) {
-      fetchWeeklyTasks(selectedWeek);
+  const handleTaskDeleted = (weeklyTask: WeeklyTask) => {
+    // Open delete dialog with the selected task
+    setTaskToDelete(weeklyTask);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDialogClose = (open: boolean) => {
+    setDeleteDialogOpen(open);
+    if (!open) {
+      setTaskToDelete(null);
+      // Refetch tasks after dialog closes (deletion successful or cancelled)
+      if (selectedWeek) {
+        fetchWeeklyTasks(selectedWeek);
+      }
     }
   };
 
   const isAtMaxCapacity = weeklyTasks.length >= 3;
-  const createHref = `/goals/${task.goalId}/regions/${task.regionId}/tasks/${task.id}/weekly-tasks/new`;
+  const createHref = `/goals/${task.goalId}/${task.regionId}/tasks/${task.id}/weekly-tasks/new`;
 
   return (
     <Card>
@@ -132,6 +148,15 @@ export function WeeklyTasksSection({ task }: WeeklyTasksSectionProps) {
           </div>
         )}
       </CardContent>
+
+      {taskToDelete && (
+        <DeleteWeeklyTaskDialog
+          open={deleteDialogOpen}
+          onOpenChange={handleDialogClose}
+          weeklyTaskId={taskToDelete.id}
+          weeklyTaskTitle={taskToDelete.title}
+        />
+      )}
     </Card>
   );
 }

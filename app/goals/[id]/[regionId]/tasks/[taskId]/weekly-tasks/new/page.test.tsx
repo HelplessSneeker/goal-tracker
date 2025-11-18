@@ -1,6 +1,6 @@
 // Mock server actions
 jest.mock("@/app/actions/tasks", () => ({
-  getTaskByIdAction: jest.fn(),
+  getTaskAction: jest.fn(),
 }));
 
 // Mock next-intl server
@@ -13,12 +13,11 @@ jest.mock("@/components/weekly-tasks", () => ({
   WeeklyTaskForm: () => null,
 }));
 
-import { getTaskByIdAction } from "@/app/actions/tasks";
+import { getTaskAction } from "@/app/actions/tasks";
+import { ActionErrorCode } from "@/lib/action-types";
 import NewWeeklyTaskPage from "./page";
 
-const mockGetTask = getTaskByIdAction as jest.MockedFunction<
-  typeof getTaskByIdAction
->;
+const mockGetTask = getTaskAction as jest.MockedFunction<typeof getTaskAction>;
 
 describe("NewWeeklyTaskPage", () => {
   const mockParams = {
@@ -42,7 +41,7 @@ describe("NewWeeklyTaskPage", () => {
     jest.clearAllMocks();
   });
 
-  it("fetches task data using getTaskByIdAction", async () => {
+  it("fetches task data using getTaskAction", async () => {
     mockGetTask.mockResolvedValue({
       success: true,
       data: mockTaskData,
@@ -57,7 +56,7 @@ describe("NewWeeklyTaskPage", () => {
   it("handles task not found error", async () => {
     mockGetTask.mockResolvedValue({
       error: "Task not found",
-      code: "NOT_FOUND" as const,
+      code: ActionErrorCode.NOT_FOUND,
     });
 
     const result = await NewWeeklyTaskPage({ params: mockParams });

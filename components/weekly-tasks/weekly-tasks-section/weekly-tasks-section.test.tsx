@@ -3,7 +3,8 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { WeeklyTasksSection } from "./weekly-tasks-section";
 import { getWeeklyTasksAction } from "@/app/actions/weekly-tasks";
-import type { WeeklyTask } from "@prisma/client";
+import { ActionErrorCode } from "@/lib/action-types";
+import type { WeeklyTask } from "@/lib/types";
 
 // Mock next/cache
 jest.mock("next/cache", () => ({
@@ -12,6 +13,33 @@ jest.mock("next/cache", () => ({
 
 // Mock server actions
 jest.mock("@/app/actions/weekly-tasks");
+
+// Mock DeleteWeeklyTaskDialog
+jest.mock("../delete-weekly-task-dialog/delete-weekly-task-dialog", () => ({
+  DeleteWeeklyTaskDialog: jest.fn(
+    ({ open, onOpenChange, weeklyTaskId, weeklyTaskTitle }) => {
+      if (!open) return null;
+      return (
+        <div data-testid="delete-dialog">
+          <p>Delete: {weeklyTaskTitle}</p>
+          <p>ID: {weeklyTaskId}</p>
+          <button onClick={() => onOpenChange(false)}>Close Dialog</button>
+        </div>
+      );
+    },
+  ),
+}));
+
+// Mock WeeklyTaskCard
+jest.mock("../weekly-task-card/weekly-task-card", () => ({
+  WeeklyTaskCard: jest.fn(({ weeklyTask, onDeleted }) => (
+    <div data-testid={`weekly-task-${weeklyTask.id}`}>
+      <h3>{weeklyTask.title}</h3>
+      <p>{weeklyTask.description}</p>
+      <button onClick={() => onDeleted?.(weeklyTask)}>Delete</button>
+    </div>
+  )),
+}));
 
 // Mock getWeekStart to return a fixed date
 jest.mock("../week-selector/week-selector", () => ({
@@ -114,7 +142,7 @@ describe("WeeklyTasksSection", () => {
   it("fetches and displays weekly tasks for current week on mount", async () => {
     mockGetWeeklyTasks.mockResolvedValue({
       success: true,
-      data: mockWeeklyTasks,
+      data: mockWeeklyTasks as any,
     });
 
     render(<WeeklyTasksSection task={mockTask} />);
@@ -122,7 +150,7 @@ describe("WeeklyTasksSection", () => {
     await waitFor(() => {
       expect(mockGetWeeklyTasks).toHaveBeenCalledWith(
         "task-1",
-        expect.any(Date),
+        expect.any(String),
       );
     });
 
@@ -135,7 +163,7 @@ describe("WeeklyTasksSection", () => {
   it("updates weekly tasks when week changes", async () => {
     mockGetWeeklyTasks.mockResolvedValue({
       success: true,
-      data: mockWeeklyTasks,
+      data: mockWeeklyTasks as any,
     });
 
     render(<WeeklyTasksSection task={mockTask} />);
@@ -174,7 +202,7 @@ describe("WeeklyTasksSection", () => {
       () =>
         new Promise((resolve) => {
           setTimeout(
-            () => resolve({ success: true, data: mockWeeklyTasks }),
+            () => resolve({ success: true, data: mockWeeklyTasks as any }),
             100,
           );
         }),
@@ -192,7 +220,7 @@ describe("WeeklyTasksSection", () => {
   it("displays error message when fetching fails", async () => {
     mockGetWeeklyTasks.mockResolvedValue({
       error: "Failed to fetch weekly tasks",
-      code: "DATABASE_ERROR" as const,
+      code: ActionErrorCode.DATABASE_ERROR,
     });
 
     render(<WeeklyTasksSection task={mockTask} />);
@@ -215,7 +243,7 @@ describe("WeeklyTasksSection", () => {
     const createButton = screen.getByText(/create new weekly task/i);
     expect(createButton.closest("a")).toHaveAttribute(
       "href",
-      "/goals/goal-1/regions/region-1/tasks/task-1/weekly-tasks/new",
+      "/goals/goal-1/region-1/tasks/task-1/weekly-tasks/new",
     );
   });
 
@@ -258,7 +286,7 @@ describe("WeeklyTasksSection", () => {
 
     mockGetWeeklyTasks.mockResolvedValue({
       success: true,
-      data: threeWeeklyTasks,
+      data: threeWeeklyTasks as any,
     });
 
     render(<WeeklyTasksSection task={mockTask} />);
@@ -274,10 +302,34 @@ describe("WeeklyTasksSection", () => {
     expect(createButton).toHaveAttribute("aria-disabled", "true");
   });
 
-  it("refetches tasks after successful deletion", async () => {
+  it("opens delete dialog when delete button is clicked", async () => {
     mockGetWeeklyTasks.mockResolvedValue({
       success: true,
-      data: mockWeeklyTasks,
+      data: mockWeeklyTasks as any,
+    });
+
+    render(<WeeklyTasksSection task={mockTask} />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Weekly Task 1")).toBeInTheDocument();
+    });
+
+    // Click delete button on first task
+    const deleteButtons = screen.getAllByText("Delete");
+    await userEvent.click(deleteButtons[0]);
+
+    // Dialog should open with correct task info
+    await waitFor(() => {
+      expect(screen.getByTestId("delete-dialog")).toBeInTheDocument();
+      expect(screen.getByText("Delete: Weekly Task 1")).toBeInTheDocument();
+      expect(screen.getByText("ID: weekly-1")).toBeInTheDocument();
+    });
+  });
+
+  it("refetches tasks when delete dialog closes", async () => {
+    mockGetWeeklyTasks.mockResolvedValue({
+      success: true,
+      data: mockWeeklyTasks as any,
     });
 
     render(<WeeklyTasksSection task={mockTask} />);
@@ -289,7 +341,21 @@ describe("WeeklyTasksSection", () => {
     // Initial fetch
     expect(mockGetWeeklyTasks).toHaveBeenCalledTimes(1);
 
-    // Verify the action is called with correct parameters on mount
-    expect(mockGetWeeklyTasks).toHaveBeenCalledWith("task-1", expect.any(Date));
+    // Click delete button to open dialog
+    const deleteButtons = screen.getAllByText("Delete");
+    await userEvent.click(deleteButtons[0]);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("delete-dialog")).toBeInTheDocument();
+    });
+
+    // Close dialog (simulates deletion or cancellation)
+    const closeButton = screen.getByText("Close Dialog");
+    await userEvent.click(closeButton);
+
+    // Should refetch tasks after dialog closes
+    await waitFor(() => {
+      expect(mockGetWeeklyTasks).toHaveBeenCalledTimes(2);
+    });
   });
 });

@@ -1,5 +1,5 @@
-import { getTaskByIdAction } from "@/app/actions/tasks";
-import { getWeeklyTaskByIdAction } from "@/app/actions/weekly-tasks";
+import { getTaskAction } from "@/app/actions/tasks";
+import { getWeeklyTaskAction } from "@/app/actions/weekly-tasks";
 import { WeeklyTaskForm } from "@/components/weekly-tasks";
 import { getTranslations } from "next-intl/server";
 
@@ -19,8 +19,8 @@ export default async function EditWeeklyTaskPage({
 
   // Fetch both task and weekly task data
   const [taskResult, weeklyTaskResult] = await Promise.all([
-    getTaskByIdAction(params.taskId),
-    getWeeklyTaskByIdAction(params.weeklyTaskId),
+    getTaskAction(params.taskId),
+    getWeeklyTaskAction(params.weeklyTaskId),
   ]);
 
   if ("error" in taskResult) {

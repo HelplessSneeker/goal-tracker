@@ -13,11 +13,16 @@ import prisma from "@/lib/prisma";
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 
 // Type assertions for mock methods
-const mockWeeklyTaskFindMany = mockPrisma.weeklyTask.findMany as unknown as jest.Mock;
-const mockWeeklyTaskFindFirst = mockPrisma.weeklyTask.findFirst as unknown as jest.Mock;
-const mockWeeklyTaskCreate = mockPrisma.weeklyTask.create as unknown as jest.Mock;
-const mockWeeklyTaskUpdate = mockPrisma.weeklyTask.update as unknown as jest.Mock;
-const mockWeeklyTaskDelete = mockPrisma.weeklyTask.delete as unknown as jest.Mock;
+const mockWeeklyTaskFindMany = mockPrisma.weeklyTask
+  .findMany as unknown as jest.Mock;
+const mockWeeklyTaskFindFirst = mockPrisma.weeklyTask
+  .findFirst as unknown as jest.Mock;
+const mockWeeklyTaskCreate = mockPrisma.weeklyTask
+  .create as unknown as jest.Mock;
+const mockWeeklyTaskUpdate = mockPrisma.weeklyTask
+  .update as unknown as jest.Mock;
+const mockWeeklyTaskDelete = mockPrisma.weeklyTask
+  .delete as unknown as jest.Mock;
 const mockTaskFindFirst = mockPrisma.task.findFirst as unknown as jest.Mock;
 
 describe("WeeklyTasksService", () => {
@@ -73,7 +78,7 @@ describe("WeeklyTasksService", () => {
             },
           },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { priority: "asc" },
       });
     });
 
@@ -103,7 +108,11 @@ describe("WeeklyTasksService", () => {
 
       mockWeeklyTaskFindMany.mockResolvedValue(mockWeeklyTasks);
 
-      const result = await getWeeklyTasksForTask(mockTaskId, mockUserId, mockWeekStartDate);
+      const result = await getWeeklyTasksForTask(
+        mockTaskId,
+        mockUserId,
+        mockWeekStartDate,
+      );
 
       expect(result).toHaveLength(1);
       expect(mockWeeklyTaskFindMany).toHaveBeenCalledWith({
@@ -116,7 +125,7 @@ describe("WeeklyTasksService", () => {
             },
           },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { priority: "asc" },
       });
     });
 
@@ -134,7 +143,7 @@ describe("WeeklyTasksService", () => {
             },
           },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { priority: "asc" },
       });
     });
   });
@@ -289,7 +298,11 @@ describe("WeeklyTasksService", () => {
       mockWeeklyTaskFindFirst.mockResolvedValue(mockExistingWeeklyTask);
       mockWeeklyTaskUpdate.mockResolvedValue(mockUpdatedWeeklyTask);
 
-      const result = await updateWeeklyTask(mockWeeklyTaskId, mockUserId, updateData);
+      const result = await updateWeeklyTask(
+        mockWeeklyTaskId,
+        mockUserId,
+        updateData,
+      );
 
       expect(result).toEqual(mockUpdatedWeeklyTask);
       expect(mockWeeklyTaskFindFirst).toHaveBeenCalledWith({
@@ -311,7 +324,11 @@ describe("WeeklyTasksService", () => {
     it("should return null when weekly task does not exist", async () => {
       mockWeeklyTaskFindFirst.mockResolvedValue(null);
 
-      const result = await updateWeeklyTask(mockWeeklyTaskId, mockUserId, updateData);
+      const result = await updateWeeklyTask(
+        mockWeeklyTaskId,
+        mockUserId,
+        updateData,
+      );
 
       expect(result).toBeNull();
       expect(mockWeeklyTaskUpdate).not.toHaveBeenCalled();
@@ -320,7 +337,11 @@ describe("WeeklyTasksService", () => {
     it("should return null when user is not authorized", async () => {
       mockWeeklyTaskFindFirst.mockResolvedValue(null);
 
-      const result = await updateWeeklyTask(mockWeeklyTaskId, mockOtherUserId, updateData);
+      const result = await updateWeeklyTask(
+        mockWeeklyTaskId,
+        mockOtherUserId,
+        updateData,
+      );
 
       expect(result).toBeNull();
       expect(mockWeeklyTaskUpdate).not.toHaveBeenCalled();
@@ -346,7 +367,11 @@ describe("WeeklyTasksService", () => {
       mockWeeklyTaskFindFirst.mockResolvedValue(mockExistingWeeklyTask);
       mockWeeklyTaskUpdate.mockResolvedValue(mockUpdatedWeeklyTask);
 
-      const result = await updateWeeklyTask(mockWeeklyTaskId, mockUserId, partialUpdateData);
+      const result = await updateWeeklyTask(
+        mockWeeklyTaskId,
+        mockUserId,
+        partialUpdateData,
+      );
 
       expect(result?.title).toBe("Only Title Updated");
       expect(result?.description).toBe("Keep this");
@@ -371,7 +396,11 @@ describe("WeeklyTasksService", () => {
       mockWeeklyTaskFindFirst.mockResolvedValue(mockExistingWeeklyTask);
       mockWeeklyTaskUpdate.mockResolvedValue(mockUpdatedWeeklyTask);
 
-      const result = await updateWeeklyTask(mockWeeklyTaskId, mockUserId, statusUpdate);
+      const result = await updateWeeklyTask(
+        mockWeeklyTaskId,
+        mockUserId,
+        statusUpdate,
+      );
 
       expect(result?.status).toBe("pending");
     });

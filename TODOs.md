@@ -2,7 +2,7 @@
 
 This document tracks the implementation progress and remaining work for the goal tracking system.
 
-**Last Updated:** 2025-01-17
+**Last Updated:** 2025-11-18
 
 ---
 
@@ -12,7 +12,7 @@ This document tracks the implementation progress and remaining work for the goal
 
 **Architecture:** Server Actions + Service Layer (migrated from API routes)
 
-**Test Status:** ✅ 424/424 tests passing (~6s, 100% service coverage)
+**Test Status:** ✅ 425/425 tests passing (~5.6s, 100% service coverage)
 
 **Completed:**
 - Goals, Regions, Tasks (CRUD with Server Actions + Service Layer)
@@ -26,9 +26,9 @@ This document tracks the implementation progress and remaining work for the goal
 - Comprehensive test coverage (actions, services, components)
 - Database seeding with 4 test users and comprehensive data
 - Theme implementation (Light/Dark/System mode with next-themes)
-- **Weekly Tasks COMPLETE** (backend, UI, pages, integration - all tests passing)
+- **Weekly Tasks COMPLETE** (backend, UI, pages, full integration - 425 tests passing)
 
-**Next:** Progress Entries
+**Next:** Progress Page overhaul
 
 ---
 
@@ -55,6 +55,12 @@ The system follows a 4-level hierarchy:
   - Integrated in sidebar footer with responsive behavior
   - i18n support (English + German)
   - 15 comprehensive tests with 100% coverage
+- ✅ **Weekly Tasks (2025-11-18):** Complete CRUD implementation with full UI integration
+  - Backend: Service layer + actions (TDD, 18 service + 27 action tests)
+  - Components: 5 components with 96-100% coverage (61 tests)
+  - Pages: Create/edit pages (11 tests)
+  - UI: Task detail integration, 3-task limit, priority ordering
+  - Bug fixes: TypeScript errors, action naming, delete dialog integration
 - ✅ **User Settings Page:** Complete with all 4 phases (2025-11-11 to 2025-11-12)
   - Phase 1: UI structure with profile and preferences sections
   - Phase 2: Backend integration with database persistence
@@ -80,7 +86,7 @@ The system follows a 4-level hierarchy:
   - Instant theme switching with `useThemeSync` hook
   - All components theme-ready with semantic Tailwind classes
   - Seamless persistence across sessions
-- ✅ **Testing:** 321/321 tests passing (actions, services, components, auth)
+- ✅ **Testing:** 425/425 tests passing (actions, services, components, auth)
 - ✅ **Components:** Forms, cards, dialogs for all entities
 - ✅ **User Ownership:** Service layer verifies user ownership on all operations
 - ✅ **Type Safety:** ActionResponse types with proper error handling (2025-11-06)
@@ -156,103 +162,23 @@ Implemented full Light/Dark/System theme switching with `next-themes`.
 
 ---
 
-### Phase 5: Weekly Tasks Implementation 📅 ✅ COMPLETED (2025-01-17)
+### Phase 5: Weekly Tasks Implementation 📅 ✅ COMPLETED (2025-11-18)
 
-**Fully Complete** - Backend, UI, Pages, and Integration
+**Fully Complete** - Backend, UI, Pages, and Full Integration
 
-#### Data Layer ✅
-- [x] Add `WeeklyTask` model to Prisma schema
-  - Fields: id, taskId, title, description, priority (1-3), weekStartDate, status
-  - Enum: WeeklyTaskStatus (pending, in_progress, completed)
-  - Indexes on taskId and weekStartDate
-  - Cascade delete on Task deletion
-- [x] Create service layer: `lib/services/weekly-tasks.service.ts` (100% coverage)
-  - getWeeklyTasksForTask (with optional weekStartDate filter)
-  - getWeeklyTaskById (with ownership verification)
-  - createWeeklyTask (with task ownership check)
-  - updateWeeklyTask (with ownership verification)
-  - deleteWeeklyTask (returns boolean)
-  - Ownership verification through Task → Region → Goal chain
-- [x] Create server actions: `app/actions/weekly-tasks.ts` (85%+ coverage)
-  - createWeeklyTaskAction, updateWeeklyTaskAction, deleteWeeklyTaskAction
-  - getWeeklyTasksAction (with optional weekStartDate filter)
-  - getWeeklyTaskAction
-  - All actions use NextAuth session verification, FormData validation, cache revalidation
+- [x] Database: WeeklyTask model with priority (1-3), status, weekStartDate
+- [x] Service Layer: 5 functions, 100% coverage, 18 tests
+- [x] Server Actions: 5 actions, 85%+ coverage, 27 tests
+- [x] Components: 5 components, 96-100% coverage, 61 tests
+  - WeeklyTaskCard, WeeklyTaskForm, WeekSelector, DeleteWeeklyTaskDialog, WeeklyTasksSection
+- [x] Pages: Create/edit pages with full test coverage (11 tests)
+- [x] UI Integration: Task detail pages with full weekly tasks management
+- [x] Bug Fixes: 404 errors, action naming, TypeScript errors (14 resolved), delete dialog
+- [x] i18n: 24+ translation keys (EN + DE)
+- [x] Ordering: Priority-based (1, 2, 3) instead of creation date
 
-#### Validation & Types ✅
-- [x] Zod validation schemas in `lib/validation.ts`
-  - createWeeklyTaskSchema, updateWeeklyTaskSchema, deleteWeeklyTaskSchema
-  - Priority validation (1-3 range), status validation, date coercion
-- [x] TypeScript types in `lib/types.ts`
-  - WeeklyTask type with Date/string serialization support
-
-#### Components ✅
-- [x] WeekSelector component with prev/next/this week navigation (100% coverage)
-- [x] WeeklyTaskCard component with edit/delete actions (100% coverage)
-- [x] DeleteWeeklyTaskDialog component with confirmation (100% coverage)
-- [x] WeeklyTaskForm component - create/edit modes (99.62% coverage)
-- [x] WeeklyTasksSection container component (96.03% coverage)
-
-#### Pages ✅
-- [x] `/weekly-tasks/new` - Create weekly task page (5 tests)
-- [x] `/weekly-tasks/[weeklyTaskId]/edit` - Edit weekly task page (5 tests)
-- [x] Task detail page integration with WeeklyTasksSection
-
-#### Integration ✅
-- [x] Replace placeholder Card in task detail page
-- [x] Week navigation with state management
-- [x] 3-task-per-week limit enforcement in UI
-- [x] Loading, error, and empty states
-- [x] Refetch on deletion
-- [x] Full i18n support (EN/DE)
-
-#### Bug Fixes ✅
-- [x] Fix getUserPreferences foreign key constraint (seeding issue)
-- [x] Fix client component date initialization (SSR issue)
-- [x] Fix WeekSelector prop name mismatch (selectedWeekStart)
-
-#### Test Coverage ✅
-- [x] 31 new UI tests added (11 form + 10 section + 5 new page + 5 edit page)
-- [x] Total: 424/424 tests passing (~6s)
-- [x] Component coverage: 96-100%
-- [x] Service coverage: 100%
-- [x] Action coverage: 85%+
-- [x] DeleteWeeklyTaskDialog component (98% coverage)
-  - Confirmation dialog with exact title match
-  - Loading states, error handling
-  - Router refresh on success
-- [x] WeekSelector component (100% coverage)
-  - Previous/This Week/Next navigation buttons
-  - Week range display with proper formatting
-  - getWeekStart utility (normalizes to Sunday at midnight UTC)
-
-#### Internationalization ✅
-- [x] Added 24 i18n keys to en.json and de.json
-  - weeklyTasks.* (labels, buttons, status, priority)
-  - delete.weeklyTask.* (delete dialog)
-
-#### Testing (TDD Approach) ✅
-- [x] 15 service tests (100% coverage) - All passing
-- [x] 27 action tests (85%+ coverage) - All passing
-- [x] 30 component tests (98-100% coverage) - All passing
-- [x] Fixed 6 failing WeekSelector tests (date calculation bug)
-
-#### Bug Fixes ✅
-- [x] Fixed test date calculations in week-selector.test.tsx
-  - Issue: Tests assumed Nov 10, 2025 was Sunday (actually Monday)
-  - Solution: Changed to Nov 9, 2025 (actual Sunday)
-
-#### UI Integration (PENDING) 🚧
-- [ ] Create WeeklyTaskForm component (create/edit modes)
-- [ ] Integrate into task detail pages
-- [ ] Add "Add Weekly Task" button and form dialog
-- [ ] Display weekly tasks list filtered by selected week
-- [ ] Empty states for weeks with no tasks
-- [ ] Optional: Warning when 3+ tasks exist for a week
-
-**Test Status:** 393/393 passing (~10s)
-**Files Created:** 10 (services, actions, components, tests)
-**Time Invested:** ~6 hours (including TDD, bug fixes)
+**Test Status:** 425/425 passing (~5.6s)
+**Time Invested:** ~8 hours (including full UI integration and bug fixes)
 
 ---
 
@@ -423,21 +349,21 @@ Implemented full Light/Dark/System theme switching with `next-themes`.
 
 ## Test Status 🧪
 
-**Current Status:** ✅ All tests passing, excellent coverage (2025-11-17)
+**Current Status:** ✅ All tests passing, excellent coverage (2025-11-18)
 - ✅ **TypeScript compilation:** Successful - No blocking errors
 - ✅ **ESLint:** Passing - Minor warnings only (unused imports in test files)
 - ✅ **Production build:** Successful - App compiles and runs (~3.8s)
 - ✅ **Action tests:** 129 tests (85%+ coverage) - All passing
   - Includes 11 user preferences + 9 user + 27 weekly tasks action tests
-- ✅ **Service tests:** 75 tests (100% coverage) - All passing
-  - Includes 7 user preferences + 8 user + 15 weekly tasks service tests
-- ✅ **Component tests:** 177 tests (93-100% coverage) - All passing
-  - Includes 15 UserMenu + 31 UserSettings + 30 weekly tasks component tests
+- ✅ **Service tests:** 76 tests (100% coverage) - All passing
+  - Includes 7 user preferences + 8 user + 18 weekly tasks service tests
+- ✅ **Component tests:** 208 tests (93-100% coverage) - All passing
+  - Includes 15 UserMenu + 31 UserSettings + 61 weekly tasks component tests
 - ✅ **Authentication tests:** 12 tests (100% coverage) - All passing
 
-**Total:** 424/424 tests passing (~6s)
+**Total:** 425/425 tests passing (~5.6s)
 
-**Summary:** Application is production-ready with comprehensive test coverage including full weekly tasks implementation (backend + UI + pages). Type-safe action responses, dynamic language switching, theme support, user settings complete, and proper error handling throughout. Ready for Progress Entries implementation.
+**Summary:** Application is production-ready with comprehensive test coverage including full weekly tasks implementation (backend + UI + pages + full integration). Type-safe action responses, dynamic language switching, theme support, user settings complete, and proper error handling throughout. Ready for Progress Page overhaul and Progress Entries implementation.
 
 See [TESTING.md](./TESTING.md) for comprehensive testing guide.
 
@@ -445,15 +371,14 @@ See [TESTING.md](./TESTING.md) for comprehensive testing guide.
 
 ## Immediate Next Steps (Priority Order)
 
-1. **Phase 6: Progress Entries Implementation** 📊 **← START HERE**
-   - Add ProgressEntry model to Prisma schema (weeklyTaskId, date, notes, completionPercentage)
-   - Create service layer with TDD (100% coverage target)
-   - Create server actions with TDD (85%+ coverage target)
-   - Create UI components (form, list, card) with TDD
-   - Integrate into weekly task detail pages
-   - Add daily progress tracking UI
-   - **Why next:** Complete the data hierarchy (Goal → Region → Task → Weekly Task → Progress Entry)
-   - **Estimated time:** 2-3 hours
+1. **Phase 7: Progress Page Overhaul** 🎯 **← START HERE**
+   - Display current week's weekly tasks with parent task info
+   - Show task hierarchy (Goal → Region → Task → Weekly Task)
+   - Filter by week with WeekSelector component
+   - Include priority indicators and status display
+   - Add completion statistics
+   - **Why next:** Provide central dashboard before adding Progress Entries
+   - **Estimated time:** 3-4 hours
 
 2. **Phase 6: Progress Entries Implementation** 📝
    - Add ProgressEntry Prisma model for daily journaling
@@ -463,13 +388,7 @@ See [TESTING.md](./TESTING.md) for comprehensive testing guide.
    - Daily progress tracking with completion percentage (0-100)
    - **Estimated time:** 4-5 hours
 
-3. **Phase 7: Redesign Progress Page** 🎯
-   - Focus on current week's weekly tasks
-   - Quick progress entry interface
-   - Visual progress indicators
-   - **Estimated time:** 2-3 hours
-
-4. **Phase 8: Weekly Review & Archive** 🗂️
+3. **Phase 8: Weekly Review & Archive** 🗂️
    - Weekly review workflow
    - Historical data access
    - Archive system for completed weeks

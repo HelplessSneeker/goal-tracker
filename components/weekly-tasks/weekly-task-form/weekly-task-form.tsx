@@ -214,7 +214,9 @@ export function WeeklyTaskForm({
               </label>
               <Select
                 value={status}
-                onValueChange={setStatus}
+                onValueChange={(value) =>
+                  setStatus(value as "pending" | "in_progress" | "completed")
+                }
                 disabled={isSubmitting}
               >
                 <SelectTrigger id="status">
