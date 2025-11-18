@@ -1,325 +1,308 @@
-# Session Handoff - 2025-11-06
+# Session Handoff - Weekly Tasks UI Implementation Complete
 
-**Session Date:** 2025-11-06
-**Session Duration:** ~2 hours
-**Context Usage:** ~78k / 200k tokens
-**Branch:** claude-optimization
-**Status:** ✅ Clean working tree, all tests passing
-
----
-
-## Session Summary
-
-Completed comprehensive TypeScript error fixes across all test files in the codebase. Successfully reduced TypeScript errors from 77 to 9 (only auth-related errors remain, which are out of scope).
-
-**Key Achievement:** Standardized action response formats and Prisma mock typing patterns across the entire test suite while maintaining 100% test pass rate (228/228 tests).
+**Date:** 2025-01-17  
+**Branch:** `weekly-tasks`  
+**Status:** ✅ READY TO COMMIT  
+**Tests:** 424/424 passing (~6s)
 
 ---
 
-## Work Completed This Session
+## What Was Completed This Session
 
-### 1. TypeScript Error Fixes ✅ COMPLETE
+### Phase 5: Weekly Tasks UI Implementation ✅
 
-**Problem:** Test files had TypeScript errors due to:
-- Incorrect action response mock formats
-- Wrong error response structures
-- Untyped Prisma mocks
+Successfully completed the **entire UI layer** for weekly tasks using Test-Driven Development.
 
-**Solution Implemented:**
-1. **Component Tests (9 files):**
-   - Standardized success responses: `{ success: true, data: {...} }`
-   - Fixed delete responses: `{ success: true, data: { deleted: true } }`
-   - Fixed error responses: `{ error: "...", code: ActionErrorCode.ENUM_VALUE }`
-   - Added ActionErrorCode imports where needed
+#### Components Implemented (31 new tests)
 
-2. **Service Tests (3 files):**
-   - Added explicit type assertions for Prisma mock methods
-   - Pattern: `const mockMethod = mockPrisma.entity.method as unknown as jest.Mock`
-   - Replaced all `mockPrisma.*` usages with typed variables
+1. **WeeklyTaskForm** (11 tests, 99.62% coverage)
+   - Create and edit modes
+   - Week range display (read-only)
+   - Priority selection (1-3)
+   - Status field (edit mode only)
+   - Form validation and error handling
 
-3. **Results:**
-   - TypeScript errors: 77 → 9 (88% reduction)
-   - All 228 tests still passing
-   - Build successful
-   - Changes committed (commit: 3ec8e0e)
+2. **WeeklyTasksSection** (10 tests, 96.03% coverage)
+   - Container component for task detail page
+   - Week navigation integration
+   - Weekly task list with week filtering
+   - Create button with 3-task limit enforcement
+   - Loading, error, and empty states
+   - Refetch on deletion
 
-### 2. Documentation Created ✅ COMPLETE
+3. **New Weekly Task Page** (5 tests)
+   - Server component for creating tasks
+   - Fetches parent task data
+   - Error handling
 
-Created comprehensive documentation for the completed task:
-- `dev/completed/typescript-error-fixes/typescript-error-fixes-context.md` - Full implementation details
-- `dev/completed/typescript-error-fixes/typescript-error-fixes-plan.md` - Strategy and patterns
-- `dev/completed/typescript-error-fixes/typescript-error-fixes-tasks.md` - Task checklist (27/27 complete)
-- `dev/completed/ARCHIVE_INDEX.md` - Archive index with task summary
+4. **Edit Weekly Task Page** (5 tests)
+   - Server component for editing tasks
+   - Parallel data fetching
+   - Error handling
+
+#### Integration
+
+- ✅ Replaced placeholder Card in task detail page
+- ✅ Integrated WeeklyTasksSection component
+- ✅ Clean removal of unused imports
+- ✅ Proper prop passing
+
+#### Bug Fixes (4 critical fixes)
+
+1. **Foreign Key Constraint Error** (Database Seeding)
+   - **Problem**: Seeding failed when dev server running
+   - **Root Cause**: `getUserPreferences` tried to create preferences for non-existent user
+   - **Solution**: Added user existence check before creating preferences
+   - **Files**: `lib/services/user-preferences.service.ts`, `.test.ts`
+
+2. **Client Component Date Initialization** (SSR Issue)
+   - **Problem**: `new Date()` returning undefined during SSR
+   - **Root Cause**: Date objects behave differently on server vs client
+   - **Solution**: Initialize `selectedWeek` as nullable, set in `useEffect`
+   - **Files**: `components/weekly-tasks/weekly-tasks-section/weekly-tasks-section.tsx`
+
+3. **WeekSelector Prop Name Mismatch** (Runtime Error)
+   - **Problem**: `Cannot read properties of undefined (reading 'getTime')`
+   - **Root Cause**: Passing `selectedWeek` but component expects `selectedWeekStart`
+   - **Solution**: Corrected prop name to match interface
+   - **Files**: `components/weekly-tasks/weekly-tasks-section/weekly-tasks-section.tsx`
+
+4. **WeekSelector Test Date Calculations** (6 Failing Tests)
+   - **Problem**: Tests assumed Nov 10, 2025 was Sunday (actually Monday)
+   - **Root Cause**: Incorrect date in test fixtures
+   - **Solution**: Changed to Nov 9, 2025 (actual Sunday)
+   - **Files**: `components/weekly-tasks/week-selector/week-selector.test.tsx`
+
+#### Documentation Updates
+
+- ✅ Updated `CLAUDE.md` (test count 393→424, marked Weekly Tasks complete)
+- ✅ Updated `TODOs.md` (marked Phase 5 complete, updated next steps)
+- ✅ Created `dev/active/weekly-tasks-ui/COMPLETION_SUMMARY.md` (comprehensive completion doc)
+- ✅ Updated `TROUBLESHOOTING.md` (added TextEncoder, SSR dates, foreign key errors)
+- ✅ Created `dev/COMMIT_HANDOFF.md` (commit-ready handoff document)
 
 ---
 
-## Current State
+## Files Modified (20 total)
 
-### Git Status
+### New Files (12)
 ```
-Branch: claude-optimization
-Status: Clean (nothing to commit, working tree clean)
-Latest commit: 3ec8e0e "fixed typescript errors"
-```
-
-### Test Status
-```
-Tests: 228/228 passing (100%)
-Coverage: 100% statement coverage for service layer
-Time: ~7.4s
-```
-
-### Build Status
-```
-Build: ✅ Success
-Time: ~3.7s
-Warnings: None
+app/goals/[id]/[regionId]/tasks/[taskId]/weekly-tasks/new/page.tsx
+app/goals/[id]/[regionId]/tasks/[taskId]/weekly-tasks/new/page.test.tsx
+app/goals/[id]/[regionId]/tasks/[taskId]/weekly-tasks/[weeklyTaskId]/edit/page.tsx
+app/goals/[id]/[regionId]/tasks/[taskId]/weekly-tasks/[weeklyTaskId]/edit/page.test.tsx
+components/weekly-tasks/weekly-task-form/weekly-task-form.tsx
+components/weekly-tasks/weekly-task-form/weekly-task-form.test.tsx
+components/weekly-tasks/weekly-tasks-section/weekly-tasks-section.tsx
+components/weekly-tasks/weekly-tasks-section/weekly-tasks-section.test.tsx
+dev/active/weekly-tasks-ui/COMPLETION_SUMMARY.md
+dev/COMMIT_HANDOFF.md
+dev/SESSION_HANDOFF.md (this file)
 ```
 
-### TypeScript Status
+### Modified Files (8)
 ```
-Errors: 9 remaining (all in auth-related files)
-Files affected:
-- components/user-menu/user-menu.test.tsx (1 error)
-- lib/auth.test.ts (8 errors)
-
-Note: These are NextAuth Session/JWT type issues, unrelated to the action response format work completed this session.
+CLAUDE.md (test count, implementation status)
+TODOs.md (phase 5 complete, next steps)
+TROUBLESHOOTING.md (new error solutions)
+app/goals/[id]/[regionId]/tasks/[taskId]/page.tsx (integrated WeeklyTasksSection)
+components/weekly-tasks/index.ts (new exports)
+components/weekly-tasks/week-selector/week-selector.test.tsx (date fixes)
+lib/services/user-preferences.service.ts (user check)
+lib/services/user-preferences.service.test.ts (updated tests)
 ```
 
 ---
 
-## Key Patterns Established
+## Test Results
 
-### Pattern 1: Action Response Mocking
+### Before This Session
+- 393/393 tests passing
+- Weekly Tasks backend complete (service + actions)
+- No UI components
+
+### After This Session
+- **424/424 tests passing** ✅
+- **31 new UI tests** added
+- **6 failing tests** fixed
+- **4 critical bugs** resolved
+- **~6 seconds** total test time
+
+### Coverage
+- **Actions**: 85%+ (129 tests)
+- **Services**: 100% (75 tests)
+- **Components**: 93-100% (208 tests)
+- **Auth**: 100% (12 tests)
+
+---
+
+## Key Learnings & Patterns
+
+### 1. TextEncoder Error in Tests
+**Problem**: Tests fail with "ReferenceError: TextEncoder is not defined"  
+**Cause**: Component imports server actions → actions import `next/cache`  
+**Solution**: Add before importing component:
 ```typescript
-// SUCCESS - Standard entity response
-mockAction.mockResolvedValue({
-  success: true,
-  data: { id: "123", title: "Example", ... }
-});
-
-// SUCCESS - Delete response
-mockDeleteAction.mockResolvedValue({
-  success: true,
-  data: { deleted: true }
-});
-
-// ERROR response
-import { ActionErrorCode } from "@/lib/action-types";
-mockAction.mockResolvedValue({
-  error: "Human-readable error message",
-  code: ActionErrorCode.DATABASE_ERROR
-});
+jest.mock("next/cache", () => ({
+  revalidatePath: jest.fn(),
+}))
 ```
 
-### Pattern 2: Prisma Mock Typing
+### 2. SSR Date Initialization
+**Problem**: `new Date()` returns undefined during SSR  
+**Cause**: Date objects behave differently on server vs client  
+**Solution**: Initialize as null, set in useEffect:
 ```typescript
-// At top of service test file
-const mockPrisma = prisma as jest.Mocked<typeof prisma>;
-
-// Add type assertions for each method
-const mockEntityFindMany = mockPrisma.entity.findMany as unknown as jest.Mock;
-const mockEntityFindFirst = mockPrisma.entity.findFirst as unknown as jest.Mock;
-const mockEntityCreate = mockPrisma.entity.create as unknown as jest.Mock;
-const mockEntityUpdate = mockPrisma.entity.update as unknown as jest.Mock;
-const mockEntityDelete = mockPrisma.entity.delete as unknown as jest.Mock;
-
-// Use throughout test file
-mockEntityFindMany.mockResolvedValue([...]);
-expect(mockEntityFindMany).toHaveBeenCalledWith(...);
+const [date, setDate] = useState<Date | null>(null)
+useEffect(() => {
+  setDate(new Date())
+}, [])
 ```
+
+### 3. Prop Name Precision
+**Problem**: Passing `selectedWeek` but component expects `selectedWeekStart`  
+**Cause**: Prop name didn't match interface definition  
+**Solution**: Always verify exact prop names from component interface
+
+### 4. Testing Server Components
+**Problem**: JSX inspection doesn't work for server components  
+**Cause**: Server components don't render to DOM in tests  
+**Solution**: Test action calls and error handling, not JSX structure
 
 ---
 
-## Important Files Modified
+## Production Readiness
 
-### Component Tests (9 files)
-```
-components/app-sidebar.test.tsx
-components/goals/delete-goal-dialog/delete-goal-dialog.test.tsx
-components/goals/goal-form/goal-form.test.tsx
-components/goals/goal-card/goal-card.test.tsx
-components/goals/goal-detail-header/goal-detail-header.test.tsx
-components/regions/delete-region-dialog/delete-region-dialog.test.tsx
-components/regions/region-form/region-form.test.tsx
-components/tasks/delete-task-dialog/delete-task-dialog.test.tsx
-components/tasks/task-form/task-form.test.tsx
-```
-
-### Service Tests (3 files)
-```
-lib/services/goals.service.test.ts
-lib/services/regions.service.test.ts
-lib/services/tasks.service.test.ts
-```
-
-### Configuration (2 files)
-```
-tsconfig.json - Minor adjustments
-.gitignore - Added .claude/tsc-cache/
-```
+✅ **This feature is production-ready:**
+- All tests passing (100% test suite)
+- Full TDD cycle completed
+- Error handling implemented
+- Loading states handled
+- i18n support (EN/DE)
+- Responsive design
+- Type safety (TypeScript)
+- Server Actions integration
+- Service layer validation
+- Database constraints enforced
+- All critical bugs fixed
+- Documentation complete
 
 ---
 
-## Next Steps (Recommended)
+## Next Steps
 
-### Immediate Priority (If Continuing)
-1. **Fix Remaining Auth Type Errors (9 errors):**
-   - `components/user-menu/user-menu.test.tsx` - Session mock type issue
-   - `lib/auth.test.ts` - JWT type issues
-   - These are NextAuth-specific type definition problems
+### Immediate (Before Next Session)
+1. **Review and commit** this work
+   - All files tracked in git
+   - Commit message ready in `dev/COMMIT_HANDOFF.md`
+   - Tests passing, no blockers
 
-### Short-term Improvements
-2. **Update Documentation:**
-   - Add action response mock patterns to `TESTING.md`
-   - Add ActionResponse examples to `CLAUDE.md`
-   - Document Prisma mock typing pattern
+2. **Optional: Merge to main**
+   - Weekly Tasks feature is complete
+   - No breaking changes
+   - No migration required
 
-3. **Create Test Utilities:**
-   ```typescript
-   // test-utils.ts
-   export const createSuccessMock = <T>(data: T) => ({
-     success: true,
-     data
-   });
+### Future Work (Next Session)
+1. **Phase 6: Progress Entries Implementation**
+   - Add ProgressEntry Prisma model
+   - Implement service layer + actions (TDD)
+   - Create UI components (TDD)
+   - Daily progress tracking with completion %
+   - **Estimated time**: 4-5 hours
 
-   export const createErrorMock = (
-     message: string,
-     code = ActionErrorCode.DATABASE_ERROR
-   ) => ({
-     error: message,
-     code
-   });
-   ```
-
-### Long-term Enhancements
-4. **Evaluate `jest-mock-extended`:** For cleaner Prisma mocking
-5. **Add ESLint Rule:** Enforce ActionErrorCode enum usage
-6. **CI/CD Integration:** Automated checks for response format consistency
+2. **Phase 7: Progress Page Redesign**
+   - Focus on current week's weekly tasks
+   - Quick progress entry interface
+   - Visual progress indicators
+   - **Estimated time**: 2-3 hours
 
 ---
 
-## Active Tasks
+## Context for Next Session
 
-### ✅ All Active Tasks Archived
+### What to Know
+1. **Weekly Tasks is DONE** - Backend + UI + Pages + Integration complete
+2. **All tests passing** - 424/424 (~6s)
+3. **4 critical bugs fixed** - Foreign key, SSR dates, prop names, test dates
+4. **Ready to commit** - See `dev/COMMIT_HANDOFF.md` for details
 
-**Status:** No active tasks remaining. All completed work has been archived.
+### What to Continue
+- **Phase 6: Progress Entries** (next feature in hierarchy)
+- Continue TDD approach (Red-Green-Refactor)
+- Maintain 100% service coverage, 85%+ action coverage
 
-**Last Archived Task:** User Avatar Sidebar
-- **Archive Date:** 2025-11-06
-- **Archive Location:** `dev/completed/user-avatar-sidebar-active/`
-- **Status:** Implementation complete, all tests passing (260/260)
-- **Note:** Task was complete but documentation wasn't updated. Now properly archived.
-
----
-
-## Key Learnings This Session
-
-### TypeScript with Complex Generic Types
-- TypeScript's type inference struggles with Prisma's complex return types wrapped in Jest mocks
-- Explicit type assertions (`as unknown as jest.Mock`) are sometimes necessary
-- Better to add assertions upfront rather than fighting errors later
-
-### ActionResponse Type Design
-- The discriminated union (ActionSuccess | ActionError) is elegant but requires understanding
-- ActionError does NOT have a `success: false` field
-- Error codes MUST be enum values, not strings
-
-### Test Resilience
-- Well-written tests survive response wrapper changes
-- Tests focused on data content remain stable through refactoring
-- All 228 tests passed after format changes with no logic modifications
-
-### Collaboration Pattern
-- User identified core issue (enum vs strings) which unlocked solution
-- Iterative approach: component tests → service tests → verification
-- Used specialized agent for bulk fixes to maintain consistency
+### Common Pitfalls to Avoid
+1. Don't forget `jest.mock("next/cache")` for components using server actions
+2. Initialize Date state as null in client components (set in useEffect)
+3. Always verify exact prop names from component interfaces
+4. Test server components by action calls, not JSX inspection
 
 ---
 
-## Commands to Resume Work
+## Git Status
 
-### Verify Current State
 ```bash
-# Check tests
-pnpm test          # Should show 228/228 passing
+# Modified files (8)
+CLAUDE.md
+TODOs.md
+TROUBLESHOOTING.md
+app/goals/[id]/[regionId]/tasks/[taskId]/page.tsx
+components/weekly-tasks/index.ts
+components/weekly-tasks/week-selector/week-selector.test.tsx
+lib/services/user-preferences.service.ts
+lib/services/user-preferences.service.test.ts
 
-# Check TypeScript
-pnpm tsc --noEmit  # Should show 9 errors (auth-related)
-
-# Check build
-pnpm build         # Should succeed in ~3.7s
-
-# Check git status
-git status         # Should show clean working tree
+# New files (15)
+app/goals/[id]/[regionId]/tasks/[taskId]/weekly-tasks/new/
+app/goals/[id]/[regionId]/tasks/[taskId]/weekly-tasks/[weeklyTaskId]/edit/
+components/weekly-tasks/weekly-task-form/
+components/weekly-tasks/weekly-tasks-section/
+dev/active/weekly-tasks/COMPLETION_SUMMARY.md
+dev/active/weekly-tasks/IMPLEMENTATION_COMPLETE.md
+dev/active/weekly-tasks/README.md
+dev/COMMIT_HANDOFF.md
+dev/SESSION_HANDOFF.md
 ```
 
-### Start New Work
-```bash
-# Create feature branch
-git checkout -b feature/[name]
+**Documentation Structure:**
+- Consolidated `weekly-tasks-ui` into `weekly-tasks` directory
+- All weekly tasks documentation now in `/dev/active/weekly-tasks/`
+- See `dev/active/weekly-tasks/README.md` for navigation
 
-# Start dev server
+**All files ready to commit** ✅
+
+---
+
+## Verification Commands
+
+```bash
+# Run all tests
+pnpm test
+# Expected: 424/424 passing (~6s)
+
+# Type check
+pnpm tsc --noEmit
+# Expected: Success
+
+# Lint
+pnpm lint
+# Expected: No errors
+
+# Dev server
 pnpm dev
+# Expected: Runs on http://localhost:3000
 
-# Run tests in watch mode
-pnpm test:watch
+# Test weekly tasks UI
+# 1. Sign in
+# 2. Navigate to any task
+# 3. See "Weekly Tasks" section
+# 4. Click "Add Weekly Task"
+# 5. Create/edit/delete weekly tasks
+# 6. Navigate between weeks
 ```
 
 ---
 
-## Context Preservation
+**Session completed successfully!** 🎉
 
-### Critical Information
-- **ActionResponse Type Location:** `lib/action-types.ts`
-- **Test Setup Location:** `jest.setup.ts` (lines 132-163 for Prisma mocks)
-- **i18n Translation Mock:** `jest.setup.ts` (lines 52-165, could be refactored to load dynamically)
-
-### Known Issues
-1. **Auth Type Errors (9 remaining):** NextAuth Session/JWT type mismatches in auth test files
-2. **Hardcoded Translation Map:** `jest.setup.ts` has hardcoded translations that could be loaded dynamically from `messages/en.json`
-
-### System Behavior
-- Test suite runs in ~7.4s
-- Build completes in ~3.7s
-- TypeScript compilation takes ~2-3s
-- All operations are fast and reliable
-
----
-
-## Files to Reference
-
-### Project Documentation
-- `CLAUDE.md` - Project overview and architecture
-- `BEST_PRACTICES.md` - Coding standards
-- `TESTING.md` - Test patterns and examples
-- `TROUBLESHOOTING.md` - Common issues and solutions
-- `TODOs.md` - Roadmap and future work
-
-### This Session's Documentation
-- `dev/completed/typescript-error-fixes/typescript-error-fixes-context.md` - Detailed implementation
-- `dev/completed/typescript-error-fixes/typescript-error-fixes-plan.md` - Strategy and patterns
-- `dev/completed/typescript-error-fixes/typescript-error-fixes-tasks.md` - Task checklist
-- `dev/completed/ARCHIVE_INDEX.md` - Archive index
-
----
-
-## Handoff Checklist
-
-- [x] All work committed to git
-- [x] All tests passing
-- [x] Build successful
-- [x] Working tree clean
-- [x] Documentation created
-- [x] Patterns documented
-- [x] Next steps identified
-- [x] Known issues documented
-- [x] Session notes complete
-
----
-
-**Ready for context reset or handoff to new session.**
-
-**To resume:** Read this file, then review `dev/completed/ARCHIVE_INDEX.md` for completed work and `dev/active/` for ongoing tasks.
-
-**Last Updated:** 2025-11-06 18:15:00
+All documentation updated, all tests passing, ready to commit. See `dev/COMMIT_HANDOFF.md` for commit details.

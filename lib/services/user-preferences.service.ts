@@ -20,7 +20,7 @@ export interface UpdateUserPreferencesData {
  * @returns User preferences or null if user doesn't exist
  */
 export async function getUserPreferences(
-  userId: string
+  userId: string,
 ): Promise<UserPreferencesData | null> {
   let preferences = await prisma.userPreferences.findUnique({
     where: { userId },
@@ -28,6 +28,15 @@ export async function getUserPreferences(
 
   // Auto-create defaults if not exist
   if (!preferences) {
+    // Verify user exists before creating preferences
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return null;
+    }
+
     preferences = await prisma.userPreferences.create({
       data: {
         userId,
@@ -48,7 +57,7 @@ export async function getUserPreferences(
  */
 export async function updateUserPreferences(
   userId: string,
-  data: UpdateUserPreferencesData
+  data: UpdateUserPreferencesData,
 ): Promise<UserPreferencesData | null> {
   // Verify ownership
   const existing = await prisma.userPreferences.findUnique({

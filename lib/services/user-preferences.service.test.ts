@@ -10,12 +10,13 @@ import prisma from "@/lib/prisma";
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 
 // Type assertions for mock methods
-const mockUserPreferencesFindUnique =
-  mockPrisma.userPreferences.findUnique as unknown as jest.Mock;
-const mockUserPreferencesCreate =
-  mockPrisma.userPreferences.create as unknown as jest.Mock;
-const mockUserPreferencesUpdate =
-  mockPrisma.userPreferences.update as unknown as jest.Mock;
+const mockUserPreferencesFindUnique = mockPrisma.userPreferences
+  .findUnique as unknown as jest.Mock;
+const mockUserPreferencesCreate = mockPrisma.userPreferences
+  .create as unknown as jest.Mock;
+const mockUserPreferencesUpdate = mockPrisma.userPreferences
+  .update as unknown as jest.Mock;
+const mockUserFindUnique = mockPrisma.user.findUnique as unknown as jest.Mock;
 
 describe("UserPreferencesService", () => {
   const mockUserId = "clxyz123456789";
@@ -47,6 +48,14 @@ describe("UserPreferencesService", () => {
     });
 
     it("should create and return default preferences if none exist", async () => {
+      const mockUser = {
+        id: mockUserId,
+        email: "test@example.com",
+        name: "Test User",
+        emailVerified: new Date(),
+        image: null,
+      };
+
       const mockCreatedPreferences = {
         id: "pref-1",
         userId: mockUserId,
@@ -56,8 +65,9 @@ describe("UserPreferencesService", () => {
         updatedAt: new Date(),
       };
 
-      // First call returns null (not found), second call creates it
+      // First call returns null (not found), verify user exists, then create
       mockUserPreferencesFindUnique.mockResolvedValue(null);
+      mockUserFindUnique.mockResolvedValue(mockUser);
       mockUserPreferencesCreate.mockResolvedValue(mockCreatedPreferences);
 
       const result = await getUserPreferences(mockUserId);
@@ -65,6 +75,9 @@ describe("UserPreferencesService", () => {
       expect(result).toEqual(mockCreatedPreferences);
       expect(mockUserPreferencesFindUnique).toHaveBeenCalledWith({
         where: { userId: mockUserId },
+      });
+      expect(mockUserFindUnique).toHaveBeenCalledWith({
+        where: { id: mockUserId },
       });
       expect(mockUserPreferencesCreate).toHaveBeenCalledWith({
         data: {

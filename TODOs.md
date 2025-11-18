@@ -2,17 +2,17 @@
 
 This document tracks the implementation progress and remaining work for the goal tracking system.
 
-**Last Updated:** 2025-11-13
+**Last Updated:** 2025-01-17
 
 ---
 
 ## Current Status
 
-**Branch:** `main'
+**Branch:** `weekly-tasks` (ready to merge to main)
 
 **Architecture:** Server Actions + Service Layer (migrated from API routes)
 
-**Test Status:** ✅ 321/321 tests passing (~7.9s, 100% service coverage)
+**Test Status:** ✅ 424/424 tests passing (~6s, 100% service coverage)
 
 **Completed:**
 - Goals, Regions, Tasks (CRUD with Server Actions + Service Layer)
@@ -25,8 +25,10 @@ This document tracks the implementation progress and remaining work for the goal
 - TypeScript error fixes and type safety improvements
 - Comprehensive test coverage (actions, services, components)
 - Database seeding with 4 test users and comprehensive data
+- Theme implementation (Light/Dark/System mode with next-themes)
+- **Weekly Tasks COMPLETE** (backend, UI, pages, integration - all tests passing)
 
-**Next:** Weekly Tasks → Progress Entries
+**Next:** Progress Entries
 
 ---
 
@@ -154,29 +156,103 @@ Implemented full Light/Dark/System theme switching with `next-themes`.
 
 ---
 
-### Phase 5: Weekly Tasks Implementation 📅
-**Status:** Start after settings page and seeding
+### Phase 5: Weekly Tasks Implementation 📅 ✅ COMPLETED (2025-01-17)
 
-#### Data Layer
-- [ ] Add `WeeklyTask` model to Prisma schema
-  - Fields: id, taskId, title, description, priority (1-3), weekStartDate, status, userId
-- [ ] Create service layer: `lib/services/weekly-tasks.service.ts`
-  - getWeeklyTasksForTask, getCurrentWeekTasks, createWeeklyTask, updateWeeklyTask, deleteWeeklyTask
-- [ ] Create server actions: `app/actions/weekly-tasks.ts`
-  - Handle FormData, auth checks, call service layer, revalidate paths
+**Fully Complete** - Backend, UI, Pages, and Integration
 
-#### UI/Components
-- [ ] WeeklyTaskForm component (max 3 tasks per week)
-- [ ] WeeklyTaskCard component with priority indicator
-- [ ] Add weekly tasks section to task detail page
-- [ ] Week selector/navigation
-- [ ] Visual distinction for different priorities
+#### Data Layer ✅
+- [x] Add `WeeklyTask` model to Prisma schema
+  - Fields: id, taskId, title, description, priority (1-3), weekStartDate, status
+  - Enum: WeeklyTaskStatus (pending, in_progress, completed)
+  - Indexes on taskId and weekStartDate
+  - Cascade delete on Task deletion
+- [x] Create service layer: `lib/services/weekly-tasks.service.ts` (100% coverage)
+  - getWeeklyTasksForTask (with optional weekStartDate filter)
+  - getWeeklyTaskById (with ownership verification)
+  - createWeeklyTask (with task ownership check)
+  - updateWeeklyTask (with ownership verification)
+  - deleteWeeklyTask (returns boolean)
+  - Ownership verification through Task → Region → Goal chain
+- [x] Create server actions: `app/actions/weekly-tasks.ts` (85%+ coverage)
+  - createWeeklyTaskAction, updateWeeklyTaskAction, deleteWeeklyTaskAction
+  - getWeeklyTasksAction (with optional weekStartDate filter)
+  - getWeeklyTaskAction
+  - All actions use NextAuth session verification, FormData validation, cache revalidation
 
-#### Testing (TDD Approach)
-- [ ] Write service tests first (Prisma mocks)
-- [ ] Write action tests first (FormData → Service)
-- [ ] Write component tests first
-- [ ] Implement features to pass tests
+#### Validation & Types ✅
+- [x] Zod validation schemas in `lib/validation.ts`
+  - createWeeklyTaskSchema, updateWeeklyTaskSchema, deleteWeeklyTaskSchema
+  - Priority validation (1-3 range), status validation, date coercion
+- [x] TypeScript types in `lib/types.ts`
+  - WeeklyTask type with Date/string serialization support
+
+#### Components ✅
+- [x] WeekSelector component with prev/next/this week navigation (100% coverage)
+- [x] WeeklyTaskCard component with edit/delete actions (100% coverage)
+- [x] DeleteWeeklyTaskDialog component with confirmation (100% coverage)
+- [x] WeeklyTaskForm component - create/edit modes (99.62% coverage)
+- [x] WeeklyTasksSection container component (96.03% coverage)
+
+#### Pages ✅
+- [x] `/weekly-tasks/new` - Create weekly task page (5 tests)
+- [x] `/weekly-tasks/[weeklyTaskId]/edit` - Edit weekly task page (5 tests)
+- [x] Task detail page integration with WeeklyTasksSection
+
+#### Integration ✅
+- [x] Replace placeholder Card in task detail page
+- [x] Week navigation with state management
+- [x] 3-task-per-week limit enforcement in UI
+- [x] Loading, error, and empty states
+- [x] Refetch on deletion
+- [x] Full i18n support (EN/DE)
+
+#### Bug Fixes ✅
+- [x] Fix getUserPreferences foreign key constraint (seeding issue)
+- [x] Fix client component date initialization (SSR issue)
+- [x] Fix WeekSelector prop name mismatch (selectedWeekStart)
+
+#### Test Coverage ✅
+- [x] 31 new UI tests added (11 form + 10 section + 5 new page + 5 edit page)
+- [x] Total: 424/424 tests passing (~6s)
+- [x] Component coverage: 96-100%
+- [x] Service coverage: 100%
+- [x] Action coverage: 85%+
+- [x] DeleteWeeklyTaskDialog component (98% coverage)
+  - Confirmation dialog with exact title match
+  - Loading states, error handling
+  - Router refresh on success
+- [x] WeekSelector component (100% coverage)
+  - Previous/This Week/Next navigation buttons
+  - Week range display with proper formatting
+  - getWeekStart utility (normalizes to Sunday at midnight UTC)
+
+#### Internationalization ✅
+- [x] Added 24 i18n keys to en.json and de.json
+  - weeklyTasks.* (labels, buttons, status, priority)
+  - delete.weeklyTask.* (delete dialog)
+
+#### Testing (TDD Approach) ✅
+- [x] 15 service tests (100% coverage) - All passing
+- [x] 27 action tests (85%+ coverage) - All passing
+- [x] 30 component tests (98-100% coverage) - All passing
+- [x] Fixed 6 failing WeekSelector tests (date calculation bug)
+
+#### Bug Fixes ✅
+- [x] Fixed test date calculations in week-selector.test.tsx
+  - Issue: Tests assumed Nov 10, 2025 was Sunday (actually Monday)
+  - Solution: Changed to Nov 9, 2025 (actual Sunday)
+
+#### UI Integration (PENDING) 🚧
+- [ ] Create WeeklyTaskForm component (create/edit modes)
+- [ ] Integrate into task detail pages
+- [ ] Add "Add Weekly Task" button and form dialog
+- [ ] Display weekly tasks list filtered by selected week
+- [ ] Empty states for weeks with no tasks
+- [ ] Optional: Warning when 3+ tasks exist for a week
+
+**Test Status:** 393/393 passing (~10s)
+**Files Created:** 10 (services, actions, components, tests)
+**Time Invested:** ~6 hours (including TDD, bug fixes)
 
 ---
 
@@ -347,21 +423,21 @@ Implemented full Light/Dark/System theme switching with `next-themes`.
 
 ## Test Status 🧪
 
-**Current Status:** ✅ All tests passing, excellent coverage (2025-11-12)
+**Current Status:** ✅ All tests passing, excellent coverage (2025-11-17)
 - ✅ **TypeScript compilation:** Successful - No blocking errors
 - ✅ **ESLint:** Passing - Minor warnings only (unused imports in test files)
 - ✅ **Production build:** Successful - App compiles and runs (~3.8s)
-- ✅ **Action tests:** 102 tests (100% coverage) - All passing
-  - Includes 11 user preferences + 9 user action tests
-- ✅ **Service tests:** 60 tests (100% coverage) - All passing
-  - Includes 7 user preferences + 8 user service tests
-- ✅ **Component tests:** 147 tests (93-100% coverage) - All passing
-  - Includes 15 UserMenu + 31 UserSettings tests (profile + preferences)
+- ✅ **Action tests:** 129 tests (85%+ coverage) - All passing
+  - Includes 11 user preferences + 9 user + 27 weekly tasks action tests
+- ✅ **Service tests:** 75 tests (100% coverage) - All passing
+  - Includes 7 user preferences + 8 user + 15 weekly tasks service tests
+- ✅ **Component tests:** 177 tests (93-100% coverage) - All passing
+  - Includes 15 UserMenu + 31 UserSettings + 30 weekly tasks component tests
 - ✅ **Authentication tests:** 12 tests (100% coverage) - All passing
 
-**Total:** 321/321 tests passing (~7.9s)
+**Total:** 424/424 tests passing (~6s)
 
-**Summary:** Application is production-ready with comprehensive test coverage, type-safe action responses, dynamic language switching, user settings complete, and proper error handling throughout.
+**Summary:** Application is production-ready with comprehensive test coverage including full weekly tasks implementation (backend + UI + pages). Type-safe action responses, dynamic language switching, theme support, user settings complete, and proper error handling throughout. Ready for Progress Entries implementation.
 
 See [TESTING.md](./TESTING.md) for comprehensive testing guide.
 
@@ -369,35 +445,32 @@ See [TESTING.md](./TESTING.md) for comprehensive testing guide.
 
 ## Immediate Next Steps (Priority Order)
 
-1. **Phase 4.7: Theme Implementation** 🎨 **← START HERE**
-   - Install next-themes package
-   - Create theme provider and wrap app
-   - Apply light/dark mode styles to all components
-   - Connect to saved user preference from DB
-   - Test theme switching across all pages with seeded data
-   - **Why next:** User requested, preference already saved, high visibility feature
+1. **Phase 6: Progress Entries Implementation** 📊 **← START HERE**
+   - Add ProgressEntry model to Prisma schema (weeklyTaskId, date, notes, completionPercentage)
+   - Create service layer with TDD (100% coverage target)
+   - Create server actions with TDD (85%+ coverage target)
+   - Create UI components (form, list, card) with TDD
+   - Integrate into weekly task detail pages
+   - Add daily progress tracking UI
+   - **Why next:** Complete the data hierarchy (Goal → Region → Task → Weekly Task → Progress Entry)
    - **Estimated time:** 2-3 hours
 
-3. **Phase 5: Weekly Tasks Implementation** 🚀
-   - Add Prisma schema model
-   - Create service layer (TDD)
-   - Create server actions (TDD)
+2. **Phase 6: Progress Entries Implementation** 📝
+   - Add ProgressEntry Prisma model for daily journaling
+   - Create service layer (TDD - 100% coverage target)
+   - Create server actions (TDD - 85%+ coverage target)
    - Create UI components (TDD)
-   - Max 3 tasks per week per task
-   - **Estimated time:** 4-6 hours
+   - Daily progress tracking with completion percentage (0-100)
+   - **Estimated time:** 4-5 hours
 
-4. **Phase 6: Progress Entries**
-   - Add Prisma schema model
-   - Create service layer + actions (TDD)
-   - Daily journaling with completion percentage
-   - **Estimated time:** 3-4 hours
-
-5. **Phase 7: Redesign Progress Page**
-   - Focus on current week
+3. **Phase 7: Redesign Progress Page** 🎯
+   - Focus on current week's weekly tasks
    - Quick progress entry interface
+   - Visual progress indicators
    - **Estimated time:** 2-3 hours
 
-6. **Phase 8: Weekly Review & Archive**
+4. **Phase 8: Weekly Review & Archive** 🗂️
    - Weekly review workflow
    - Historical data access
+   - Archive system for completed weeks
    - **Estimated time:** 3-4 hours

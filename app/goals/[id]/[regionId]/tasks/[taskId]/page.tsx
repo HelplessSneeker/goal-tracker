@@ -1,8 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { TaskDetailHeader } from "@/components/tasks";
+import { WeeklyTasksSection } from "@/components/weekly-tasks";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getTaskById } from "@/lib/services/tasks.service";
@@ -40,19 +40,14 @@ export default async function TaskDetailPage({
 
       <TaskDetailHeader task={task} goalId={id} />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("weeklyTasks")}</CardTitle>
-          <CardDescription>
-            {t("weeklyTasksDescription")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground text-center py-4">
-            {t("weeklyTasksComingSoon")}
-          </p>
-        </CardContent>
-      </Card>
+      <WeeklyTasksSection
+        task={{
+          id: task.id,
+          goalId: id,
+          regionId: regionId,
+          title: task.title,
+        }}
+      />
     </div>
   );
 }

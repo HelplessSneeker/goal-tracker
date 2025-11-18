@@ -248,6 +248,16 @@ const mockFindMany = mockPrisma.goal.findMany as unknown as jest.Mock
 mockFindMany.mockResolvedValue([])
 ```
 
+### TextEncoder Not Defined
+```typescript
+// Add before importing components that use server actions
+jest.mock("next/cache", () => ({
+  revalidatePath: jest.fn(),
+}))
+```
+
+**Why:** Components import server actions → actions import `next/cache` → Node.js test environment lacks TextEncoder
+
 ---
 
 ## TypeScript
@@ -369,6 +379,19 @@ useEffect(() => {
 }, [])
 ```
 
+**Date objects in client components:**
+```typescript
+// ❌ const [date, setDate] = useState(new Date())
+
+// ✅ Initialize as null, set in useEffect
+const [date, setDate] = useState<Date | null>(null)
+useEffect(() => {
+  setDate(new Date())
+}, [])
+```
+
+**Why:** `new Date()` returns different values on server vs client → hydration mismatch
+
 ### Cache Not Updating
 
 **Revalidate after mutations:**
@@ -452,6 +475,9 @@ pnpm tsc --noEmit     # Type check
 | `Hydration failed` | Client/server mismatch | Check Date formatting, browser APIs |
 | `Type 'null' not assignable` | Missing null check | Use `?.` or type guard |
 | `@prisma/client not initialized` | Client not generated | `pnpm prisma generate` |
+| `TextEncoder is not defined` | next/cache in tests | Add `jest.mock("next/cache")` |
+| `Cannot read 'getTime' of undefined` | SSR date initialization | Use nullable state + useEffect |
+| `Foreign key constraint` | User doesn't exist | Check user exists before creating related records |
 
 ---
 
